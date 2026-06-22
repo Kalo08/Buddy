@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Buddy — Remote Presence Hub</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:          #0b0b0b;
+      --s1:          #121212;
+      --s2:          #1a1a1a;
+      --border:      #272727;
+      --border-dim:  #1c1c1c;
+      --text:        #ede9e3;
+      --text-mid:    #857f78;
+      --text-dim:    #3a3835;
+      --accent:      #c4973f;
+      --accent-dim:  #6b5122;
+      --live:        #5a9e6f;
+      --mono: 'Cascadia Code', 'Cascadia Mono', 'Consolas', 'Courier New', monospace;
+      --sans: 'Segoe UI Variable', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── NAV ─────────────────────────────────────────────────── */
+
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 40px;
+      border-bottom: 1px solid var(--border-dim);
+      background: var(--bg);
+    }
+
+    .nav-logo {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .nav-logo span {
+      color: var(--accent);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-mid);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-status {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      letter-spacing: 0.06em;
+    }
+
+    /* ─── HERO ────────────────────────────────────────────────── */
+
+    .hero {
+      min-height: 100vh;
+      padding-top: 80px;
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      grid-template-rows: 1fr auto;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hero-left {
+      padding: 72px 56px 56px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-right: 1px solid var(--border);
+    }
+
+    .hero-headline {
+      font-size: clamp(72px, 10vw, 128px);
+      font-weight: 700;
+      line-height: 0.92;
+      letter-spacing: -0.03em;
+      color: var(--text);
+    }
+
+    .hero-headline .line-2 {
+      display: block;
+      color: var(--text-dim);
+    }
+
+    .hero-headline .line-accent {
+      display: block;
+      color: var(--accent);
+    }
+
+    .hero-sub {
+      margin-top: 40px;
+      max-width: 440px;
+    }
+
+    .hero-sub p {
+      font-size: 16px;
+      font-weight: 300;
+      line-height: 1.65;
+      color: var(--text-mid);
+    }
+
+    .hero-sub p + p {
+      margin-top: 12px;
+    }
+
+    .hero-chain {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-top: 56px;
+    }
+
+    .hero-chain .node {
+      padding: 6px 12px;
+      border: 1px solid var(--border-dim);
+      white-space: nowrap;
+    }
+
+    .hero-chain .edge {
+      width: 24px;
+      height: 1px;
+      background: var(--border);
+      flex-shrink: 0;
+    }
+
+    .hero-chain .node.you {
+      border-color: var(--accent-dim);
+      color: var(--accent);
+    }
+
+    /* ─── CONNECT PANEL ───────────────────────────────────────── */
+
+    .connect-panel {
+      padding: 72px 36px 56px 36px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0;
+    }
+
+    .connect-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 20px;
+    }
+
+    .connect-terminal {
+      border: 1px solid var(--border);
+      background: var(--s1);
+    }
+
+    .terminal-bar {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .terminal-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--border);
+    }
+
+    .terminal-title {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-dim);
+      letter-spacing: 0.08em;
+      margin-left: 4px;
+    }
+
+    .terminal-body {
+      padding: 24px 20px;
+    }
+
+    .terminal-prompt {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-mid);
+      letter-spacing: 0.04em;
+      margin-bottom: 10px;
+    }
+
+    .terminal-prompt span {
+      color: var(--accent);
+    }
+
+    .id-input-wrap {
+      display: flex;
+      align-items: stretch;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      margin-top: 4px;
+    }
+
+    .id-prefix {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--accent-dim);
+      padding: 10px 12px;
+      border-right: 1px solid var(--border);
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+    }
+
+    .id-input {
+      background: transparent;
+      border: none;
+      outline: none;
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--text);
+      padding: 10px 12px;
+      width: 100%;
+      letter-spacing: 0.06em;
+      caret-color: var(--accent);
+    }
+
+    .id-input::placeholder {
+      color: var(--text-dim);
+    }
+
+    .connect-btn {
+      width: 100%;
+      margin-top: 14px;
+      padding: 12px 20px;
+      background: var(--accent);
+      border: none;
+      color: #0b0b0b;
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.1s;
+    }
+
+    .connect-btn:hover { background: #d4a84a; }
+    .connect-btn:active { background: #b08535; }
+
+    .connect-hint {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-dim);
+      line-height: 1.6;
+      margin-top: 20px;
+      border-top: 1px solid var(--border-dim);
+      padding-top: 16px;
+    }
+
+    /* ─── DASHBOARD MOCKUP ────────────────────────────────────── */
+
+    .section-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border-dim);
+    }
+
+    .dashboard-section {
+      padding: 80px 40px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .dashboard-heading {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-mid);
+      margin-top: 32px;
+      margin-bottom: 40px;
+      max-width: 480px;
+      line-height: 1.6;
+    }
+
+    .dashboard-heading strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    /* the hub interface */
+    .hub-frame {
+      border: 1px solid var(--border);
+      background: var(--s1);
+      overflow: hidden;
+    }
+
+    .hub-topbar {
+      padding: 10px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--s2);
+    }
+
+    .hub-id {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-mid);
+      letter-spacing: 0.06em;
+    }
+
+    .hub-id strong {
+      color: var(--text);
+    }
+
+    .hub-live {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--live);
+    }
+
+    .live-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--live);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .hub-body {
+      display: grid;
+      grid-template-columns: 1fr 260px;
+    }
+
+    .camera-area {
+      border-right: 1px solid var(--border);
+      aspect-ratio: 16/9;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .camera-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      position: absolute;
+      top: 14px; left: 16px;
+    }
+
+    .camera-offline {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .camera-icon {
+      width: 48px; height: 36px;
+      border: 2px solid var(--border);
+      border-radius: 3px;
+      position: relative;
+    }
+
+    .camera-icon::before {
+      content: '';
+      position: absolute;
+      right: -9px; top: 50%;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-top: 7px solid transparent;
+      border-bottom: 7px solid transparent;
+      border-left: 9px solid var(--border);
+    }
+
+    .camera-offline-text {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-dim);
+      letter-spacing: 0.08em;
+    }
+
+    .camera-corner {
+      position: absolute;
+      width: 14px; height: 14px;
+    }
+
+    .camera-corner.tl { top: 8px; left: 8px; border-top: 1px solid var(--border); border-left: 1px solid var(--border); }
+    .camera-corner.tr { top: 8px; right: 8px; border-top: 1px solid var(--border); border-right: 1px solid var(--border); }
+    .camera-corner.bl { bottom: 8px; left: 8px; border-bottom: 1px solid var(--border); border-left: 1px solid var(--border); }
+    .camera-corner.br { bottom: 8px; right: 8px; border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); }
+
+    .hub-sidebar {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .sidebar-block-label {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 10px;
+    }
+
+    /* audio toggles */
+    .audio-toggles {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 10px;
+      border: 1px solid var(--border-dim);
+      background: var(--bg);
+    }
+
+    .toggle-name {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-mid);
+      letter-spacing: 0.04em;
+    }
+
+    .toggle-switch {
+      width: 30px; height: 16px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      position: relative;
+      cursor: pointer;
+    }
+
+    .toggle-switch.on {
+      background: var(--accent-dim);
+      border-color: var(--accent-dim);
+    }
+
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      top: 2px; left: 2px;
+      width: 10px; height: 10px;
+      background: var(--text-dim);
+    }
+
+    .toggle-switch.on::after {
+      left: calc(100% - 12px);
+      background: var(--accent);
+    }
+
+    /* movement controls */
+    .d-pad {
+      display: grid;
+      grid-template-columns: repeat(3, 40px);
+      grid-template-rows: repeat(3, 40px);
+      gap: 3px;
+      justify-content: center;
+    }
+
+    .d-btn {
+      width: 40px; height: 40px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text-mid);
+      font-family: var(--mono);
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+      transition: background 0.08s, color 0.08s;
+    }
+
+    .d-btn:hover {
+      background: var(--s2);
+      color: var(--text);
+    }
+
+    .d-btn:active {
+      background: var(--accent-dim);
+      border-color: var(--accent-dim);
+      color: var(--accent);
+    }
+
+    .d-btn.center {
+      background: var(--s2);
+      cursor: default;
+    }
+
+    .d-btn.empty {
+      border-color: transparent;
+      cursor: default;
+      background: transparent;
+    }
+
+    /* speak button */
+    .speak-btn {
+      width: 100%;
+      padding: 11px;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text-mid);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.08s;
+    }
+
+    .speak-btn:hover {
+      border-color: var(--accent-dim);
+      color: var(--accent);
+    }
+
+    .speak-btn:active {
+      border-color: var(--accent);
+      background: var(--accent-dim);
+    }
+
+    .mic-icon {
+      font-size: 13px;
+    }
+
+    /* ─── FEATURES / EDITORIAL ────────────────────────────────── */
+
+    .features-section {
+      padding: 80px 40px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .features-grid {
+      margin-top: 56px;
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: 0;
+    }
+
+    .feature-entry {
+      display: contents;
+    }
+
+    .feature-num {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      letter-spacing: 0.06em;
+      padding: 32px 0;
+      border-top: 1px solid var(--border-dim);
+    }
+
+    .feature-content {
+      padding: 32px 0 32px 24px;
+      border-top: 1px solid var(--border-dim);
+      border-left: 1px solid var(--border-dim);
+    }
+
+    .feature-title {
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+
+    .feature-desc {
+      font-size: 14px;
+      font-weight: 300;
+      color: var(--text-mid);
+      line-height: 1.7;
+      max-width: 560px;
+    }
+
+    .feature-tag {
+      display: inline-block;
+      margin-top: 14px;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent-dim);
+      border: 1px solid var(--accent-dim);
+      padding: 3px 8px;
+    }
+
+    /* ─── SPEC TABLE ──────────────────────────────────────────── */
+
+    .spec-section {
+      padding: 80px 40px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .spec-left {}
+
+    .spec-heading {
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      margin-top: 24px;
+    }
+
+    .spec-note {
+      margin-top: 16px;
+      font-size: 13px;
+      font-weight: 300;
+      color: var(--text-mid);
+      line-height: 1.65;
+      max-width: 340px;
+    }
+
+    .spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0;
+    }
+
+    .spec-table td {
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-dim);
+      vertical-align: top;
+    }
+
+    .spec-table td:first-child {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      width: 120px;
+      padding-right: 20px;
+    }
+
+    .spec-table td:last-child {
+      font-size: 13px;
+      color: var(--text-mid);
+      font-weight: 300;
+    }
+
+    .spec-table td:last-child strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    /* ─── FOOTER ──────────────────────────────────────────────── */
+
+    footer {
+      padding: 32px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-logo {
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    .footer-logo span { color: var(--accent-dim); }
+
+    .footer-note {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-dim);
+      letter-spacing: 0.06em;
+    }
+
+    /* ─── RESPONSIVE ─────────────────────────────────────────── */
+
+    @media (max-width: 860px) {
+      nav { padding: 16px 20px; }
+      .nav-links { display: none; }
+
+      .hero {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
+      }
+
+      .hero-left {
+        padding: 48px 20px 40px;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .hero-headline { font-size: clamp(52px, 14vw, 80px); }
+
+      .connect-panel { padding: 40px 20px; }
+
+      .dashboard-section,
+      .features-section,
+      .spec-section { padding: 56px 20px; }
+
+      .hub-body { grid-template-columns: 1fr; }
+      .camera-area { border-right: none; border-bottom: 1px solid var(--border); }
+      .hub-sidebar { padding: 16px; }
+
+      .spec-section { grid-template-columns: 1fr; gap: 40px; }
+
+      footer { padding: 24px 20px; flex-direction: column; align-items: flex-start; gap: 8px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a class="nav-logo" href="#">bdy<span>.</span></a>
+    <ul class="nav-links">
+      <li><a href="#how-it-works">hardware</a></li>
+      <li><a href="#features">what it does</a></li>
+      <li><a href="#spec">specs</a></li>
+    </ul>
+    <span class="nav-status">v0.1 — local network only</span>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-left">
+      <div>
+        <h1 class="hero-headline">
+          YOUR<br>
+          <span class="line-2">BUDDY</span><span class="line-accent">.</span>
+        </h1>
+        <div class="hero-sub">
+          <p>A physical device that sits in your home. You connect to it from anywhere. You see what it sees, hear what it hears, move it around, and speak through it.</p>
+          <p>No cloud. No account. Just a buddy ID and a local wifi connection.</p>
+        </div>
+      </div>
+      <div class="hero-chain">
+        <div class="node">ESP32</div>
+        <div class="edge"></div>
+        <div class="node">home wifi</div>
+        <div class="edge"></div>
+        <div class="node">websocket</div>
+        <div class="edge"></div>
+        <div class="node you">you</div>
+      </div>
+    </div>
+
+    <div class="connect-panel">
+      <div class="connect-label">connect to a buddy</div>
+      <div class="connect-terminal">
+        <div class="terminal-bar">
+          <div class="terminal-dot"></div>
+          <div class="terminal-dot"></div>
+          <div class="terminal-dot"></div>
+          <span class="terminal-title">buddy-connect</span>
+        </div>
+        <div class="terminal-body">
+          <div class="terminal-prompt">
+            <span>$</span> enter buddy_id to connect
+          </div>
+          <div class="id-input-wrap">
+            <span class="id-prefix">BDY-</span>
+            <input
+              class="id-input"
+              type="text"
+              placeholder="00000"
+              maxlength="8"
+              spellcheck="false"
+              autocomplete="off"
+            />
+          </div>
+          <button class="connect-btn">
+            <span>Establish connection</span>
+            <span>-></span>
+          </button>
+          <div class="connect-hint">
+            Your buddy ID is printed on the underside of the device.<br>
+            Both devices must be on the same local network.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DASHBOARD PREVIEW -->
+  <section class="dashboard-section" id="how-it-works">
+    <div class="section-label">the interface</div>
+    <p class="dashboard-heading">
+      Once connected, this is what you're looking at.
+      <strong>Camera feed on the left. Controls and audio on the right.</strong>
+      Everything stays in-browser — no install required.
+    </p>
+
+    <div class="hub-frame">
+      <div class="hub-topbar">
+        <span class="hub-id">buddy / <strong>BDY-00441</strong></span>
+        <span class="hub-live">
+          <span class="live-dot"></span>
+          connected
+        </span>
+      </div>
+      <div class="hub-body">
+        <div class="camera-area">
+          <span class="camera-label">camera feed</span>
+          <span class="camera-corner tl"></span>
+          <span class="camera-corner tr"></span>
+          <span class="camera-corner bl"></span>
+          <span class="camera-corner br"></span>
+          <div class="camera-offline">
+            <div class="camera-icon"></div>
+            <span class="camera-offline-text">awaiting stream — not connected</span>
+          </div>
+        </div>
+        <div class="hub-sidebar">
+
+          <div>
+            <div class="sidebar-block-label">audio</div>
+            <div class="audio-toggles">
+              <div class="toggle-row">
+                <span class="toggle-name">microphone</span>
+                <div class="toggle-switch on"></div>
+              </div>
+              <div class="toggle-row">
+                <span class="toggle-name">speaker</span>
+                <div class="toggle-switch"></div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="sidebar-block-label">movement</div>
+            <div class="d-pad">
+              <div class="d-btn empty"></div>
+              <div class="d-btn">&#8593;</div>
+              <div class="d-btn empty"></div>
+              <div class="d-btn">&#8592;</div>
+              <div class="d-btn center">&#183;</div>
+              <div class="d-btn">&#8594;</div>
+              <div class="d-btn empty"></div>
+              <div class="d-btn">&#8595;</div>
+              <div class="d-btn empty"></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="sidebar-block-label">voice</div>
+            <button class="speak-btn">
+              <span class="mic-icon">&#9671;</span>
+              hold to speak
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features-section" id="features">
+    <div class="section-label">what it does</div>
+    <div class="features-grid">
+
+      <div class="feature-entry">
+        <div class="feature-num">01</div>
+        <div class="feature-content">
+          <div class="feature-title">You see what it sees.</div>
+          <p class="feature-desc">
+            Live camera feed streams directly from the ESP32 camera module to your browser.
+            Real-time, in the room, no preprocessing. If something moves, you see it move.
+          </p>
+          <span class="feature-tag">camera stream</span>
+        </div>
+      </div>
+
+      <div class="feature-entry">
+        <div class="feature-num">02</div>
+        <div class="feature-content">
+          <div class="feature-title">Your voice, in the room.</div>
+          <p class="feature-desc">
+            Hold to speak and your audio plays through the buddy's speaker. You're not sending a message — you're talking into the room. The people there hear you like you're in it.
+          </p>
+          <span class="feature-tag">two-way audio</span>
+        </div>
+      </div>
+
+      <div class="feature-entry">
+        <div class="feature-num">03</div>
+        <div class="feature-content">
+          <div class="feature-title">You move it. Actually move it.</div>
+          <p class="feature-desc">
+            The directional pad sends motor commands over WebSocket to the ESP32.
+            No lag, no buffering — just press a direction and the buddy goes there.
+          </p>
+          <span class="feature-tag">motor control</span>
+        </div>
+      </div>
+
+      <div class="feature-entry">
+        <div class="feature-num">04</div>
+        <div class="feature-content">
+          <div class="feature-title">One ID. That's the whole setup.</div>
+          <p class="feature-desc">
+            Your buddy prints an ID on boot. You type that ID here. The connection is established peer-to-peer over your local network. Nothing leaves the house unless you want it to.
+          </p>
+          <span class="feature-tag">local network</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- SPEC -->
+  <section class="spec-section" id="spec">
+    <div class="spec-left">
+      <div class="section-label">under the hood</div>
+      <h2 class="spec-heading">Hardware.<br>Software.<br>Nothing else.</h2>
+      <p class="spec-note">
+        Buddy runs entirely on an ESP32 microcontroller. There is no backend, no cloud relay, no subscription. The website connects directly to the device on your LAN.
+      </p>
+    </div>
+    <div>
+      <table class="spec-table">
+        <tr>
+          <td>controller</td>
+          <td><strong>ESP32</strong> — dual-core, 240MHz, 4MB flash</td>
+        </tr>
+        <tr>
+          <td>camera</td>
+          <td><strong>OV2640</strong> — up to 1600x1200, JPEG output</td>
+        </tr>
+        <tr>
+          <td>audio in</td>
+          <td><strong>INMP441</strong> — I2S MEMS microphone</td>
+        </tr>
+        <tr>
+          <td>audio out</td>
+          <td><strong>MAX98357</strong> — I2S 3W amplifier</td>
+        </tr>
+        <tr>
+          <td>transport</td>
+          <td><strong>WebSocket</strong> — full duplex, no polling</td>
+        </tr>
+        <tr>
+          <td>network</td>
+          <td><strong>802.11 b/g/n</strong> — connects to your home wifi</td>
+        </tr>
+        <tr>
+          <td>pairing</td>
+          <td><strong>buddy ID</strong> — printed on device boot, local only</td>
+        </tr>
+        <tr>
+          <td>cloud</td>
+          <td>none</td>
+        </tr>
+      </table>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <span class="footer-logo">bdy<span>.</span></span>
+    <span class="footer-note">open hardware — local network — no cloud</span>
+  </footer>
+
+</body>
+</html>
