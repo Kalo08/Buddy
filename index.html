@@ -382,6 +382,10 @@
     .live-dot {
       width: 6px; height: 6px;
       border-radius: 50%;
+      background: var(--text-dim);
+    }
+
+    .live-dot.active {
       background: var(--live);
       animation: pulse 2s ease-in-out infinite;
     }
@@ -727,6 +731,135 @@
       font-weight: 500;
     }
 
+    /* ─── FUNCTIONAL STATES ──────────────────────────────────── */
+
+    #cam-canvas {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: none;
+    }
+
+    .d-btn-active {
+      background: var(--accent-dim) !important;
+      border-color: var(--accent-dim) !important;
+      color: var(--accent) !important;
+    }
+
+    .speak-btn.speaking {
+      border-color: var(--accent);
+      background: var(--accent-dim);
+      color: var(--accent);
+    }
+
+    /* ─── HOW TO CONNECT ─────────────────────────────────────── */
+
+    .connect-guide {
+      padding: 80px 40px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .connect-steps {
+      margin-top: 48px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border-left: 1px solid var(--border);
+    }
+
+    .connect-step {
+      padding: 28px 24px 28px 24px;
+      border-right: 1px solid var(--border);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .step-num {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    .step-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.01em;
+      line-height: 1.3;
+    }
+
+    .step-body {
+      font-size: 13px;
+      font-weight: 300;
+      color: var(--text-mid);
+      line-height: 1.65;
+      flex: 1;
+    }
+
+    .step-code {
+      margin-top: 8px;
+      padding: 10px 12px;
+      background: var(--bg);
+      border: 1px solid var(--border-dim);
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--accent);
+      letter-spacing: 0.04em;
+      line-height: 1.7;
+      word-break: break-all;
+    }
+
+    .connect-note {
+      margin-top: 24px;
+      padding: 16px 20px;
+      border: 1px solid var(--border-dim);
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .note-marker {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      white-space: nowrap;
+      padding-top: 2px;
+    }
+
+    .note-text {
+      font-size: 12px;
+      font-weight: 300;
+      color: var(--text-mid);
+      line-height: 1.65;
+    }
+
+    .note-text code {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--accent);
+      background: var(--s1);
+      padding: 1px 5px;
+    }
+
+    @media (max-width: 860px) {
+      .connect-guide { padding: 56px 20px; }
+      .connect-steps {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .connect-steps {
+        grid-template-columns: 1fr;
+      }
+    }
+
     /* ─── FOOTER ──────────────────────────────────────────────── */
 
     footer {
@@ -794,9 +927,11 @@
   <nav>
     <a class="nav-logo" href="#">bdy<span>.</span></a>
     <ul class="nav-links">
-      <li><a href="#how-it-works">hardware</a></li>
+      <li><a href="#how-it-works">interface</a></li>
       <li><a href="#features">what it does</a></li>
+      <li><a href="#connect-guide">how to connect</a></li>
       <li><a href="#spec">specs</a></li>
+      <li><a href="/flash.html">flash</a></li>
     </ul>
     <span class="nav-status">v0.1 — local network only</span>
   </nav>
@@ -841,6 +976,7 @@
           <div class="id-input-wrap">
             <span class="id-prefix">BDY-</span>
             <input
+              id="buddy-id-input"
               class="id-input"
               type="text"
               placeholder="00000"
@@ -849,11 +985,11 @@
               autocomplete="off"
             />
           </div>
-          <button class="connect-btn">
+          <button id="connect-btn" class="connect-btn">
             <span>Establish connection</span>
             <span>-></span>
           </button>
-          <div class="connect-hint">
+          <div id="connect-hint" class="connect-hint">
             Your buddy ID is printed on the underside of the device.<br>
             Both devices must be on the same local network.
           </div>
@@ -873,20 +1009,21 @@
 
     <div class="hub-frame">
       <div class="hub-topbar">
-        <span class="hub-id">buddy / <strong>BDY-00441</strong></span>
-        <span class="hub-live">
-          <span class="live-dot"></span>
-          connected
+        <span class="hub-id">buddy / <strong id="hub-buddy-id">---</strong></span>
+        <span id="hub-live" class="hub-live">
+          <span id="live-dot" class="live-dot"></span>
+          not connected
         </span>
       </div>
       <div class="hub-body">
-        <div class="camera-area">
+        <div id="camera-area" class="camera-area">
           <span class="camera-label">camera feed</span>
           <span class="camera-corner tl"></span>
           <span class="camera-corner tr"></span>
           <span class="camera-corner bl"></span>
           <span class="camera-corner br"></span>
-          <div class="camera-offline">
+          <canvas id="cam-canvas"></canvas>
+          <div id="camera-offline" class="camera-offline">
             <div class="camera-icon"></div>
             <span class="camera-offline-text">awaiting stream — not connected</span>
           </div>
@@ -898,11 +1035,11 @@
             <div class="audio-toggles">
               <div class="toggle-row">
                 <span class="toggle-name">microphone</span>
-                <div class="toggle-switch on"></div>
+                <div id="mic-toggle" class="toggle-switch on"></div>
               </div>
               <div class="toggle-row">
                 <span class="toggle-name">speaker</span>
-                <div class="toggle-switch"></div>
+                <div id="speaker-toggle" class="toggle-switch"></div>
               </div>
             </div>
           </div>
@@ -911,20 +1048,20 @@
             <div class="sidebar-block-label">movement</div>
             <div class="d-pad">
               <div class="d-btn empty"></div>
-              <div class="d-btn">&#8593;</div>
+              <div class="d-btn" data-dir="fwd">&#8593;</div>
               <div class="d-btn empty"></div>
-              <div class="d-btn">&#8592;</div>
+              <div class="d-btn" data-dir="left">&#8592;</div>
               <div class="d-btn center">&#183;</div>
-              <div class="d-btn">&#8594;</div>
+              <div class="d-btn" data-dir="right">&#8594;</div>
               <div class="d-btn empty"></div>
-              <div class="d-btn">&#8595;</div>
+              <div class="d-btn" data-dir="back">&#8595;</div>
               <div class="d-btn empty"></div>
             </div>
           </div>
 
           <div>
             <div class="sidebar-block-label">voice</div>
-            <button class="speak-btn">
+            <button id="speak-btn" class="speak-btn">
               <span class="mic-icon">&#9671;</span>
               hold to speak
             </button>
@@ -989,6 +1126,59 @@
     </div>
   </section>
 
+  <!-- HOW TO CONNECT -->
+  <section class="connect-guide" id="connect-guide">
+    <div class="section-label">first connection</div>
+
+    <div class="connect-steps">
+
+      <div class="connect-step">
+        <span class="step-num">step 01</span>
+        <div class="step-title">Flash your buddy and power it on.</div>
+        <p class="step-body">
+          Upload the buddy firmware to your ESP32. On boot it connects to your home wifi and starts listening for an incoming WebSocket connection.
+        </p>
+      </div>
+
+      <div class="connect-step">
+        <span class="step-num">step 02</span>
+        <div class="step-title">Find the buddy ID.</div>
+        <p class="step-body">
+          The ID is printed on the underside of the device. It also appears in the ESP32 serial monitor on first boot. It looks like this:
+        </p>
+        <div class="step-code">BDY-00441</div>
+      </div>
+
+      <div class="connect-step">
+        <span class="step-num">step 03</span>
+        <div class="step-title">Make sure you're on the same network.</div>
+        <p class="step-body">
+          Your computer and the buddy both need to be on the same local wifi network. The hub server runs on your machine — the ESP32 connects directly to it.
+        </p>
+        <div class="step-code">
+          ws://[your-ip]:3000/ws<br>
+          ?id=BDY-XXXXX&amp;role=device
+        </div>
+      </div>
+
+      <div class="connect-step">
+        <span class="step-num">step 04</span>
+        <div class="step-title">Type the ID and connect.</div>
+        <p class="step-body">
+          Enter the five-digit code in the connect panel at the top of this page and hit connect. The hub pairs with your buddy and the camera feed goes live.
+        </p>
+      </div>
+
+    </div>
+
+    <div class="connect-note">
+      <span class="note-marker">note</span>
+      <p class="note-text">
+        The hub server must be running before you connect. Start it with <code>node server.js</code> from the project folder. Your local IP (for the ESP32 firmware) can be found with <code>ipconfig</code> on Windows or <code>ifconfig</code> on Mac/Linux.
+      </p>
+    </div>
+  </section>
+
   <!-- SPEC -->
   <section class="spec-section" id="spec">
     <div class="spec-left">
@@ -1042,5 +1232,6 @@
     <span class="footer-note">open hardware — local network — no cloud</span>
   </footer>
 
+  <script src="client.js"></script>
 </body>
 </html>

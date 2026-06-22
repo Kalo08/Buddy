@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Buddy — Flash Firmware</title>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:         #0b0b0b;
+      --s1:         #121212;
+      --s2:         #1a1a1a;
+      --border:     #272727;
+      --border-dim: #1c1c1c;
+      --text:       #ede9e3;
+      --text-mid:   #857f78;
+      --text-dim:   #3a3835;
+      --accent:     #c4973f;
+      --accent-dim: #6b5122;
+      --live:       #5a9e6f;
+      --red:        #9e4a4a;
+      --mono: 'Cascadia Code', 'Cascadia Mono', 'Consolas', 'Courier New', monospace;
+      --sans: 'Segoe UI Variable', 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    /* ─── NAV ─────────────────────────────────────────────────── */
+
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 40px;
+      border-bottom: 1px solid var(--border-dim);
+      background: var(--bg);
+    }
+
+    .nav-logo {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .nav-logo span { color: var(--accent); }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-mid);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a.active { color: var(--accent); }
+
+    .nav-status {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      letter-spacing: 0.06em;
+    }
+
+    /* ─── PAGE LAYOUT ─────────────────────────────────────────── */
+
+    .page {
+      padding-top: 80px;
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      grid-template-rows: auto 1fr;
+    }
+
+    .page-header {
+      grid-column: 1 / -1;
+      padding: 48px 40px 40px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .page-title-group {}
+
+    .page-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 10px;
+    }
+
+    .page-title {
+      font-size: 36px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.1;
+    }
+
+    .page-subtitle {
+      margin-top: 10px;
+      font-size: 13px;
+      font-weight: 300;
+      color: var(--text-mid);
+      max-width: 480px;
+      line-height: 1.65;
+    }
+
+    .browser-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-dim);
+      letter-spacing: 0.08em;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .browser-badge .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--live);
+    }
+
+    /* ─── SIDEBAR (prerequisites) ─────────────────────────────── */
+
+    .sidebar {
+      border-right: 1px solid var(--border);
+      padding: 36px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    .sidebar-section-label {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 14px;
+    }
+
+    .prereq-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .prereq-item {
+      display: flex;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border-dim);
+      align-items: flex-start;
+    }
+
+    .prereq-item:first-child {
+      border-top: 1px solid var(--border-dim);
+    }
+
+    .prereq-marker {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--accent-dim);
+      padding-top: 2px;
+      flex-shrink: 0;
+    }
+
+    .prereq-text {
+      font-size: 12px;
+      font-weight: 300;
+      color: var(--text-mid);
+      line-height: 1.55;
+    }
+
+    .prereq-text strong {
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .addr-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .addr-table th {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      text-align: left;
+      padding: 0 0 8px 0;
+    }
+
+    .addr-table td {
+      padding: 7px 0;
+      border-top: 1px solid var(--border-dim);
+      vertical-align: top;
+    }
+
+    .addr-table td:first-child {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--accent);
+      padding-right: 16px;
+      white-space: nowrap;
+    }
+
+    .addr-table td:last-child {
+      font-size: 11px;
+      font-weight: 300;
+      color: var(--text-mid);
+    }
+
+    /* ─── MAIN FLASH PANEL ────────────────────────────────────── */
+
+    .flash-panel {
+      padding: 36px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Firmware file drop zone */
+    .fw-zone {
+      border: 1px solid var(--border);
+      background: var(--s1);
+      cursor: pointer;
+      transition: border-color 0.1s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .fw-zone:hover, .fw-zone.dragover {
+      border-color: var(--accent-dim);
+    }
+
+    .fw-zone.has-file {
+      border-color: var(--accent-dim);
+    }
+
+    .fw-zone-inner {
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .fw-icon {
+      width: 36px; height: 36px;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      flex-shrink: 0;
+    }
+
+    .fw-zone.has-file .fw-icon {
+      border-color: var(--accent-dim);
+      color: var(--accent);
+    }
+
+    .fw-text {}
+
+    .fw-title {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .fw-sub {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-dim);
+      margin-top: 3px;
+      letter-spacing: 0.04em;
+    }
+
+    .fw-size {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-mid);
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    /* Hidden file input */
+    #fw-file-input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    /* Config row */
+    .config-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+    }
+
+    .config-field {}
+
+    .config-label {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 6px;
+    }
+
+    .config-input {
+      width: 100%;
+      background: var(--s1);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 9px 12px;
+      outline: none;
+      letter-spacing: 0.04em;
+      caret-color: var(--accent);
+    }
+
+    .config-input:focus { border-color: var(--accent-dim); }
+
+    .config-select {
+      width: 100%;
+      background: var(--s1);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 9px 12px;
+      outline: none;
+      cursor: pointer;
+      appearance: none;
+      letter-spacing: 0.04em;
+    }
+
+    .config-select:focus { border-color: var(--accent-dim); }
+
+    /* Action buttons */
+    .action-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn {
+      padding: 11px 20px;
+      border: 1px solid var(--border);
+      background: var(--s1);
+      color: var(--text-mid);
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: border-color 0.1s, color 0.1s, background 0.1s;
+      white-space: nowrap;
+    }
+
+    .btn:hover:not(:disabled) {
+      border-color: var(--text-dim);
+      color: var(--text);
+    }
+
+    .btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #0b0b0b;
+      font-weight: 500;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: #d4a84a;
+      border-color: #d4a84a;
+      color: #0b0b0b;
+    }
+
+    .btn-danger {
+      border-color: var(--red);
+      color: var(--red);
+    }
+
+    .btn-danger:hover:not(:disabled) {
+      background: var(--red);
+      color: var(--text);
+    }
+
+    .action-status {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-left: 8px;
+      letter-spacing: 0.04em;
+    }
+
+    /* Progress bar */
+    .progress-wrap {
+      display: none;
+    }
+
+    .progress-wrap.visible {
+      display: block;
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-dim);
+      letter-spacing: 0.06em;
+      margin-bottom: 6px;
+    }
+
+    .progress-track {
+      height: 2px;
+      background: var(--border);
+      width: 100%;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      width: 0%;
+      transition: width 0.2s;
+    }
+
+    /* Terminal log */
+    .log-wrap {}
+
+    .log-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-bottom: none;
+      background: var(--s2);
+    }
+
+    .log-title {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-dim);
+      letter-spacing: 0.08em;
+    }
+
+    .log-clear-btn {
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 2px 0;
+    }
+
+    .log-clear-btn:hover { color: var(--text-mid); }
+
+    #flash-log {
+      width: 100%;
+      height: 260px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text-mid);
+      font-family: var(--mono);
+      font-size: 11px;
+      line-height: 1.7;
+      padding: 14px;
+      overflow-y: auto;
+      resize: none;
+      outline: none;
+      letter-spacing: 0.02em;
+    }
+
+    /* ─── RESPONSIVE ─────────────────────────────────────────── */
+
+    @media (max-width: 860px) {
+      nav { padding: 16px 20px; }
+      .nav-links { display: none; }
+      .page { grid-template-columns: 1fr; }
+      .page-header { padding: 32px 20px 28px; flex-direction: column; align-items: flex-start; }
+      .sidebar { border-right: none; border-bottom: 1px solid var(--border); padding: 28px 20px; }
+      .flash-panel { padding: 28px 20px; }
+      .config-row { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 480px) {
+      .config-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a class="nav-logo" href="/">bdy<span>.</span></a>
+    <ul class="nav-links">
+      <li><a href="/#how-it-works">interface</a></li>
+      <li><a href="/#features">what it does</a></li>
+      <li><a href="/#connect-guide">how to connect</a></li>
+      <li><a href="/#spec">specs</a></li>
+      <li><a href="/flash.html" class="active">flash</a></li>
+    </ul>
+    <span class="nav-status">web serial — chrome / edge only</span>
+  </nav>
+
+  <div class="page">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+      <div class="page-title-group">
+        <div class="page-label">firmware</div>
+        <h1 class="page-title">Flash your buddy.</h1>
+        <p class="page-subtitle">
+          Connect your ESP32 over USB, select a compiled <code style="font-family:var(--mono);font-size:12px;color:var(--accent)">.bin</code> file, and write it directly from the browser. No esptool install required.
+        </p>
+      </div>
+      <div class="browser-badge">
+        <span class="dot"></span>
+        requires chrome or edge 89+
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+      <div>
+        <div class="sidebar-section-label">before you start</div>
+        <ul class="prereq-list">
+          <li class="prereq-item">
+            <span class="prereq-marker">[1]</span>
+            <span class="prereq-text"><strong>Chrome or Edge 89+</strong> — Web Serial API is required. Firefox does not support it.</span>
+          </li>
+          <li class="prereq-item">
+            <span class="prereq-marker">[2]</span>
+            <span class="prereq-text"><strong>USB cable</strong> — data cable, not charge-only. Connect directly to your ESP32 or dev board.</span>
+          </li>
+          <li class="prereq-item">
+            <span class="prereq-marker">[3]</span>
+            <span class="prereq-text"><strong>Compiled .bin file</strong> — built from Arduino IDE or PlatformIO. Use the merged binary if available.</span>
+          </li>
+          <li class="prereq-item">
+            <span class="prereq-marker">[4]</span>
+            <span class="prereq-text"><strong>Close other serial monitors</strong> — Arduino IDE serial monitor, PlatformIO terminal, or any other tool holding the port.</span>
+          </li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="sidebar-section-label">common flash addresses</div>
+        <table class="addr-table">
+          <thead>
+            <tr>
+              <th>address</th>
+              <th>use</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>0x0</td>
+              <td>merged full image</td>
+            </tr>
+            <tr>
+              <td>0x1000</td>
+              <td>bootloader</td>
+            </tr>
+            <tr>
+              <td>0x8000</td>
+              <td>partition table</td>
+            </tr>
+            <tr>
+              <td>0x10000</td>
+              <td>application binary</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <div class="sidebar-section-label">bootloader mode</div>
+        <p style="font-size:12px;font-weight:300;color:var(--text-mid);line-height:1.65">
+          Hold <strong style="color:var(--text)">BOOT</strong> while pressing <strong style="color:var(--text)">RESET</strong> to enter bootloader mode manually. Most dev boards handle this automatically via DTR/RTS.
+        </p>
+      </div>
+
+    </aside>
+
+    <!-- FLASH PANEL -->
+    <main class="flash-panel">
+
+      <!-- Firmware file picker -->
+      <div>
+        <div class="config-label">firmware file</div>
+        <div class="fw-zone" id="fw-zone">
+          <input type="file" id="fw-file-input" accept=".bin" />
+          <div class="fw-zone-inner">
+            <div class="fw-icon" id="fw-icon">.bin</div>
+            <div class="fw-text">
+              <div class="fw-title" id="fw-title">drag and drop or click to select</div>
+              <div class="fw-sub" id="fw-sub">accepts .bin files only</div>
+            </div>
+            <span class="fw-size" id="fw-size"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Configuration -->
+      <div class="config-row">
+        <div class="config-field">
+          <div class="config-label">flash address</div>
+          <input class="config-input" id="flash-addr" type="text" value="0x0" spellcheck="false" />
+        </div>
+        <div class="config-field">
+          <div class="config-label">flash mode</div>
+          <select class="config-select" id="flash-mode">
+            <option value="dio" selected>dio (default)</option>
+            <option value="qio">qio</option>
+            <option value="dout">dout</option>
+            <option value="qout">qout</option>
+          </select>
+        </div>
+        <div class="config-field">
+          <div class="config-label">baud rate</div>
+          <select class="config-select" id="baud-rate">
+            <option value="921600" selected>921600</option>
+            <option value="460800">460800</option>
+            <option value="115200">115200</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Action buttons -->
+      <div class="action-row">
+        <button class="btn btn-primary" id="btn-connect">Connect ESP32</button>
+        <button class="btn" id="btn-flash" disabled>-> Flash</button>
+        <button class="btn btn-danger" id="btn-disconnect" disabled>Disconnect</button>
+        <span class="action-status" id="action-status">not connected</span>
+      </div>
+
+      <!-- Progress -->
+      <div class="progress-wrap" id="progress-wrap">
+        <div class="progress-meta">
+          <span id="progress-label">writing flash...</span>
+          <span id="progress-pct">0%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+      </div>
+
+      <!-- Log terminal -->
+      <div class="log-wrap">
+        <div class="log-header">
+          <span class="log-title">serial output</span>
+          <button class="log-clear-btn" id="log-clear">clear</button>
+        </div>
+        <textarea id="flash-log" readonly spellcheck="false"></textarea>
+      </div>
+
+    </main>
+
+  </div><!-- /.page -->
+
+  <!-- Load CryptoJS as global before the module -->
+  <script src="/crypto-js.js"></script>
+
+  <script type="module">
+    import { ESPLoader, Transport } from '/esptool.js';
+
+    // ── State ────────────────────────────────────────────────────────────────
+
+    let port       = null;
+    let transport  = null;
+    let esploader  = null;
+    let firmwareBytes = null;  // Uint8Array
+    let isFlashing = false;
+
+    // ── DOM refs ─────────────────────────────────────────────────────────────
+
+    const fwZone       = document.getElementById('fw-zone');
+    const fwInput      = document.getElementById('fw-file-input');
+    const fwTitle      = document.getElementById('fw-title');
+    const fwSub        = document.getElementById('fw-sub');
+    const fwSize       = document.getElementById('fw-size');
+    const btnConnect   = document.getElementById('btn-connect');
+    const btnFlash     = document.getElementById('btn-flash');
+    const btnDisconnect= document.getElementById('btn-disconnect');
+    const actionStatus = document.getElementById('action-status');
+    const progressWrap = document.getElementById('progress-wrap');
+    const progressFill = document.getElementById('progress-fill');
+    const progressLabel= document.getElementById('progress-label');
+    const progressPct  = document.getElementById('progress-pct');
+    const logEl        = document.getElementById('flash-log');
+    const logClear     = document.getElementById('log-clear');
+
+    // ── Logging ──────────────────────────────────────────────────────────────
+
+    function log(text, color) {
+      const prefix = color === 'accent' ? '> ' : color === 'err' ? '! ' : '  ';
+      logEl.value += prefix + text + '\n';
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    const terminal = {
+      clean()           { logEl.value = ''; },
+      writeLine(data)   { log(data); },
+      write(data)       { log(data); },
+    };
+
+    logClear.addEventListener('click', () => { logEl.value = ''; });
+
+    // ── Status helpers ───────────────────────────────────────────────────────
+
+    function setStatus(text, isError = false) {
+      actionStatus.textContent = text;
+      actionStatus.style.color = isError ? 'var(--red)' : 'var(--text-dim)';
+    }
+
+    function updateButtons() {
+      const hasPort = !!esploader;
+      const hasFile = !!firmwareBytes;
+      btnFlash.disabled      = !hasPort || !hasFile || isFlashing;
+      btnDisconnect.disabled = !port || isFlashing;
+      btnConnect.disabled    = isFlashing;
+    }
+
+    function formatBytes(n) {
+      if (n < 1024) return n + ' B';
+      if (n < 1024 * 1024) return (n / 1024).toFixed(1) + ' KB';
+      return (n / (1024 * 1024)).toFixed(2) + ' MB';
+    }
+
+    // ── File input ───────────────────────────────────────────────────────────
+
+    fwInput.addEventListener('change', async () => {
+      const file = fwInput.files[0];
+      if (!file) return;
+      await loadFile(file);
+    });
+
+    fwZone.addEventListener('dragover', e => {
+      e.preventDefault();
+      fwZone.classList.add('dragover');
+    });
+
+    fwZone.addEventListener('dragleave', () => fwZone.classList.remove('dragover'));
+
+    fwZone.addEventListener('drop', async e => {
+      e.preventDefault();
+      fwZone.classList.remove('dragover');
+      const file = e.dataTransfer.files[0];
+      if (file && file.name.endsWith('.bin')) await loadFile(file);
+      else log('dropped file is not a .bin', 'err');
+    });
+
+    async function loadFile(file) {
+      const buf = await file.arrayBuffer();
+      firmwareBytes = new Uint8Array(buf);
+      fwZone.classList.add('has-file');
+      fwTitle.textContent = file.name;
+      fwSub.textContent   = formatBytes(file.size);
+      fwSize.textContent  = '';
+      log('loaded: ' + file.name + ' (' + formatBytes(file.size) + ')', 'accent');
+      updateButtons();
+    }
+
+    // ── Connect ──────────────────────────────────────────────────────────────
+
+    btnConnect.addEventListener('click', async () => {
+      if (!('serial' in navigator)) {
+        log('Web Serial API not available. Use Chrome or Edge 89+.', 'err');
+        setStatus('unsupported browser', true);
+        return;
+      }
+
+      try {
+        port = await navigator.serial.requestPort();
+      } catch (err) {
+        if (err.name !== 'NotFoundError') log('port selection cancelled or failed: ' + err.message, 'err');
+        return;
+      }
+
+      const baudrate = parseInt(document.getElementById('baud-rate').value);
+
+      transport = new Transport(port, true);
+
+      esploader = new ESPLoader({
+        transport,
+        baudrate,
+        terminal,
+        debugLogging: false,
+      });
+
+      setStatus('connecting...');
+      log('connecting at ' + baudrate + ' baud...', 'accent');
+
+      try {
+        const chip = await esploader.main();
+        log('connected: ' + chip, 'accent');
+        setStatus('connected — ' + chip);
+        updateButtons();
+      } catch (err) {
+        log('connection failed: ' + err.message, 'err');
+        setStatus('connection failed', true);
+        await cleanupPort();
+        updateButtons();
+      }
+    });
+
+    // ── Flash ─────────────────────────────────────────────────────────────────
+
+    btnFlash.addEventListener('click', async () => {
+      if (!esploader || !firmwareBytes || isFlashing) return;
+
+      const addrStr = document.getElementById('flash-addr').value.trim();
+      const address = addrStr.startsWith('0x') ? parseInt(addrStr, 16) : parseInt(addrStr, 10);
+
+      if (isNaN(address)) {
+        log('invalid flash address: ' + addrStr, 'err');
+        return;
+      }
+
+      const flashMode = document.getElementById('flash-mode').value;
+
+      isFlashing = true;
+      updateButtons();
+      progressWrap.classList.add('visible');
+      progressFill.style.width = '0%';
+      progressPct.textContent  = '0%';
+      progressLabel.textContent = 'erasing...';
+
+      log('writing ' + formatBytes(firmwareBytes.length) + ' to 0x' + address.toString(16) + '...', 'accent');
+
+      try {
+        await esploader.writeFlash({
+          fileArray: [{ data: firmwareBytes, address }],
+          flashMode,
+          flashFreq:  '40m',
+          flashSize:  '4MB',
+          eraseAll:   false,
+          compress:   true,
+          reportProgress: (fileIndex, written, total) => {
+            const pct = Math.round((written / total) * 100);
+            progressFill.style.width = pct + '%';
+            progressPct.textContent  = pct + '%';
+            progressLabel.textContent = 'writing flash...';
+          },
+          calculateMD5Hash: (image) => {
+            // CryptoJS loaded globally above
+            const wordArray = CryptoJS.lib.WordArray.create(image);
+            return CryptoJS.MD5(wordArray).toString();
+          },
+        });
+
+        progressFill.style.width = '100%';
+        progressPct.textContent  = '100%';
+        progressLabel.textContent = 'done';
+
+        log('flash complete.', 'accent');
+        setStatus('flash complete — resetting device');
+
+        await esploader.after('hard_reset');
+        log('device reset.', 'accent');
+        setStatus('done — device is running new firmware');
+
+      } catch (err) {
+        log('flash failed: ' + err.message, 'err');
+        setStatus('flash failed', true);
+        progressLabel.textContent = 'failed';
+      } finally {
+        isFlashing = false;
+        updateButtons();
+      }
+    });
+
+    // ── Disconnect ────────────────────────────────────────────────────────────
+
+    btnDisconnect.addEventListener('click', async () => {
+      log('disconnecting...', 'accent');
+      await cleanupPort();
+      setStatus('disconnected');
+      updateButtons();
+    });
+
+    async function cleanupPort() {
+      esploader = null;
+      if (transport) {
+        try { await transport.disconnect(); } catch (_) {}
+        transport = null;
+      }
+      if (port) {
+        try { await port.close(); } catch (_) {}
+        port = null;
+      }
+    }
+
+    // ── Init ──────────────────────────────────────────────────────────────────
+
+    if (!('serial' in navigator)) {
+      log('Web Serial API not detected.', 'err');
+      log('this page requires Chrome or Edge 89+.', 'err');
+      btnConnect.disabled = true;
+      setStatus('unsupported browser', true);
+    } else {
+      log('ready. select a .bin file and connect your ESP32.');
+    }
+
+    updateButtons();
+  </script>
+
+</body>
+</html>

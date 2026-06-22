@@ -1,0 +1,14 @@
+{
+  "name": "buddy-hub",
+  "version": "0.1.0",
+  "description": "Local WebSocket relay hub for Buddy ESP32 device",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "crypto-js": "^4.2.0",
+    "esptool-js": "^0.6.0",
+    "ws": "^8.18.0"
+  }
+}
