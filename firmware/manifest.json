@@ -2,7 +2,7 @@
   "name": "buddy-firmware",
   "version": "1.0.0",
   "chip": "ESP32",
-  "board": "AI-Thinker ESP32-CAM",
+  "board": "Seeed Studio XIAO ESP32S3 Sense",
   "flashAddress": "0x0",
   "flashMode": "dio",
   "source": "buddy_firmware.ino",
