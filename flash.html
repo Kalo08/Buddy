@@ -1167,6 +1167,55 @@
       }
     }
 
+    // ── Error diagnosis ───────────────────────────────────────────────────────
+
+    function diagnose(err, phase) {
+      const msg = (err.message || '').toLowerCase();
+      const tips = [];
+
+      if (phase === 'connect') {
+        if (msg.includes('serial data stream stopped') || msg.includes('unable to verify') || msg.includes('noise') || msg.includes('corruption')) {
+          tips.push('Serial noise after baud-rate change — try a lower baud rate (460800 or 115200).');
+          tips.push('Use a shorter, shielded USB cable.');
+        } else if (msg.includes('failed to execute') || msg.includes('timed out') || msg.includes('no response')) {
+          tips.push('Chip not responding — hold BOOT then press RESET, release RESET first, then release BOOT.');
+          tips.push('On AI-Thinker ESP32-CAM: hold IO0 LOW (bridge IO0 to GND) while powering on.');
+        } else if (msg.includes('access denied') || msg.includes('could not open port') || msg.includes('device busy')) {
+          tips.push('Port is in use — close Arduino IDE serial monitor, PlatformIO terminal, or any other serial tool.');
+        } else if (msg.includes('disconnected') || msg.includes('device lost')) {
+          tips.push('USB connection dropped — try a different cable or USB port.');
+          tips.push('Ensure the board is getting enough power (use a powered hub or direct PC port).');
+        }
+        if (!tips.length) {
+          tips.push('Hold BOOT while pressing RESET to enter bootloader mode manually.');
+          tips.push('Try a lower baud rate.');
+          tips.push('Close any other programs using the serial port.');
+        }
+      }
+
+      if (phase === 'flash') {
+        if (msg.includes('md5') || msg.includes('checksum') || msg.includes('verify')) {
+          tips.push('Flash verification failed — the write was corrupted.');
+          tips.push('Try a lower baud rate (115200) and reflash.');
+          tips.push('Check your USB cable — charge-only cables have no data lines.');
+        } else if (msg.includes('timeout') || msg.includes('timed out')) {
+          tips.push('Flash timed out — chip stopped responding mid-write.');
+          tips.push('Try a lower baud rate and ensure the board has stable power.');
+        } else if (msg.includes('invalid head') || msg.includes('wrong') || msg.includes('not supported')) {
+          tips.push('Flash address or mode may be wrong for this chip.');
+          tips.push('For a merged full image use address 0x0 with mode "dio".');
+        } else if (msg.includes('erase')) {
+          tips.push('Erase failed — try holding BOOT/IO0 again and reflashing.');
+        }
+        if (!tips.length) {
+          tips.push('Try a lower baud rate (115200) for a more stable write.');
+          tips.push('Reconnect and reflash — transient USB errors can cause one-off failures.');
+        }
+      }
+
+      tips.forEach(t => log('  → ' + t, 'err'));
+    }
+
     // ── Connect ──────────────────────────────────────────────────────────────
 
     btnConnect.addEventListener('click', async () => {
@@ -1204,6 +1253,7 @@
         updateButtons();
       } catch (err) {
         log('connection failed: ' + err.message, 'err');
+        diagnose(err, 'connect');
         setStatus('connection failed', true);
         await cleanupPort();
         updateButtons();
@@ -1250,7 +1300,6 @@
             progressLabel.textContent = 'writing flash...';
           },
           calculateMD5Hash: (image) => {
-            // CryptoJS loaded globally above
             const wordArray = CryptoJS.lib.WordArray.create(image);
             return CryptoJS.MD5(wordArray).toString();
           },
@@ -1269,8 +1318,10 @@
 
       } catch (err) {
         log('flash failed: ' + err.message, 'err');
+        diagnose(err, 'flash');
         setStatus('flash failed', true);
         progressLabel.textContent = 'failed';
+        progressFill.style.background = 'var(--red)';
       } finally {
         isFlashing = false;
         updateButtons();

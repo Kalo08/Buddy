@@ -13,7 +13,7 @@ function getLocalIP() {
   return '127.0.0.1';
 }
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const ROOT = __dirname;
 
 // ── Static file MIME map ──────────────────────────────────────────────────────

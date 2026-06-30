@@ -26,6 +26,8 @@
 #include <WebSocketsClient.h>
 #include <ArduinoJson.h>
 #include "driver/i2s.h"
+#include "soc/soc.h"
+#include "soc/rtc_cntl_reg.h"
 
 // ─── Config block ─────────────────────────────────────────────────────────────
 // DO NOT reorder fields. The flash tool finds the magic bytes and patches
@@ -33,10 +35,10 @@
 
 struct __attribute__((packed)) BuddyConfig {
   uint8_t  magic[8] = {0xBD,0xBD,0xBD,0xBD,0x42,0x55,0x44,0x59};
-  char     ssid[32] = "YOUR_SSID";
-  char     pass[64] = "YOUR_PASS";
-  char     host[40] = "192.168.1.x";
-  uint32_t port     = 3000;
+  char     ssid[32] = "Home2018";
+  char     pass[64] = "LBGS2018";
+  char     host[40] = "buddy-production-948c.up.railway.app";
+  uint32_t port     = 443;
   char     id[16]   = "BDY-00001";
 } cfg;
 
@@ -74,13 +76,12 @@ struct __attribute__((packed)) BuddyConfig {
 #define SPK_RATE    16000
 
 // ─── Motor driver (L298N or similar) ─────────────────────────────────────────
-// Change these to match your wiring.
-// ESP32-CAM has limited free GPIO; wire to an I2C motor driver if needed.
-#define MTR_A_FWD   16   // Motor A forward
-#define MTR_A_BWD    3   // Motor A reverse
-#define MTR_B_FWD    1   // Motor B forward
-#define MTR_B_BWD   16   // Motor B reverse
-// For a standard ESP32 DevKit use e.g. 25/26/27/14
+// Using former I2S pins — safe on ESP32-CAM when audio is disabled.
+// GPIO1=TX and GPIO3=RX are reserved for serial; do NOT use them here.
+#define MTR_A_FWD   14   // Motor A forward  (was MIC_SCK)
+#define MTR_A_BWD   15   // Motor A reverse  (was MIC_WS)
+#define MTR_B_FWD   13   // Motor B forward  (was MIC_SD)
+#define MTR_B_BWD   12   // Motor B reverse  (was SPK_BCK)
 
 // ─── Frame type bytes (must match client.js) ─────────────────────────────────
 #define TYPE_VIDEO  0x01
@@ -91,6 +92,9 @@ WebSocketsClient ws;
 
 volatile bool wsLive     = false;   // server connection up
 volatile bool peerOnline = false;   // browser client paired
+bool          camReady   = false;
+bool          micReady   = false;
+bool          spkReady   = false;
 
 // Thread-safe send queue — tasks push here, main loop drains
 struct Frame { uint8_t* buf; size_t len; };
@@ -155,8 +159,7 @@ void onWsEvent(WStype_t type, uint8_t* payload, size_t len) {
     }
 
     case WStype_BIN:
-      // Incoming audio from browser mic → play on speaker
-      if (len > 1 && payload[0] == TYPE_AUDIO) {
+      if (spkReady && len > 1 && payload[0] == TYPE_AUDIO) {
         size_t written = 0;
         i2s_write(SPK_I2S, payload + 1, len - 1, &written, pdMS_TO_TICKS(20));
       }
@@ -202,6 +205,7 @@ void micTask(void*) {
   if (!raw) { Serial.println("[mic] malloc fail"); vTaskDelete(NULL); }
 
   for (;;) {
+    if (!micReady) { vTaskDelay(pdMS_TO_TICKS(1000)); continue; }
     size_t got = 0;
     i2s_read(MIC_I2S, raw, rawBytes, &got, pdMS_TO_TICKS(200));
     if (got == 0 || !peerOnline) continue;
@@ -245,16 +249,25 @@ void initCamera() {
   c.grab_mode       = CAMERA_GRAB_LATEST;
 
   if (esp_camera_init(&c) != ESP_OK) {
-    Serial.println("[cam] init FAILED"); return;
+    Serial.println("[cam] init FAILED — check ribbon cable");
+    esp_camera_deinit();
+    delay(100);
+    return;
   }
   sensor_t* s = esp_camera_sensor_get();
   s->set_whitebal(s, 1); s->set_awb_gain(s, 1);
   s->set_exposure_ctrl(s, 1); s->set_gain_ctrl(s, 1);
   s->set_raw_gma(s, 1); s->set_lenc(s, 1);
+  camReady = true;
   Serial.println("[cam] ready");
 }
 
 void initMic() {
+  // AI-Thinker ESP32-CAM shares I2S interrupt lines with the camera peripheral.
+  // Attempting i2s_driver_install corrupts the stack when interrupts are exhausted.
+  Serial.println("[mic] skipped — not available on ESP32-CAM with camera active");
+  return;
+  // Remove the early return above if using an ESP32 board without a camera.
   i2s_config_t mc = {};
   mc.mode                 = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_RX);
   mc.sample_rate          = MIC_RATE;
@@ -264,19 +277,30 @@ void initMic() {
   mc.intr_alloc_flags     = ESP_INTR_FLAG_LEVEL1;
   mc.dma_buf_count        = 4;
   mc.dma_buf_len          = 256;
-  mc.use_apll             = true;
+  mc.use_apll             = false; // apll requires MCLK output; conflicts with camera on ESP32-CAM
 
-  i2s_pin_config_t mp = {MIC_SCK, MIC_WS, I2S_PIN_NO_CHANGE, MIC_SD};
+  i2s_pin_config_t mp = {
+    .mck_io_num   = I2S_PIN_NO_CHANGE,
+    .bck_io_num   = MIC_SCK,
+    .ws_io_num    = MIC_WS,
+    .data_out_num = I2S_PIN_NO_CHANGE,
+    .data_in_num  = MIC_SD,
+  };
 
   if (i2s_driver_install(MIC_I2S, &mc, 0, NULL) != ESP_OK ||
       i2s_set_pin(MIC_I2S, &mp)                 != ESP_OK) {
-    Serial.println("[mic] init FAILED"); return;
+    Serial.println("[mic] init FAILED — audio RX disabled");
+    return;
   }
   i2s_zero_dma_buffer(MIC_I2S);
+  micReady = true;
   Serial.println("[mic] ready");
 }
 
 void initSpeaker() {
+  Serial.println("[spk] skipped — not available on ESP32-CAM with camera active");
+  return;
+  // Remove the early return above if using an ESP32 board without a camera.
   i2s_config_t sc = {};
   sc.mode                 = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX);
   sc.sample_rate          = SPK_RATE;
@@ -286,15 +310,23 @@ void initSpeaker() {
   sc.intr_alloc_flags     = ESP_INTR_FLAG_LEVEL1;
   sc.dma_buf_count        = 4;
   sc.dma_buf_len          = 256;
-  sc.use_apll             = true;
+  sc.use_apll             = false; // apll + GPIO2 as LRC causes abort() on AI-Thinker
   sc.tx_desc_auto_clear   = true;
 
-  i2s_pin_config_t sp = {SPK_BCK, SPK_LRC, SPK_DIN, I2S_PIN_NO_CHANGE};
+  i2s_pin_config_t sp = {
+    .mck_io_num   = I2S_PIN_NO_CHANGE,
+    .bck_io_num   = SPK_BCK,
+    .ws_io_num    = SPK_LRC,
+    .data_out_num = SPK_DIN,
+    .data_in_num  = I2S_PIN_NO_CHANGE,
+  };
 
   if (i2s_driver_install(SPK_I2S, &sc, 0, NULL) != ESP_OK ||
       i2s_set_pin(SPK_I2S, &sp)                 != ESP_OK) {
-    Serial.println("[spk] init FAILED"); return;
+    Serial.println("[spk] init FAILED — audio TX disabled");
+    return;
   }
+  spkReady = true;
   Serial.println("[spk] ready");
 }
 
@@ -309,8 +341,17 @@ void initMotors() {
 // Setup
 // ─────────────────────────────────────────────────────────────────────────────
 void setup() {
+  WRITE_PERI_REG(RTC_CNTL_BROWN_OUT_REG, 0); // disable brownout detector
+
   Serial.begin(115200);
+  delay(500); // let serial settle before first print
   Serial.printf("\n[buddy] booting — id: %s\n", cfg.id);
+
+  if (!psramFound()) {
+    Serial.println("[buddy] WARNING: no PSRAM detected — camera may fail");
+  } else {
+    Serial.printf("[buddy] PSRAM: %u bytes free\n", ESP.getFreePsram());
+  }
 
   txQueue = xQueueCreate(TX_QUEUE_DEPTH, sizeof(Frame));
 
@@ -332,10 +373,15 @@ void setup() {
   else
     Serial.println("\n[wifi] timed out — will retry");
 
-  // WebSocket
+  // WebSocket — use WSS (port 443) for Railway, plain WS (cfg.port) for local
   String path = String("/ws?id=") + cfg.id + "&role=device";
-  Serial.printf("[ws]  → %s:%u%s\n", cfg.host, cfg.port, path.c_str());
-  ws.begin(cfg.host, (uint16_t)cfg.port, path.c_str());
+  bool useSSL = (cfg.port == 443);
+  Serial.printf("[ws]  → %s:%u%s (SSL: %s)\n", cfg.host, cfg.port, path.c_str(), useSSL ? "yes" : "no");
+  if (useSSL) {
+    ws.beginSSL(cfg.host, 443, path.c_str());
+  } else {
+    ws.begin(cfg.host, (uint16_t)cfg.port, path.c_str());
+  }
   ws.onEvent(onWsEvent);
   ws.setReconnectInterval(3000);
   ws.enableHeartbeat(15000, 3000, 2);
