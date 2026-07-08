@@ -1,7 +1,7 @@
 /*
  * buddy_firmware.ino — Buddy v1.0
  * ─────────────────────────────────────────────────────────────────────────────
- * Target board : Seeed Studio XIAO ESP32S3 Sense
+ * Target board : AI Thinker ESP32-CAM  (+ ESP32-CAM-MB programmer)
  *
  * Required libraries (Tools → Manage Libraries):
  *   WebSockets              by Markus Sattler   (>= 2.4.0)
@@ -10,19 +10,20 @@
  *   Adafruit BusIO          by Adafruit          (>= 1.14.0)
  *
  * Board package : esp32 by Espressif (>= 2.0.14)
- * Board select  : XIAO_ESP32S3  (or "Seeed Studio XIAO ESP32S3")
- * PSRAM         : Tools → PSRAM → OPI PSRAM   ← important, enables 8MB PSRAM
+ * Board select  : AI Thinker ESP32-CAM
+ * PSRAM         : Tools → PSRAM → Enabled   ← 4MB QSPI PSRAM
  *
- * Hardware on the Sense board (no extra wiring needed):
- *   Camera  OV2640  — connected via flex cable to expansion board
- *   Mic     PDM     — onboard, CLK=GPIO42  DATA=GPIO41
+ * Hardware on the ESP32-CAM (no extra wiring needed):
+ *   Camera  OV2640  — onboard
+ *   Flash LED       — GPIO4 (HIGH = on, avoid using as GPIO while camera runs)
  *
  * External wiring needed:
- *   PCA9685 servo driver  → SDA=D4(GPIO5)  SCL=D5(GPIO6)  VCC=3.3V  GND=GND
+ *   PCA9685 servo driver  → SDA=GPIO14  SCL=GPIO15  VCC=3.3V  GND=GND
  *     Servo 0 → PCA channel 0
  *     Servo 1 → PCA channel 1
  *     Servo 2 → PCA channel 2
- *   MAX98357A speaker amp → BCLK=D8(GPIO7)  LRC=D7(GPIO44)  DIN=D6(GPIO43)
+ *   MAX98357A speaker amp → BCLK=GPIO2  LRC=GPIO13  DIN=GPIO12
+ *   NOTE: GPIO12 must be LOW at boot — ensure amp DIN is not driving HIGH on power-on
  *
  * Servo command (JSON over WebSocket):
  *   { "type": "servo", "ch": 0, "angle": 90 }   — ch: 0-2, angle: 0-180
@@ -53,36 +54,30 @@ struct __attribute__((packed)) BuddyConfig {
   char id[16] = "BDY-00001";
 } cfg;
 
-// ─── Camera pins (XIAO ESP32S3 Sense) ────────────────────────────────────────
-#define PWDN_GPIO_NUM     -1
+// ─── Camera pins (AI Thinker ESP32-CAM / OV2640) ─────────────────────────────
+#define PWDN_GPIO_NUM     32
 #define RESET_GPIO_NUM    -1
-#define XCLK_GPIO_NUM     10
-#define SIOD_GPIO_NUM     40
-#define SIOC_GPIO_NUM     39
-#define Y9_GPIO_NUM       48
-#define Y8_GPIO_NUM       11
-#define Y7_GPIO_NUM       12
-#define Y6_GPIO_NUM       14
-#define Y5_GPIO_NUM       16
-#define Y4_GPIO_NUM       18
-#define Y3_GPIO_NUM       17
-#define Y2_GPIO_NUM       15
-#define VSYNC_GPIO_NUM    38
-#define HREF_GPIO_NUM     47
-#define PCLK_GPIO_NUM     13
-
-// ─── PDM microphone (onboard) ─────────────────────────────────────────────────
-#define MIC_I2S     I2S_NUM_0
-#define MIC_CLK     42         // PDM clock
-#define MIC_DATA    41         // PDM data
-#define MIC_RATE    16000
-#define MIC_MS      30         // chunk size → 30ms × 16000 = 480 samples
+#define XCLK_GPIO_NUM      0
+#define SIOD_GPIO_NUM     26
+#define SIOC_GPIO_NUM     27
+#define Y9_GPIO_NUM       35
+#define Y8_GPIO_NUM       34
+#define Y7_GPIO_NUM       39
+#define Y6_GPIO_NUM       36
+#define Y5_GPIO_NUM       21
+#define Y4_GPIO_NUM       19
+#define Y3_GPIO_NUM       18
+#define Y2_GPIO_NUM        5
+#define VSYNC_GPIO_NUM    25
+#define HREF_GPIO_NUM     23
+#define PCLK_GPIO_NUM     22
 
 // ─── I2S speaker (external MAX98357A) ─────────────────────────────────────────
+// No onboard mic on ESP32-CAM — mic task is disabled.
 #define SPK_I2S     I2S_NUM_1
-#define SPK_BCLK    7          // D8
-#define SPK_LRC     44         // D7
-#define SPK_DIN     43         // D6
+#define SPK_BCLK     2         // GPIO2
+#define SPK_LRC     13         // GPIO13
+#define SPK_DIN     12         // GPIO12 — must be LOW at boot (keep amp DIN floating/low until after init)
 #define SPK_RATE    16000
 
 // ─── PCA9685 servo driver ─────────────────────────────────────────────────────
