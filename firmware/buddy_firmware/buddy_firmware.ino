@@ -81,7 +81,7 @@ struct __attribute__((packed)) BuddyConfig {
 #define SPK_RATE    16000
 
 // ─── PCA9685 servo driver ─────────────────────────────────────────────────────
-// I2C: SDA=D4(GPIO5), SCL=D5(GPIO6) — default XIAO ESP32S3 I2C pins.
+// I2C: SDA=GPIO14, SCL=GPIO15 — safest free pins on ESP32-CAM after camera.
 // PCA9685 default I2C address is 0x40 (all address pins tied low).
 // Pulse range calibrated for standard 50Hz hobby servos:
 //   SERVO_MIN (~500 µs) = 0°,  SERVO_MAX (~2500 µs) = 180°
@@ -337,7 +337,7 @@ void initSpeaker() {
 }
 
 void initServos() {
-  Wire.begin();                       // SDA=GPIO5, SCL=GPIO6 (XIAO defaults)
+  Wire.begin(14, 15);                 // SDA=GPIO14, SCL=GPIO15 (ESP32-CAM safe pins)
   pca.begin();
   pca.setOscillatorFrequency(27000000);  // tune to actual PCA9685 oscillator (±10%)
   pca.setPWMFreq(SERVO_FREQ);
@@ -365,7 +365,6 @@ void setup() {
   txQueue = xQueueCreate(TX_QUEUE_DEPTH, sizeof(Frame));
 
   initCamera();
-  initMic();
   initSpeaker();
   initServos();
 
@@ -397,7 +396,7 @@ void setup() {
   ws.enableHeartbeat(15000, 3000, 2);
 
   xTaskCreatePinnedToCore(cameraTask, "cam", 8192, NULL, 2, NULL, 0);
-  xTaskCreatePinnedToCore(micTask, "mic", 4096, NULL, 1, NULL, 1);
+  // micTask omitted — ESP32-CAM has no onboard microphone
 
   Serial.println("[buddy] running");
 }
