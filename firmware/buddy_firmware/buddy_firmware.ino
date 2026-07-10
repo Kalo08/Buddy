@@ -32,15 +32,20 @@
  *   { "type": "servo", "ch": 0, "angle": 90 }                       — raw per-wheel override, ch: 0-2, angle: 0-180
  *   { "type": "reset_config" }                                      — clear saved config, re-enter setup hotspot on reboot
  *
- * Config block is patched by the Buddy flash tool before writing (factory default).
- * Can be overridden later at runtime via on-device WiFi setup, saved to NVS flash:
+ * Config block is patched by the Buddy flash tool before writing (factory default,
+ * ssid = "Hack Club"). Can be overridden later at runtime via on-device WiFi
+ * setup, saved to NVS flash:
  *   - On boot, WiFi connect is attempted with the current config (flash default,
- *     or NVS override if one was saved). If it fails (or a reset was requested),
- *     the device stops and broadcasts its own open WiFi hotspot named
- *     "Buddy-Setup-<id>". Connect a phone/laptop to that network — a captive
- *     portal setup page (served directly from the ESP32, no internet needed)
- *     opens automatically, or browse to http://192.168.4.1 manually. Submitting
- *     the form saves the new config to NVS and reboots into normal operation.
+ *     or NVS override if one was saved). connectWifi() retries generously
+ *     (3 rounds x 20s, with a fresh WiFi.begin() each round) before giving up,
+ *     so a slow router/mesh handshake doesn't get misread as "can't connect."
+ *   - Only if that genuinely fails — or a reset was explicitly requested (the
+ *     dashboard's "reset wifi" button, or { "type": "reset_config" }) — does
+ *     the device broadcast its own open WiFi hotspot named "Buddy-Setup-<id>".
+ *     Connect a phone/laptop to that network — a captive portal setup page
+ *     (served directly from the ESP32, no internet needed) opens automatically,
+ *     or browse to http://192.168.4.1 manually. Submitting the form saves the
+ *     new config to NVS and reboots into normal operation.
  *   - The hotspot is never active at the same time as the camera/WiFi-station/
  *     WebSocket — it's a one-shot setup phase, not a background service.
  * ─────────────────────────────────────────────────────────────────────────────
@@ -361,18 +366,27 @@ static void loadConfigFromNVS() {
   Serial.println("[cfg] loaded saved override from NVS");
 }
 
+// Tries the saved network for a generous window, with a couple of fresh
+// WiFi.begin() attempts along the way — a single short timeout was too quick
+// to declare failure on a slow router/mesh handshake and falsely fell back
+// to the setup hotspot even though the credentials were fine.
 static bool connectWifi() {
   Serial.printf("[wifi] connecting to \"%s\"\n", cfg.ssid);
   WiFi.mode(WIFI_STA);
-  WiFi.begin(cfg.ssid, cfg.pass);
   WiFi.setAutoReconnect(true);
-  for (int i = 0; i < 40 && WiFi.status() != WL_CONNECTED; i++) {
-    delay(500);
-    Serial.print(".");
-  }
-  if (WiFi.status() == WL_CONNECTED) {
-    Serial.printf("\n[wifi] %s\n", WiFi.localIP().toString().c_str());
-    return true;
+
+  const int ROUNDS = 3;
+  const int WAIT_PER_ROUND = 40;  // x 500ms = 20s per round
+  for (int round = 0; round < ROUNDS; round++) {
+    WiFi.begin(cfg.ssid, cfg.pass);
+    for (int i = 0; i < WAIT_PER_ROUND && WiFi.status() != WL_CONNECTED; i++) {
+      delay(500);
+      Serial.print(".");
+    }
+    if (WiFi.status() == WL_CONNECTED) {
+      Serial.printf("\n[wifi] %s\n", WiFi.localIP().toString().c_str());
+      return true;
+    }
   }
   Serial.println("\n[wifi] connect failed");
   return false;
@@ -500,6 +514,9 @@ void setup() {
   bool forceProvision = prefs.getBool("force_setup", false);
   if (forceProvision) prefs.putBool("force_setup", false);
 
+  // Try the saved/default network (connectWifi() itself retries generously
+  // before giving up). Only if that genuinely fails — or a reset was
+  // explicitly requested — do we fall back to the setup hotspot.
   bool wifiOk = forceProvision ? false : connectWifi();
   if (!wifiOk) runApProvisioning();  // blocks; saves config + restarts on success, never returns
 
