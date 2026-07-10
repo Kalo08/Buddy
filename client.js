@@ -23,6 +23,7 @@ const el = {
   micToggle:      $('mic-toggle'),
   speakerToggle:  $('speaker-toggle'),
   speakBtn:       $('speak-btn'),
+  resetWifiBtn:   $('reset-wifi-btn'),
 };
 
 // ── State ─────────────────────────────────────────────────────────────────────
@@ -374,6 +375,14 @@ document.querySelectorAll('.d-btn[data-dir]').forEach(btn => {
   btn.addEventListener('mouseleave',  releaseDpad);
   btn.addEventListener('touchend',    releaseDpad);
   btn.addEventListener('touchcancel', releaseDpad);
+});
+
+// Reset WiFi — tells the buddy to drop its saved network and re-enter
+// Bluetooth setup mode on reboot (see flash.html's Bluetooth panel).
+el.resetWifiBtn.addEventListener('click', () => {
+  if (!ws || ws.readyState !== WebSocket.OPEN) return;
+  if (!confirm('This will disconnect the buddy from its current WiFi and restart it into Bluetooth setup mode. Continue?')) return;
+  ws.send(JSON.stringify({ type: 'reset_config' }));
 });
 
 // Keyboard support

@@ -19,16 +19,30 @@
  *
  * External wiring needed:
  *   PCA9685 servo driver  → SDA=GPIO14  SCL=GPIO13  VCC=3.3V  GND=GND
- *     Servo 0 → PCA channel 0
- *     Servo 1 → PCA channel 1
- *     Servo 2 → PCA channel 2
+ *     3 continuous-rotation wheel servos, tangent to chassis center,
+ *     positioned at 0°/120°/240° (clockwise from front, top-down view):
+ *       Servo 0 → PCA channel 0  (front, 0°)
+ *       Servo 1 → PCA channel 1  (120°)
+ *       Servo 2 → PCA channel 2  (240°)
  *   MAX98357A speaker amp → BCLK=GPIO2  LRC=GPIO13  DIN=GPIO12
  *   NOTE: GPIO12 must be LOW at boot — ensure amp DIN is not driving HIGH on power-on
  *
- * Servo command (JSON over WebSocket):
- *   { "type": "servo", "ch": 0, "angle": 90 }   — ch: 0-2, angle: 0-180
+ * Commands (JSON over WebSocket):
+ *   { "type": "cmd",   "dir": "fwd"|"back"|"left"|"right"|"stop" }  — holonomic drive
+ *   { "type": "servo", "ch": 0, "angle": 90 }                       — raw per-wheel override, ch: 0-2, angle: 0-180
+ *   { "type": "reset_config" }                                      — clear saved config, re-enter BLE setup on reboot
  *
- * Config block is patched by the Buddy flash tool before writing.
+ * Config block is patched by the Buddy flash tool before writing (factory default).
+ * Can be overridden later at runtime via Bluetooth setup, saved to NVS flash:
+ *   - On boot, WiFi connect is attempted with the current config (flash default,
+ *     or NVS override if one was saved). If it fails (or a reset was requested),
+ *     the device stops and advertises BLE as "Buddy-Setup-<id>" until a browser
+ *     using Web Bluetooth writes a new config, then reboots into normal operation.
+ *   - BLE is never active at the same time as the camera/WebSocket — it's a
+ *     one-shot setup phase, not a background service.
+ *   - GATT service  7a51b900-3e26-4b64-9b8f-1a1f6d6a8e10
+ *       config char  7a51b901-...  (write)  JSON: {ssid,pass,host,port,id}
+ *       status char  7a51b902-...  (read/notify) plain text progress/result
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
@@ -41,6 +55,11 @@
 #include "soc/rtc_cntl_reg.h"
 #include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
+#include <Preferences.h>
+#include <BLEDevice.h>
+#include <BLEServer.h>
+#include <BLEUtils.h>
+#include <BLE2902.h>
 
 // ─── Config block ─────────────────────────────────────────────────────────────
 // DO NOT reorder fields. Flash tool patches at fixed offsets from magic bytes.
@@ -53,6 +72,15 @@ struct __attribute__((packed)) BuddyConfig {
   uint32_t port = 443;
   char id[16] = "BDY-00001";
 } cfg;
+
+// ─── Bluetooth WiFi setup ──────────────────────────────────────────────────────
+#define BLE_SVC_UUID       "7a51b900-3e26-4b64-9b8f-1a1f6d6a8e10"
+#define BLE_CFG_CHAR_UUID  "7a51b901-3e26-4b64-9b8f-1a1f6d6a8e10"
+#define BLE_STATUS_CHAR_UUID "7a51b902-3e26-4b64-9b8f-1a1f6d6a8e10"
+
+Preferences prefs;
+volatile bool bleConfigSaved = false;
+BLECharacteristic* g_statusChar = nullptr;
 
 // ─── Camera pins (AI Thinker ESP32-CAM / OV2640) ─────────────────────────────
 #define PWDN_GPIO_NUM     32
@@ -128,6 +156,31 @@ static void setServo(uint8_t ch, int angle) {
   Serial.printf("[srv] ch%u → %d°\n", ch, angle);
 }
 
+// ─── Holonomic drive mixing ────────────────────────────────────────────────────
+// 3 continuous-rotation wheel servos, tangent to the chassis center, positioned
+// at 0° / 120° / 240° (clockwise from front, top-down view). 90° = stop.
+#define DRIVE_DEG 60   // max deflection from 90° (center) at full commanded speed
+
+// Tangential drive-direction unit vector per wheel, in (forward, right) frame —
+// i.e. -sin(pos), cos(pos) for pos = 0°, 120°, 240°.
+static const float WHEEL_DX[NUM_SERVOS] = {  0.0f,      -0.8660254f,  0.8660254f };
+static const float WHEEL_DY[NUM_SERVOS] = {  1.0f,      -0.5f,       -0.5f };
+
+static void driveServos(float vx, float vy) {
+  for (uint8_t i = 0; i < NUM_SERVOS; i++) {
+    float speed = WHEEL_DX[i] * vx + WHEEL_DY[i] * vy;  // -1..1
+    setServo(i, 90 + (int)(speed * DRIVE_DEG));
+  }
+}
+
+static void driveCmd(const char* dir) {
+  if (strcmp(dir, "fwd") == 0)         driveServos( 1,  0);
+  else if (strcmp(dir, "back") == 0)   driveServos(-1,  0);
+  else if (strcmp(dir, "left") == 0)   driveServos( 0, -1);
+  else if (strcmp(dir, "right") == 0)  driveServos( 0,  1);
+  else                                 driveServos( 0,  0);  // stop / unknown
+}
+
 static void centerServos() {
   for (uint8_t i = 0; i < NUM_SERVOS; i++) {
     pca.setPWM(i, 0, SERVO_CENTER);
@@ -166,6 +219,13 @@ void onWsEvent(WStype_t type, uint8_t* payload, size_t len) {
         } else if (strcmp(t, "servo") == 0) {
           // { "type": "servo", "ch": 0, "angle": 90 }
           setServo((uint8_t)(doc["ch"] | 0), (int)(doc["angle"] | 90));
+        } else if (strcmp(t, "cmd") == 0) {
+          // { "type": "cmd", "dir": "fwd"|"back"|"left"|"right"|"stop" }
+          driveCmd(doc["dir"] | "stop");
+        } else if (strcmp(t, "reset_config") == 0) {
+          Serial.println("[cfg] reset requested — will enter BLE setup on reboot");
+          prefs.putBool("force_ble", true);
+          ESP.restart();
         }
         break;
       }
@@ -286,6 +346,114 @@ void initServos() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Config persistence (NVS) + Bluetooth WiFi setup
+// ─────────────────────────────────────────────────────────────────────────────
+
+static void copyField(char* dst, size_t dstSize, const String& src) {
+  strncpy(dst, src.c_str(), dstSize - 1);
+  dst[dstSize - 1] = 0;
+}
+
+// Overlays cfg with a previously-saved NVS config, if one exists. Otherwise
+// cfg keeps the flash-patched factory defaults untouched.
+static void loadConfigFromNVS() {
+  if (!prefs.getBool("cfgd", false)) return;
+  copyField(cfg.ssid, sizeof(cfg.ssid), prefs.getString("ssid", cfg.ssid));
+  copyField(cfg.pass, sizeof(cfg.pass), prefs.getString("pass", cfg.pass));
+  copyField(cfg.host, sizeof(cfg.host), prefs.getString("host", cfg.host));
+  cfg.port = prefs.getUInt("port", cfg.port);
+  copyField(cfg.id, sizeof(cfg.id), prefs.getString("id", cfg.id));
+  Serial.println("[cfg] loaded saved override from NVS");
+}
+
+static bool connectWifi() {
+  Serial.printf("[wifi] connecting to \"%s\"\n", cfg.ssid);
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(cfg.ssid, cfg.pass);
+  WiFi.setAutoReconnect(true);
+  for (int i = 0; i < 40 && WiFi.status() != WL_CONNECTED; i++) {
+    delay(500);
+    Serial.print(".");
+  }
+  if (WiFi.status() == WL_CONNECTED) {
+    Serial.printf("\n[wifi] %s\n", WiFi.localIP().toString().c_str());
+    return true;
+  }
+  Serial.println("\n[wifi] connect failed");
+  return false;
+}
+
+static void notifyStatus(const char* s) {
+  Serial.printf("[ble] %s\n", s);
+  if (g_statusChar) {
+    g_statusChar->setValue(s);
+    g_statusChar->notify();
+  }
+}
+
+class ConfigWriteCallback : public BLECharacteristicCallbacks {
+  void onWrite(BLECharacteristic* c) override {
+    StaticJsonDocument<300> doc;
+    if (deserializeJson(doc, c->getValue()) != DeserializationError::Ok) {
+      notifyStatus("error: bad json");
+      return;
+    }
+    const char* ssid = doc["ssid"] | "";
+    if (strlen(ssid) == 0) {
+      notifyStatus("error: ssid required");
+      return;
+    }
+    copyField(cfg.ssid, sizeof(cfg.ssid), String(ssid));
+    copyField(cfg.pass, sizeof(cfg.pass), String(doc["pass"] | (const char*)cfg.pass));
+    copyField(cfg.host, sizeof(cfg.host), String(doc["host"] | (const char*)cfg.host));
+    cfg.port = doc["port"] | cfg.port;
+    copyField(cfg.id, sizeof(cfg.id), String(doc["id"] | (const char*)cfg.id));
+
+    prefs.putString("ssid", cfg.ssid);
+    prefs.putString("pass", cfg.pass);
+    prefs.putString("host", cfg.host);
+    prefs.putUInt("port", cfg.port);
+    prefs.putString("id", cfg.id);
+    prefs.putBool("cfgd", true);
+
+    notifyStatus("saved — restarting");
+    bleConfigSaved = true;
+  }
+};
+
+// Blocks, advertising BLE, until a valid config is written and saved — then
+// restarts the device. Never runs alongside the camera/WiFi/WebSocket.
+static void runBleProvisioning() {
+  Serial.println("[ble] entering WiFi setup mode");
+  bleConfigSaved = false;
+
+  BLEDevice::init((String("Buddy-Setup-") + cfg.id).c_str());
+  BLEServer* server   = BLEDevice::createServer();
+  BLEService* service = server->createService(BLE_SVC_UUID);
+
+  BLECharacteristic* cfgChar = service->createCharacteristic(
+      BLE_CFG_CHAR_UUID, BLECharacteristic::PROPERTY_WRITE);
+  cfgChar->setCallbacks(new ConfigWriteCallback());
+
+  g_statusChar = service->createCharacteristic(
+      BLE_STATUS_CHAR_UUID, BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_NOTIFY);
+  g_statusChar->addDescriptor(new BLE2902());
+  g_statusChar->setValue("waiting");
+
+  service->start();
+  BLEAdvertising* adv = BLEDevice::getAdvertising();
+  adv->addServiceUUID(BLE_SVC_UUID);
+  adv->start();
+
+  Serial.println("[ble] advertising — waiting for WiFi setup");
+  while (!bleConfigSaved) {
+    vTaskDelay(pdMS_TO_TICKS(200));
+  }
+  delay(500);  // let the "saved" notify actually go out before we tear down BLE
+  ESP.restart();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Setup
 // ─────────────────────────────────────────────────────────────────────────────
 void setup() {
@@ -303,23 +471,21 @@ void setup() {
 
   txQueue = xQueueCreate(TX_QUEUE_DEPTH, sizeof(Frame));
 
+  // Config + WiFi — resolved before camera/servo init so a fresh BLE setup
+  // session (which always ends in a reboot) doesn't waste time on hardware
+  // that'll just be torn down again.
+  prefs.begin("buddy", false);
+  loadConfigFromNVS();
+
+  bool forceProvision = prefs.getBool("force_ble", false);
+  if (forceProvision) prefs.putBool("force_ble", false);
+
+  bool wifiOk = forceProvision ? false : connectWifi();
+  if (!wifiOk) runBleProvisioning();  // blocks; saves config + restarts on success, never returns
+
   initCamera();
   initSpeaker();
   initServos();
-
-  // WiFi
-  Serial.printf("[wifi] connecting to \"%s\"\n", cfg.ssid);
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(cfg.ssid, cfg.pass);
-  WiFi.setAutoReconnect(true);
-  for (int i = 0; i < 40 && WiFi.status() != WL_CONNECTED; i++) {
-    delay(500);
-    Serial.print(".");
-  }
-  if (WiFi.status() == WL_CONNECTED)
-    Serial.printf("\n[wifi] %s\n", WiFi.localIP().toString().c_str());
-  else
-    Serial.println("\n[wifi] timed out — will retry");
 
   // WebSocket — use WSS (port 443) for Railway, plain WS (cfg.port) for local
   String path = String("/ws?id=") + cfg.id + "&role=device";
