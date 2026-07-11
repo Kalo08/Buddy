@@ -88,7 +88,7 @@ PCA_OSC_HZ = 27_000_000
 # never send it at idle). Calibrate per wheel — see README.
 NEUTRAL_US = [1500, 1500, 1500]
 
-DRIVE_US = 200    # offset from neutral at 100% commanded speed (lower = slower)
+DRIVE_US = 100    # offset from neutral at 100% commanded speed (lower = slower)
 DEADBAND = 0.05   # |speed| below this cuts the channel entirely
 
 # ─── Stall-protection workaround: command dithering ───────────────────────────
