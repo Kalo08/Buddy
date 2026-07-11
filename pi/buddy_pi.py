@@ -466,6 +466,19 @@ def parse_args():
     p.add_argument("--height",  default=480, type=int)
     p.add_argument("--fps",     default=15, type=int)
     p.add_argument("--quality", default=70, type=int, help="JPEG quality 0-100")
+    # Servo experiment knobs — override the file constants without editing code
+    p.add_argument("--drive-us",  default=DRIVE_US, type=int,
+                   help="pulse offset from neutral at full speed (default %(default)s)")
+    p.add_argument("--dither-us", default=DITHER_US, type=int,
+                   help="alternate-pulse deviation in µs (default %(default)s)")
+    p.add_argument("--dither-ms", default=DITHER_MS, type=int,
+                   help="dither period in ms, 0 = off (default %(default)s)")
+    p.add_argument("--rest-on",   default=REST_ON_MS, type=int,
+                   help="drive window in ms before resting (default %(default)s)")
+    p.add_argument("--rest-off",  default=REST_OFF_MS, type=int,
+                   help="rest window in ms, 0 = never rest (default %(default)s)")
+    p.add_argument("--neutral",   default=None,
+                   help="per-channel neutral pulses, e.g. --neutral 1500,1620,1480")
     p.add_argument("-v", "--verbose", action="store_true")
     args = p.parse_args()
     args.id = args.id.upper().strip()
@@ -480,6 +493,22 @@ def main():
         level=logging.DEBUG if args.verbose else logging.INFO,
         format="%(message)s",
     )
+
+    # Apply servo knob overrides to the module-level constants
+    globals().update(
+        DRIVE_US=args.drive_us,
+        DITHER_US=args.dither_us,
+        DITHER_MS=args.dither_ms,
+        REST_ON_MS=args.rest_on,
+        REST_OFF_MS=args.rest_off,
+    )
+    if args.neutral:
+        vals = [int(v) for v in args.neutral.split(",")]
+        if len(vals) != NUM_SERVOS:
+            sys.exit(f"--neutral needs {NUM_SERVOS} comma-separated values")
+        globals()["NEUTRAL_US"] = vals
+    log.info("[srv] drive=%dµs dither=%dµs/%dms rest=%d/%dms neutral=%s",
+             DRIVE_US, DITHER_US, DITHER_MS, REST_ON_MS, REST_OFF_MS, NEUTRAL_US)
 
     buddy = Buddy(args)
     loop = asyncio.new_event_loop()
