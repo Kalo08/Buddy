@@ -127,7 +127,8 @@ class Servos:
 
     def __init__(self):
         self.bus = None
-        self.targets = [0.0] * NUM_SERVOS  # commanded speed per channel (for burst task)
+        self.targets = [0.0] * NUM_SERVOS   # commanded speed per channel (for burst task)
+        self.cal_us  = [None] * NUM_SERVOS  # active calibration pulse per channel, if any
         try:
             from smbus2 import SMBus
             self.bus = SMBus(1)  # Pi 3: I2C bus 1 (GPIO2/GPIO3)
@@ -177,21 +178,28 @@ class Servos:
         if abs(speed) < DEADBAND:
             speed = 0.0
         self.targets[ch] = speed
+        self.cal_us[ch] = None  # drive commands override calibration mode
         if speed == 0.0:
             self._off(ch)
         else:
             self._write_us(ch, NEUTRAL_US[ch] + speed * DRIVE_US)
 
-    # Burst support: briefly starve driven channels of signal, then resume.
+    # Burst support: briefly starve active channels of signal, then resume.
+    # Covers both drive targets and calibration pulses.
+    def burst_active(self) -> bool:
+        return any(self.targets) or any(u is not None for u in self.cal_us)
+
     def burst_pause(self):
-        for i, t in enumerate(self.targets):
-            if t:
+        for i in range(NUM_SERVOS):
+            if self.targets[i] or self.cal_us[i] is not None:
                 self._off(i)
 
     def burst_resume(self):
-        for i, t in enumerate(self.targets):
-            if t:
-                self._write_us(i, NEUTRAL_US[i] + t * DRIVE_US)
+        for i in range(NUM_SERVOS):
+            if self.cal_us[i] is not None:
+                self._write_us(i, self.cal_us[i])
+            elif self.targets[i]:
+                self._write_us(i, NEUTRAL_US[i] + self.targets[i] * DRIVE_US)
 
     def set(self, ch: int, angle: float):
         """Calibration path for { "type": "servo" } messages.
@@ -202,15 +210,18 @@ class Servos:
         if self.bus is None or not (0 <= ch < NUM_SERVOS):
             return
         if angle < 0:
+            self.cal_us[ch] = None
             self._off(ch)
             return
         us = 500 + min(180.0, angle) * 2000.0 / 180.0
         log.info("[srv] ch%d calibrate → %.0fµs (angle %.1f)", ch, us, angle)
+        self.cal_us[ch] = us
         self._write_us(ch, us)
 
     def stop_all(self):
         """All outputs off — nothing is driven, nothing hums."""
         self.targets = [0.0] * NUM_SERVOS
+        self.cal_us  = [None] * NUM_SERVOS
         if self.bus is None:
             return
         for i in range(NUM_SERVOS):
@@ -344,9 +355,9 @@ class Buddy:
         if BURST_OFF_MS <= 0:
             return
         while True:
-            if any(self.servos.targets):
+            if self.servos.burst_active():
                 await asyncio.sleep(BURST_ON_MS / 1000)
-                if not any(self.servos.targets):
+                if not self.servos.burst_active():
                     continue  # released mid-burst — outputs already off
                 self.servos.burst_pause()
                 await asyncio.sleep(BURST_OFF_MS / 1000)
