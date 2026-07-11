@@ -91,6 +91,15 @@ NEUTRAL_US = [1500, 1500, 1500]
 DRIVE_US = 200    # offset from neutral at 100% commanded speed (lower = slower)
 DEADBAND = 0.05   # |speed| below this cuts the channel entirely
 
+# ─── Stall-protection workaround ──────────────────────────────────────────────
+# With the pot frozen, the servo firmware sees a position error that never
+# shrinks, decides the motor is stalled, and ramps power down after a few
+# seconds (power-cycling resets it — the fade-out-and-squeak symptom).
+# Workaround: while driving, briefly cut the signal every burst so the
+# protection timer restarts. Wheel inertia smooths over the gaps.
+BURST_ON_MS  = 400   # drive pulses for this long...
+BURST_OFF_MS = 60    # ...then go silent for this long. 0 = disable bursting.
+
 # ─── Drive geometry ───────────────────────────────────────────────────────────
 # Three wheels tangent to the chassis circle — TWO IN FRONT, ONE IN BACK
 # (top-down view, positions measured clockwise from straight ahead):
@@ -118,6 +127,7 @@ class Servos:
 
     def __init__(self):
         self.bus = None
+        self.targets = [0.0] * NUM_SERVOS  # commanded speed per channel (for burst task)
         try:
             from smbus2 import SMBus
             self.bus = SMBus(1)  # Pi 3: I2C bus 1 (GPIO2/GPIO3)
@@ -165,9 +175,23 @@ class Servos:
             return
         speed = max(-1.0, min(1.0, speed))
         if abs(speed) < DEADBAND:
+            speed = 0.0
+        self.targets[ch] = speed
+        if speed == 0.0:
             self._off(ch)
         else:
             self._write_us(ch, NEUTRAL_US[ch] + speed * DRIVE_US)
+
+    # Burst support: briefly starve driven channels of signal, then resume.
+    def burst_pause(self):
+        for i, t in enumerate(self.targets):
+            if t:
+                self._off(i)
+
+    def burst_resume(self):
+        for i, t in enumerate(self.targets):
+            if t:
+                self._write_us(i, NEUTRAL_US[i] + t * DRIVE_US)
 
     def set(self, ch: int, angle: float):
         """Calibration path for { "type": "servo" } messages.
@@ -186,6 +210,7 @@ class Servos:
 
     def stop_all(self):
         """All outputs off — nothing is driven, nothing hums."""
+        self.targets = [0.0] * NUM_SERVOS
         if self.bus is None:
             return
         for i in range(NUM_SERVOS):
@@ -311,6 +336,24 @@ class Buddy:
                     await ws.send(bytes([TYPE_VIDEO]) + jpg)
             await asyncio.sleep(max(0.0, interval - (loop.time() - start)))
 
+    # ── Stall-protection burst task ──────────────────────────────────────────
+    # While any wheel is being driven, cut its signal for BURST_OFF_MS every
+    # BURST_ON_MS so the servo's internal stall-protection timer keeps
+    # resetting (frozen pot = permanent "stall" as far as it can tell).
+    async def burst_task(self):
+        if BURST_OFF_MS <= 0:
+            return
+        while True:
+            if any(self.servos.targets):
+                await asyncio.sleep(BURST_ON_MS / 1000)
+                if not any(self.servos.targets):
+                    continue  # released mid-burst — outputs already off
+                self.servos.burst_pause()
+                await asyncio.sleep(BURST_OFF_MS / 1000)
+                self.servos.burst_resume()
+            else:
+                await asyncio.sleep(0.05)
+
     # ── Incoming messages ────────────────────────────────────────────────────
     async def recv_task(self, ws):
         async for msg in ws:
@@ -352,10 +395,12 @@ class Buddy:
                 ) as ws:
                     log.info("[ws]  connected — id: %s", self.args.id)
                     try:
-                        cam = asyncio.create_task(self.camera_task(ws))
+                        cam   = asyncio.create_task(self.camera_task(ws))
+                        burst = asyncio.create_task(self.burst_task())
                         await self.recv_task(ws)
                     finally:
                         cam.cancel()
+                        burst.cancel()
             except asyncio.CancelledError:
                 raise
             except Exception as e:
