@@ -322,6 +322,7 @@ class Speaker:
             is_new_webm = chunk.startswith(EBML_MAGIC)
             is_new_ogg  = (chunk.startswith(OGG_MAGIC)
                            and len(chunk) > 5 and (chunk[5] & 0x02))
+            is_new_mp4  = len(chunk) > 8 and chunk[4:8] == b"ftyp"  # iOS MediaRecorder
             if is_new_webm:
                 log.info("[spk] webm audio stream from browser (%d bytes)", len(chunk))
                 self._spawn("matroska")
@@ -330,9 +331,15 @@ class Speaker:
                 log.info("[spk] ogg audio stream from browser (%d bytes)", len(chunk))
                 self._spawn("ogg")
                 self._dump_open()
+            elif is_new_mp4:
+                log.info("[spk] mp4 audio stream from browser (%d bytes)", len(chunk))
+                self._spawn("mp4")
+                self._dump_open()
             elif self.proc is None or self.proc.poll() is not None:
-                # mid-stream chunk with no live player — we missed the header,
-                # nothing useful to do until the next fresh stream arrives
+                # Chunk with no live player and no recognizable stream header —
+                # log what it actually starts with so unknown formats show up.
+                log.warning("[spk] unrecognized audio chunk (%d bytes, header %s)",
+                            len(chunk), chunk[:16].hex())
                 self._kill()
                 continue
 
