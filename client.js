@@ -270,14 +270,26 @@ el.speakBtn.addEventListener('mouseleave',  stopSpeaking);
 el.speakBtn.addEventListener('touchend',    stopSpeaking);
 el.speakBtn.addEventListener('touchcancel', stopSpeaking);
 
+let speakSession = 0;
+
 async function startSpeaking() {
   if (!connected || micMuted) return;
+  if (mediaRecorder) return; // already recording (e.g. ghost mousedown after touchstart)
 
+  const session = ++speakSession;
   el.speakBtn.classList.add('speaking');
 
   try {
-    micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
 
+    // Button released (or pressed again) while the permission prompt was up —
+    // don't start a recorder nobody will ever stop.
+    if (session !== speakSession || !el.speakBtn.classList.contains('speaking')) {
+      stream.getTracks().forEach(t => t.stop());
+      return;
+    }
+
+    micStream = stream;
     mediaRecorder = new MediaRecorder(micStream);
 
     mediaRecorder.ondataavailable = async e => {
