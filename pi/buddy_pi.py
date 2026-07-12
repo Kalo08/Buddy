@@ -135,6 +135,11 @@ REST_NEUTRAL = True
 WHEEL_FWD   = [ 0.8660254, -0.8660254,  0.0]   # FL, FR, B
 WHEEL_RIGHT = [ 0.5,        0.5,       -1.0]
 
+# Per-wheel direction sign — flips a wheel whose real-world spin is mirrored
+# vs the math above (depends on which way the servo is mounted). Field-set:
+# both front wheels run reversed on this chassis.
+WHEEL_DIR   = [-1.0, -1.0, 1.0]                # FL, FR, B
+
 
 class Servos:
     """PCA9685 over the Pi's I2C bus. Degrades gracefully if absent."""
@@ -250,7 +255,7 @@ class Servos:
 
     def drive(self, vx: float, vy: float):
         for i in range(NUM_SERVOS):
-            self.set_speed(i, WHEEL_FWD[i] * vx + WHEEL_RIGHT[i] * vy)
+            self.set_speed(i, WHEEL_DIR[i] * (WHEEL_FWD[i] * vx + WHEEL_RIGHT[i] * vy))
 
     def cmd(self, direction: str):
         vx, vy = {
