@@ -468,7 +468,7 @@ class Microphone:
             self.proc = await asyncio.create_subprocess_exec(
                 *cmd,
                 stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.DEVNULL,
+                stderr=asyncio.subprocess.PIPE,
             )
             log.info("[mic] arecord started (pid %d, device %s)", self.proc.pid, self.device)
             return True
@@ -485,6 +485,13 @@ class Microphone:
         try:
             return await self.proc.stdout.readexactly(self.CHUNK_BYTES)
         except (asyncio.IncompleteReadError, Exception):
+            # Surface WHY arecord died — device name/format errors land here.
+            try:
+                err = (await self.proc.stderr.read()).decode(errors="replace").strip()
+                if err:
+                    log.warning("[mic] arecord said: %s", err.splitlines()[-1])
+            except Exception:
+                pass
             return None
 
     def stop(self):
@@ -638,7 +645,10 @@ def parse_args():
     p.add_argument("--port",    default=DEFAULT_PORT, type=int, help="hub server port (443 = wss)")
     p.add_argument("--id",      default=DEFAULT_ID, help="buddy ID, e.g. BDY-00001")
     p.add_argument("--camera",     default=0,    type=int, help="V4L2 device index (/dev/videoN)")
-    p.add_argument("--mic-device", default="hw:1", help="ALSA capture device (run 'arecord -l' to list). Default: hw:1")
+    # plughw (not hw): USB mics rarely support 16kHz mono natively, and bare
+    # hw: refuses to convert — plughw lets ALSA resample to what we ask for.
+    p.add_argument("--mic-device", default="plughw:1,0",
+                   help="ALSA capture device (run 'arecord -l' to list). Default: %(default)s")
     p.add_argument("--width",   default=640, type=int)
     p.add_argument("--height",  default=480, type=int)
     p.add_argument("--fps",     default=15, type=int)
