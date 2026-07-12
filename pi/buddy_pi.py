@@ -142,8 +142,7 @@ class Servos:
 
     def __init__(self):
         self.bus = None
-        self.targets = [0.0] * NUM_SERVOS   # commanded speed per channel (for burst task)
-        self.cal_us  = [None] * NUM_SERVOS  # active calibration pulse per channel, if any
+        self.targets = [0.0] * NUM_SERVOS  # commanded drive speed per channel
         try:
             from smbus2 import SMBus
             self.bus = SMBus(1)  # Pi 3: I2C bus 1 (GPIO2/GPIO3)
@@ -193,36 +192,31 @@ class Servos:
         if abs(speed) < DEADBAND:
             speed = 0.0
         self.targets[ch] = speed
-        self.cal_us[ch] = None  # drive commands override calibration mode
         if speed == 0.0:
             self._off(ch)
         else:
             self._write_us(ch, NEUTRAL_US[ch] + speed * DRIVE_US)
 
-    # Dither support: rewrite every active channel, alternating between its
-    # base pulse and base ± DITHER_US (pushed away from neutral so the wheel
-    # never reverses). Covers both drive targets and calibration pulses.
+    # Dither/rest support — applies ONLY to D-pad drive targets. Calibration
+    # pulses (browser-console "servo" messages) are always raw and steady so
+    # pot centering gets clean, predictable feedback.
     def dither_active(self) -> bool:
-        return any(self.targets) or any(u is not None for u in self.cal_us)
+        return any(self.targets)
 
     def dither_write(self, phase: bool):
         for i in range(NUM_SERVOS):
-            if self.cal_us[i] is not None:
-                base, ref = self.cal_us[i], 1500
-            elif self.targets[i]:
-                base = NEUTRAL_US[i] + self.targets[i] * DRIVE_US
-                ref  = NEUTRAL_US[i]
-            else:
+            if not self.targets[i]:
                 continue
+            base = NEUTRAL_US[i] + self.targets[i] * DRIVE_US
             if phase:
-                base += DITHER_US if base >= ref else -DITHER_US
+                base += DITHER_US if base >= NEUTRAL_US[i] else -DITHER_US
             self._write_us(i, base)
 
     def rest_pause(self):
-        """Rest all active channels: silence them, or (REST_NEUTRAL) hold
+        """Rest all driven channels: silence them, or (REST_NEUTRAL) hold
         them at their neutral pulse so the firmware sees 'target reached'."""
         for i in range(NUM_SERVOS):
-            if self.targets[i] or self.cal_us[i] is not None:
+            if self.targets[i]:
                 if REST_NEUTRAL:
                     self._write_us(i, NEUTRAL_US[i])
                 else:
@@ -237,18 +231,15 @@ class Servos:
         if self.bus is None or not (0 <= ch < NUM_SERVOS):
             return
         if angle < 0:
-            self.cal_us[ch] = None
             self._off(ch)
             return
         us = 500 + min(180.0, angle) * 2000.0 / 180.0
         log.info("[srv] ch%d calibrate → %.0fµs (angle %.1f)", ch, us, angle)
-        self.cal_us[ch] = us
         self._write_us(ch, us)
 
     def stop_all(self):
         """All outputs off — nothing is driven, nothing hums."""
         self.targets = [0.0] * NUM_SERVOS
-        self.cal_us  = [None] * NUM_SERVOS
         if self.bus is None:
             return
         for i in range(NUM_SERVOS):
