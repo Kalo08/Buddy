@@ -109,6 +109,12 @@ DITHER_MS = 300   # how often to alternate. 0 = disable dithering.
 REST_ON_MS  = 2000
 REST_OFF_MS = 1500
 
+# Rest style: False = go silent (no signal) during the rest window.
+# True = command each channel's NEUTRAL_US instead — the firmware sees
+# "target reached" (pulse matches the frozen pot), which may reset its
+# stall detector much faster than silence does.
+REST_NEUTRAL = False
+
 # ─── Drive geometry ───────────────────────────────────────────────────────────
 # Three wheels tangent to the chassis circle — TWO IN FRONT, ONE IN BACK
 # (top-down view, positions measured clockwise from straight ahead):
@@ -213,10 +219,14 @@ class Servos:
             self._write_us(i, base)
 
     def rest_pause(self):
-        """Silence all active channels for a rest window."""
+        """Rest all active channels: silence them, or (REST_NEUTRAL) hold
+        them at their neutral pulse so the firmware sees 'target reached'."""
         for i in range(NUM_SERVOS):
             if self.targets[i] or self.cal_us[i] is not None:
-                self._off(i)
+                if REST_NEUTRAL:
+                    self._write_us(i, NEUTRAL_US[i])
+                else:
+                    self._off(i)
 
     def set(self, ch: int, angle: float):
         """Calibration path for { "type": "servo" } messages.
@@ -270,28 +280,49 @@ class Speaker:
     def __init__(self):
         self.proc = None
 
-    def _spawn(self):
+    def _spawn(self, webm: bool):
         self.stop()
+        # When the chunk carries the EBML magic we KNOW it's webm/opus, so
+        # skip format probing entirely (-f matroska, minimal probesize) —
+        # otherwise ffplay buffers ~1s of pipe data before playing, and a
+        # short press never delivers enough to get past the probe.
+        fmt = ["-f", "matroska", "-probesize", "32", "-analyzeduration", "0"] if webm else []
+        cmd = (["ffplay", "-nodisp", "-autoexit", "-loglevel", "warning",
+                "-fflags", "nobuffer", "-flags", "low_delay"]
+               + fmt + ["-i", "pipe:0"])
         try:
+            # stderr inherited on purpose: if ffplay can't open an audio
+            # output device, that error must land in the journal/terminal.
             self.proc = subprocess.Popen(
-                ["ffplay", "-nodisp", "-autoexit", "-loglevel", "quiet", "-i", "pipe:0"],
+                cmd,
                 stdin=subprocess.PIPE,
                 stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
             )
+            log.info("[spk] ffplay started (pid %d)", self.proc.pid)
         except FileNotFoundError:
             log.warning("[spk] ffplay not found — audio playback disabled "
                         "(sudo apt install ffmpeg)")
             self.proc = None
 
     def feed(self, chunk: bytes):
-        if chunk.startswith(EBML_MAGIC) or self.proc is None or self.proc.poll() is not None:
-            self._spawn()
+        is_new_stream = chunk.startswith(EBML_MAGIC)
+        if is_new_stream:
+            log.info("[spk] audio stream from browser (%d bytes)", len(chunk))
+            self._spawn(webm=True)
+        elif self.proc is None:
+            log.warning("[spk] mid-stream chunk with no player — starting anyway")
+            self._spawn(webm=False)
+        elif self.proc.poll() is not None:
+            log.warning("[spk] ffplay exited (code %s) — restarting on next stream",
+                        self.proc.returncode)
+            self.proc = None
+            return
         if self.proc and self.proc.stdin:
             try:
                 self.proc.stdin.write(chunk)
                 self.proc.stdin.flush()
             except (BrokenPipeError, OSError):
+                log.warning("[spk] ffplay pipe broke — player died mid-stream")
                 self.proc = None
 
     def stop(self):
@@ -477,6 +508,8 @@ def parse_args():
                    help="drive window in ms before resting (default %(default)s)")
     p.add_argument("--rest-off",  default=REST_OFF_MS, type=int,
                    help="rest window in ms, 0 = never rest (default %(default)s)")
+    p.add_argument("--rest-neutral", action="store_true",
+                   help="rest at the neutral pulse ('target reached') instead of silence")
     p.add_argument("--neutral",   default=None,
                    help="per-channel neutral pulses, e.g. --neutral 1500,1620,1480")
     p.add_argument("-v", "--verbose", action="store_true")
@@ -501,6 +534,7 @@ def main():
         DITHER_MS=args.dither_ms,
         REST_ON_MS=args.rest_on,
         REST_OFF_MS=args.rest_off,
+        REST_NEUTRAL=args.rest_neutral,
     )
     if args.neutral:
         vals = [int(v) for v in args.neutral.split(",")]
