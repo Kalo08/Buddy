@@ -313,10 +313,17 @@ class Speaker:
             if self.disabled:
                 continue
 
-            if chunk.startswith(EBML_MAGIC):
+            # New-stream detection. NOTE: "OggS" alone is NOT enough — ogg puts
+            # it at the start of EVERY page. A stream truly begins only when
+            # the page's BOS (beginning-of-stream) flag is set: bit 0x02 of
+            # byte 5. Mid-stream pages must be fed to the existing player.
+            is_new_webm = chunk.startswith(EBML_MAGIC)
+            is_new_ogg  = (chunk.startswith(OGG_MAGIC)
+                           and len(chunk) > 5 and (chunk[5] & 0x02))
+            if is_new_webm:
                 log.info("[spk] webm audio stream from browser (%d bytes)", len(chunk))
                 self._spawn("matroska")
-            elif chunk.startswith(OGG_MAGIC):
+            elif is_new_ogg:
                 log.info("[spk] ogg audio stream from browser (%d bytes)", len(chunk))
                 self._spawn("ogg")
             elif self.proc is None or self.proc.poll() is not None:
