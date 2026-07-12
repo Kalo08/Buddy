@@ -263,69 +263,102 @@ class Servos:
 
 
 # ─── Speaker (hold-to-talk audio from the browser) ────────────────────────────
-# The browser sends MediaRecorder chunks (webm/opus). Each press of the speak
-# button starts a fresh MediaRecorder, whose first chunk begins with the EBML
-# magic — when we see it, restart ffplay so the demuxer gets a clean stream.
+# The browser sends MediaRecorder chunks — webm/opus from Chrome, ogg/opus
+# from Firefox. Each press of the speak button starts a fresh MediaRecorder,
+# whose first chunk begins with a container magic; when we see one, restart
+# ffplay with the right format hint so the demuxer starts instantly (no
+# probing delay — a short press never delivers enough data to finish a probe).
+#
+# All pipe I/O happens on a worker thread behind a bounded queue: a wedged or
+# codec-confused player drops audio, but can NEVER block the asyncio loop.
+# (A blocked loop stops answering websocket pings → keepalive timeout → the
+# whole connection drops. Audio must never be able to do that.)
 
-EBML_MAGIC = b"\x1a\x45\xdf\xa3"
+EBML_MAGIC = b"\x1a\x45\xdf\xa3"   # webm/matroska (Chrome)
+OGG_MAGIC  = b"OggS"               # ogg (Firefox)
+
+import queue as _queue
+import threading as _threading
 
 
 class Speaker:
     def __init__(self):
+        self.q = _queue.Queue(maxsize=64)
         self.proc = None
+        self.disabled = False
+        _threading.Thread(target=self._worker, daemon=True, name="spk").start()
 
-    def _spawn(self, webm: bool):
-        self.stop()
-        # When the chunk carries the EBML magic we KNOW it's webm/opus, so
-        # skip format probing entirely (-f matroska, minimal probesize) —
-        # otherwise ffplay buffers ~1s of pipe data before playing, and a
-        # short press never delivers enough to get past the probe.
-        fmt = ["-f", "matroska", "-probesize", "32", "-analyzeduration", "0"] if webm else []
-        cmd = (["ffplay", "-nodisp", "-autoexit", "-loglevel", "warning",
-                "-fflags", "nobuffer", "-flags", "low_delay"]
-               + fmt + ["-i", "pipe:0"])
+    # ── async-loop side: never blocks ─────────────────────────────────────
+    def feed(self, chunk: bytes):
+        try:
+            self.q.put_nowait(chunk)
+        except _queue.Full:
+            pass  # player is behind — drop audio rather than stall the loop
+
+    def stop(self):
+        self.feed(b"")  # empty chunk = kill-player sentinel
+
+    # ── worker-thread side: all blocking lives here ───────────────────────
+    def _worker(self):
+        while True:
+            chunk = self.q.get()
+            if not chunk:
+                self._kill()
+                continue
+            if self.disabled:
+                continue
+
+            if chunk.startswith(EBML_MAGIC):
+                log.info("[spk] webm audio stream from browser (%d bytes)", len(chunk))
+                self._spawn("matroska")
+            elif chunk.startswith(OGG_MAGIC):
+                log.info("[spk] ogg audio stream from browser (%d bytes)", len(chunk))
+                self._spawn("ogg")
+            elif self.proc is None or self.proc.poll() is not None:
+                # mid-stream chunk with no live player — we missed the header,
+                # nothing useful to do until the next fresh stream arrives
+                self._kill()
+                continue
+
+            if self.proc and self.proc.stdin:
+                try:
+                    self.proc.stdin.write(chunk)
+                    self.proc.stdin.flush()
+                except (BrokenPipeError, OSError):
+                    log.warning("[spk] ffplay pipe broke — player died mid-stream")
+                    self._kill()
+
+    def _spawn(self, fmt: str):
+        self._kill()
+        cmd = ["ffplay", "-nodisp", "-autoexit", "-loglevel", "warning",
+               "-fflags", "nobuffer", "-flags", "low_delay",
+               "-f", fmt, "-probesize", "32", "-analyzeduration", "0",
+               "-i", "pipe:0"]
         try:
             # stderr inherited on purpose: if ffplay can't open an audio
-            # output device, that error must land in the journal/terminal.
+            # output device or decode a stream, that must land in the journal.
             self.proc = subprocess.Popen(
                 cmd,
                 stdin=subprocess.PIPE,
                 stdout=subprocess.DEVNULL,
             )
-            log.info("[spk] ffplay started (pid %d)", self.proc.pid)
+            log.info("[spk] ffplay started (pid %d, %s)", self.proc.pid, fmt)
         except FileNotFoundError:
             log.warning("[spk] ffplay not found — audio playback disabled "
                         "(sudo apt install ffmpeg)")
             self.proc = None
+            self.disabled = True
 
-    def feed(self, chunk: bytes):
-        is_new_stream = chunk.startswith(EBML_MAGIC)
-        if is_new_stream:
-            log.info("[spk] audio stream from browser (%d bytes)", len(chunk))
-            self._spawn(webm=True)
-        elif self.proc is None:
-            log.warning("[spk] mid-stream chunk with no player — starting anyway")
-            self._spawn(webm=False)
-        elif self.proc.poll() is not None:
-            log.warning("[spk] ffplay exited (code %s) — restarting on next stream",
-                        self.proc.returncode)
-            self.proc = None
-            return
-        if self.proc and self.proc.stdin:
-            try:
-                self.proc.stdin.write(chunk)
-                self.proc.stdin.flush()
-            except (BrokenPipeError, OSError):
-                log.warning("[spk] ffplay pipe broke — player died mid-stream")
-                self.proc = None
-
-    def stop(self):
+    def _kill(self):
         if self.proc:
             try:
                 self.proc.stdin.close()
             except Exception:
                 pass
-            self.proc.terminate()
+            try:
+                self.proc.terminate()
+            except Exception:
+                pass
             self.proc = None
 
 
