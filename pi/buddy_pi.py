@@ -15,6 +15,8 @@ Hardware:
       front-right → PCA channel 1
       back        → PCA channel 2
     Servos get NO signal at idle — pulses only while a button is held.
+  Microphone            → USB camera mic (or any ALSA input). Default ALSA device
+                          hw:1 — run `arecord -l` on the Pi to find yours.
   Speaker               → Pi 3.5mm jack / HDMI / USB audio (played via ffplay)
 
 Protocol (same as ESP32 firmware):
@@ -438,14 +440,71 @@ class Camera:
             self.cap.release()
 
 
+# ─── Microphone (USB camera mic or any ALSA capture device) ──────────────────
+# Captures raw PCM16 mono at 16 kHz via arecord and sends 30 ms chunks to the
+# browser as TYPE_AUDIO (0x02) binary frames.  The browser's playPCM16() decodes
+# raw S16_LE directly — no container/codec needed on this path.
+
+class Microphone:
+    RATE        = 16_000
+    CHANNELS    = 1
+    CHUNK_MS    = 30
+    CHUNK_BYTES = RATE * 2 * CHUNK_MS // 1000   # 960 bytes = 480 samples
+
+    def __init__(self, device: str):
+        self.device = device
+        self.proc: "asyncio.subprocess.Process | None" = None
+
+    async def start(self) -> bool:
+        cmd = [
+            "arecord",
+            "-D", self.device,
+            "-f", "S16_LE",
+            "-r", str(self.RATE),
+            "-c", str(self.CHANNELS),
+            "-t", "raw",
+        ]
+        try:
+            self.proc = await asyncio.create_subprocess_exec(
+                *cmd,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.DEVNULL,
+            )
+            log.info("[mic] arecord started (pid %d, device %s)", self.proc.pid, self.device)
+            return True
+        except FileNotFoundError:
+            log.warning("[mic] arecord not found — mic disabled (sudo apt install alsa-utils)")
+            return False
+        except Exception as e:
+            log.warning("[mic] failed to start: %s", e)
+            return False
+
+    async def read_chunk(self) -> "bytes | None":
+        if self.proc is None or self.proc.stdout is None:
+            return None
+        try:
+            return await self.proc.stdout.readexactly(self.CHUNK_BYTES)
+        except (asyncio.IncompleteReadError, Exception):
+            return None
+
+    def stop(self):
+        if self.proc:
+            try:
+                self.proc.terminate()
+            except Exception:
+                pass
+            self.proc = None
+
+
 # ─── Device client ────────────────────────────────────────────────────────────
 
 class Buddy:
     def __init__(self, args):
         self.args = args
-        self.servos  = Servos()
-        self.speaker = Speaker(dump_path=args.dump_audio)
-        self.camera  = Camera(args.camera, args.width, args.height, args.fps, args.quality)
+        self.servos     = Servos()
+        self.speaker    = Speaker(dump_path=args.dump_audio)
+        self.camera     = Camera(args.camera, args.width, args.height, args.fps, args.quality)
+        self.microphone = Microphone(args.mic_device)
         self.peer_online = False
 
     @property
@@ -464,6 +523,18 @@ class Buddy:
                 if jpg:
                     await ws.send(bytes([TYPE_VIDEO]) + jpg)
             await asyncio.sleep(max(0.0, interval - (loop.time() - start)))
+
+    # ── Microphone task ───────────────────────────────────────────────────────
+    async def mic_task(self, ws):
+        if not await self.microphone.start():
+            return
+        while True:
+            chunk = await self.microphone.read_chunk()
+            if chunk is None:
+                log.warning("[mic] arecord ended — mic task stopped")
+                break
+            if self.peer_online:
+                await ws.send(bytes([TYPE_AUDIO]) + chunk)
 
     # ── Stall-protection task: dither + rest cycling ─────────────────────────
     # While any channel is active: alternate its pulse (dither) so the servo
@@ -535,11 +606,14 @@ class Buddy:
                     log.info("[ws]  connected — id: %s", self.args.id)
                     try:
                         cam   = asyncio.create_task(self.camera_task(ws))
+                        mic   = asyncio.create_task(self.mic_task(ws))
                         burst = asyncio.create_task(self.burst_task())
                         await self.recv_task(ws)
                     finally:
                         cam.cancel()
+                        mic.cancel()
                         burst.cancel()
+                        self.microphone.stop()
             except asyncio.CancelledError:
                 raise
             except Exception as e:
@@ -552,6 +626,7 @@ class Buddy:
     def shutdown(self):
         self.servos.stop_all()
         self.speaker.stop()
+        self.microphone.stop()
         self.camera.release()
 
 
@@ -562,7 +637,8 @@ def parse_args():
     p.add_argument("--host",    default=DEFAULT_HOST, help="hub server hostname")
     p.add_argument("--port",    default=DEFAULT_PORT, type=int, help="hub server port (443 = wss)")
     p.add_argument("--id",      default=DEFAULT_ID, help="buddy ID, e.g. BDY-00001")
-    p.add_argument("--camera",  default=0, type=int, help="V4L2 device index (/dev/videoN)")
+    p.add_argument("--camera",     default=0,    type=int, help="V4L2 device index (/dev/videoN)")
+    p.add_argument("--mic-device", default="hw:1", help="ALSA capture device (run 'arecord -l' to list). Default: hw:1")
     p.add_argument("--width",   default=640, type=int)
     p.add_argument("--height",  default=480, type=int)
     p.add_argument("--fps",     default=15, type=int)
