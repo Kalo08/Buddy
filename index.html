@@ -120,6 +120,17 @@
       color: var(--text-dim);
     }
 
+    /* Logo sized so its letterforms match the old BUDDY text line:
+       cap height, baseline, and left edge stay where the text was */
+    .hero-logo {
+      display: block;
+      height: 1.29em;
+      width: auto;
+      margin-top: -0.22em;
+      margin-bottom: -0.15em;
+      opacity: 0.93;
+    }
+
     .hero-headline .line-accent {
       display: block;
       color: var(--accent);
@@ -954,7 +965,7 @@
       <div>
         <h1 class="hero-headline">
           YOUR<br>
-          <span class="line-2">BUDDY</span><span class="line-accent">.</span>
+          <img class="hero-logo" src="BuddyLogo.png" alt="BUDDY"><span class="line-accent">.</span>
         </h1>
         <div class="hero-sub">
           <p>A physical device that sits in your home. You connect to it from anywhere. You see what it sees, hear what it hears, move it around, and speak through it.</p>
