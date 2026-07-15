@@ -72,6 +72,9 @@ WHEEL_FWD   = [ 0.8660254, -0.8660254,  0.0]
 WHEEL_RIGHT = [ 0.5,        0.5,       -1.0]
 WHEEL_DIR   = [-1.0, -1.0, 1.0]
 
+# Per-wheel speed multiplier to correct drift (robot pulled left → boost FR)
+WHEEL_GAIN  = [1.0, 1.1, 1.0]
+
 
 class Servos:
     """PCA9685 over the Pi's I2C bus. Degrades gracefully if absent."""
@@ -173,7 +176,8 @@ class Servos:
 
     def drive(self, vx: float, vy: float):
         for i in range(NUM_SERVOS):
-            self.set_speed(i, WHEEL_DIR[i] * (WHEEL_FWD[i] * vx + WHEEL_RIGHT[i] * vy))
+            speed = WHEEL_DIR[i] * (WHEEL_FWD[i] * vx + WHEEL_RIGHT[i] * vy)
+            self.set_speed(i, WHEEL_GAIN[i] * speed)
 
     def cmd(self, direction: str):
         vx, vy = {
@@ -557,6 +561,8 @@ def parse_args():
                    help="rest with no signal at all instead of the neutral pulse")
     p.add_argument("--neutral",   default=None,
                    help="per-channel neutral pulses, e.g. --neutral 1500,1620,1480")
+    p.add_argument("--gain",      default=None,
+                   help="per-wheel speed multipliers (FL,FR,B), e.g. --gain 1.0,1.1,1.0")
     p.add_argument("--dump-audio", default=None, metavar="PATH",
                    help="also save incoming browser audio to this file (debug)")
     p.add_argument("-v", "--verbose", action="store_true")
@@ -587,6 +593,11 @@ def main():
         if len(vals) != NUM_SERVOS:
             sys.exit(f"--neutral needs {NUM_SERVOS} comma-separated values")
         globals()["NEUTRAL_US"] = vals
+    if args.gain:
+        vals = [float(v) for v in args.gain.split(",")]
+        if len(vals) != NUM_SERVOS:
+            sys.exit(f"--gain needs {NUM_SERVOS} comma-separated values")
+        globals()["WHEEL_GAIN"] = vals
     log.info("[srv] drive=%dµs dither=%dµs/%dms rest=%d/%dms neutral=%s",
              DRIVE_US, DITHER_US, DITHER_MS, REST_ON_MS, REST_OFF_MS, NEUTRAL_US)
 
