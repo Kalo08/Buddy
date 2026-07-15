@@ -45,6 +45,9 @@ import logging
 import signal
 import subprocess
 import sys
+import queue
+import threading
+import time
 
 import cv2
 
@@ -55,8 +58,9 @@ except ImportError:
 
 log = logging.getLogger("buddy")
 
-# ─── Defaults (match the ESP32 config block) ─────────────────────────────────
+log = logging.getLogger("buddy")
 
+# ─── Defaults (match the ESP32 config block) ─────────────────────────────────
 DEFAULT_HOST = "buddy-production-948c.up.railway.app"
 DEFAULT_PORT = 443
 DEFAULT_ID   = "BDY-00001"
@@ -66,10 +70,13 @@ DEFAULT_ID   = "BDY-00001"
 TYPE_VIDEO = 0x01
 TYPE_AUDIO = 0x02
 
-# ─── PCA9685 servo driver (minimal register-level driver over smbus2) ────────
+# ─── Servo configuration ─────────────────────────────────────────────────────
 
 SERVO_FREQ = 50
 NUM_SERVOS = 3
+PCA_ADDR   = 0x40
+PCA_OSC_HZ = 27_000_000
+
 PCA_ADDR   = 0x40
 PCA_OSC_HZ = 27_000_000
 
@@ -92,7 +99,7 @@ PCA_OSC_HZ = 27_000_000
 NEUTRAL_US = [1489, 1494, 1494]   # FL: 89 · FR: 89.5 · back: 89.5 (stop angles)
 
 DRIVE_US = 100    # offset from neutral at 100% commanded speed (lower = slower)
-DEADBAND = 0.05   # |speed| below this cuts the channel entirely
+DEADBAN D = 0.05   # |speed| below this cuts the channel entirely
 
 # ─── Stall-protection workaround: command dithering ───────────────────────────
 # With the pot frozen, the servo firmware sees a position error that never
@@ -142,6 +149,9 @@ WHEEL_RIGHT = [ 0.5,        0.5,       -1.0]
 # both front wheels run reversed on this chassis.
 WHEEL_DIR   = [-1.0, -1.0, 1.0]                # FL, FR, B
 
+# Per-wheel speed multiplier to correct drift (robot pulled left → boost FR)
+WHEEL_GAIN  = [1.0, 1.1, 1.0]
+
 
 class Servos:
     """PCA9685 over the Pi's I2C bus. Degrades gracefully if absent."""
@@ -169,12 +179,8 @@ class Servos:
         self.bus.write_byte_data(PCA_ADDR, self._MODE1, 0x10)         # sleep
         self.bus.write_byte_data(PCA_ADDR, self._PRESCALE, prescale)  # set freq
         self.bus.write_byte_data(PCA_ADDR, self._MODE1, 0x00)         # wake
-        import time
         time.sleep(0.005)
         self.bus.write_byte_data(PCA_ADDR, self._MODE1, 0xA0)         # restart + auto-inc
-
-    def _write_us(self, ch: int, us: float):
-        """Pulse width in µs → PCA9685 ticks (4096 ticks per 20ms frame @ 50Hz)."""
         ticks = round(us * SERVO_FREQ * 4096 / 1_000_000)
         try:
             self.bus.write_i2c_block_data(
@@ -257,7 +263,8 @@ class Servos:
 
     def drive(self, vx: float, vy: float):
         for i in range(NUM_SERVOS):
-            self.set_speed(i, WHEEL_DIR[i] * (WHEEL_FWD[i] * vx + WHEEL_RIGHT[i] * vy))
+            speed = WHEEL_DIR[i] * (WHEEL_FWD[i] * vx + WHEEL_RIGHT[i] * vy)
+            self.set_speed(i, WHEEL_GAIN[i] * speed)
 
     def cmd(self, direction: str):
         vx, vy = {
@@ -284,24 +291,25 @@ class Servos:
 EBML_MAGIC = b"\x1a\x45\xdf\xa3"   # webm/matroska (Chrome)
 OGG_MAGIC  = b"OggS"               # ogg (Firefox)
 
-import queue as _queue
-import threading as _threading
-
 
 class Speaker:
     def __init__(self, dump_path: str | None = None):
-        self.q = _queue.Queue(maxsize=64)
+        self.q = queue.Queue(maxsize=64)
         self.proc = None
         self.disabled = False
         self.dump_path = dump_path
         self.dump_file = None
-        _threading.Thread(target=self._worker, daemon=True, name="spk").start()
+        self.proc = None
+        self.disabled = False
+        self.dump_path = dump_path
+        self.dump_file = None
+        threading.Thread(target=self._worker, daemon=True, name="spk").start()
 
     # ── async-loop side: never blocks ─────────────────────────────────────
     def feed(self, chunk: bytes):
         try:
             self.q.put_nowait(chunk)
-        except _queue.Full:
+        except queue.Full:
             pass  # player is behind — drop audio rather than stall the loop
 
     def stop(self):
@@ -314,6 +322,9 @@ class Speaker:
             if not chunk:
                 self._kill()
                 continue
+            if self.disabled:
+                continue
+
             if self.disabled:
                 continue
 
@@ -335,6 +346,9 @@ class Speaker:
                 self._dump_open()
             elif is_new_mp4:
                 log.info("[spk] mp4 audio stream from browser (%d bytes)", len(chunk))
+                self._spawn("mp4")
+                self._dump_open()
+            elif self.proc is None or self.proc.poll() is not None:
                 self._spawn("mp4")
                 self._dump_open()
             elif self.proc is None or self.proc.poll() is not None:
@@ -482,6 +496,9 @@ class Microphone:
     async def read_chunk(self) -> "bytes | None":
         if self.proc is None or self.proc.stdout is None:
             return None
+        try:
+            return await self.proc.stdout.readexactly(self.CHUNK_BYTES)
+        except (asyncio.IncompleteReadError, Exception):
         try:
             return await self.proc.stdout.readexactly(self.CHUNK_BYTES)
         except (asyncio.IncompleteReadError, Exception):
@@ -670,6 +687,9 @@ def parse_args():
                    help="rest with no signal at all instead of the neutral pulse")
     p.add_argument("--neutral",   default=None,
                    help="per-channel neutral pulses, e.g. --neutral 1500,1620,1480")
+
+    p.add_argument("--gain",      default=None,
+                   help="per-wheel speed multipliers (FL,FR,B), e.g. --gain 1.0,1.1,1.0")
     p.add_argument("--dump-audio", default=None, metavar="PATH",
                    help="also save incoming browser audio to this file (debug)")
     p.add_argument("-v", "--verbose", action="store_true")
@@ -701,6 +721,11 @@ def main():
         if len(vals) != NUM_SERVOS:
             sys.exit(f"--neutral needs {NUM_SERVOS} comma-separated values")
         globals()["NEUTRAL_US"] = vals
+    if args.gain:
+        vals = [float(v) for v in args.gain.split(",")]
+        if len(vals) != NUM_SERVOS:
+            sys.exit(f"--gain needs {NUM_SERVOS} comma-separated values")
+        globals()["WHEEL_GAIN"] = vals
     log.info("[srv] drive=%dµs dither=%dµs/%dms rest=%d/%dms neutral=%s",
              DRIVE_US, DITHER_US, DITHER_MS, REST_ON_MS, REST_OFF_MS, NEUTRAL_US)
 
