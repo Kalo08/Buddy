@@ -158,15 +158,20 @@ class Servos:
     def __init__(self):
         self.gpio = None
         self.pwm = []
-        self.active = [False] * NUM_SERVOS  # PWM currently emitting pulses?
-        self.targets = [0.0] * NUM_SERVOS   # commanded drive speed per channel
+        self.targets = [0.0] * NUM_SERVOS  # commanded drive speed per channel
         try:
             import RPi.GPIO as GPIO
             GPIO.setmode(GPIO.BOARD)
             GPIO.setwarnings(False)
+            # Start each PWM ONCE at duty 0 (pin held constantly low — no
+            # pulses) and leave it running forever. RPi.GPIO's stop()/start()
+            # cycle is racy: the pulse thread can die and never come back,
+            # so "off" must always be ChangeDutyCycle(0), never stop().
             for pin in SERVO_PINS:
                 GPIO.setup(pin, GPIO.OUT, initial=GPIO.LOW)
-            self.pwm = [GPIO.PWM(pin, SERVO_FREQ) for pin in SERVO_PINS]
+                p = GPIO.PWM(pin, SERVO_FREQ)
+                p.start(0)
+                self.pwm.append(p)
             self.gpio = GPIO
             self.stop_all()
             log.info("[srv] GPIO servos ready (pins %s) — all outputs off until driven",
@@ -177,20 +182,14 @@ class Servos:
 
     def _write_us(self, ch: int, us: float):
         # duty% = pulse / period = us / (1e6 / SERVO_FREQ) * 100
-        duty = us * SERVO_FREQ / 10_000
-        if self.active[ch]:
-            self.pwm[ch].ChangeDutyCycle(duty)
-        else:
-            self.pwm[ch].start(duty)
-            self.active[ch] = True
+        self.pwm[ch].ChangeDutyCycle(us * SERVO_FREQ / 10_000)
         log.debug("[srv] ch%d → %.0fµs", ch, us)
 
     def _off(self, ch: int):
-        """Cut the channel entirely — no pulse, servo goes idle/limp."""
-        if self.active[ch]:
-            self.pwm[ch].stop()
-            self.active[ch] = False
-            log.debug("[srv] ch%d → off", ch)
+        """Cut the channel entirely — duty 0 holds the pin low, no pulses,
+        servo goes idle/limp."""
+        self.pwm[ch].ChangeDutyCycle(0)
+        log.debug("[srv] ch%d → off", ch)
 
     def set_speed(self, ch: int, speed: float):
         """speed -1..1 → pulse around this channel's neutral; 0 → output off."""
@@ -254,9 +253,12 @@ class Servos:
             self._off(i)
 
     def close(self):
-        """Full shutdown: stop every channel and release the GPIO pins."""
+        """Full shutdown: stop every PWM thread and release the GPIO pins.
+        stop() is safe here — the process is exiting, nothing restarts."""
         self.stop_all()
         if self.gpio:
+            for p in self.pwm:
+                p.stop()
             self.gpio.cleanup(SERVO_PINS)
             self.gpio = None
 
