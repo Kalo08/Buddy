@@ -7,13 +7,13 @@ hub server, so server.js / client.js / index.html need no changes.
 
 Hardware:
   USB camera            → any /dev/video* UVC camera (default /dev/video0)
-  PCA9685 servo driver  → Pi I2C: SDA=GPIO2 (pin 3), SCL=GPIO3 (pin 5),
-                          VCC=3.3V, GND=GND. Address 0x40 (pins tied low).
+  Wheel servos          → signal wires straight on the Pi's GPIO header
+                          (software PWM via RPi.GPIO, BOARD pin numbering).
     3 continuous-rotation wheel servos (pots decoupled), tangent to chassis
     center — two in front, one sideways in back:
-      front-left  → PCA channel 0
-      front-right → PCA channel 1
-      back        → PCA channel 2
+      front-left  → pin 11 (GPIO17)
+      front-right → pin 13 (GPIO27)
+      back        → pin 15 (GPIO22)
     Servos get NO signal at idle — pulses only while a button is held.
   Microphone            → USB camera mic (or any ALSA input). Default ALSA device
                           hw:1 — run `arecord -l` on the Pi to find yours.
@@ -31,8 +31,8 @@ Protocol (same as ESP32 firmware):
     { "type": "servo", "ch": 0-2, "angle": 0-180 }
 
 Dependencies (see pi/README.md):
-  sudo apt install python3-opencv ffmpeg i2c-tools
-  pip3 install websockets smbus2
+  sudo apt install python3-opencv ffmpeg python3-rpi.gpio
+  pip3 install websockets
 ─────────────────────────────────────────────────────────────────────────────
 """
 
@@ -47,7 +47,6 @@ import subprocess
 import sys
 import queue
 import threading
-import time
 
 import cv2
 
@@ -74,11 +73,9 @@ TYPE_AUDIO = 0x02
 
 SERVO_FREQ = 50
 NUM_SERVOS = 3
-PCA_ADDR   = 0x40
-PCA_OSC_HZ = 27_000_000
-
-PCA_ADDR   = 0x40
-PCA_OSC_HZ = 27_000_000
+# Signal pins, BOARD numbering: [front-left, front-right, back]
+# pin 11 = GPIO17, pin 13 = GPIO27, pin 15 = GPIO22
+SERVO_PINS = [11, 13, 15]
 
 # ─── Continuous-rotation servo control (pulse width in µs) ────────────────────
 # These servos are pot-decoupled conversions: the electronics still think
@@ -87,7 +84,7 @@ PCA_OSC_HZ = 27_000_000
 # only truly stops a wheel if it exactly matches that servo's frozen pot
 # reading — anything else means permanent creep, buzz, or grind.
 #
-# So: when idle we send NO PULSE AT ALL (PCA9685 channel fully off). With no
+# So: when idle we send NO PULSE AT ALL (GPIO PWM stopped, pin low). With no
 # signal, the servo electronics do nothing — the wheel sits silent and limp.
 # Pulses are only sent while a drive command is actively held; releasing the
 # button (or losing the connection) cuts all outputs.
@@ -99,7 +96,7 @@ PCA_OSC_HZ = 27_000_000
 NEUTRAL_US = [1489, 1494, 1494]   # FL: 89 · FR: 89.5 · back: 89.5 (stop angles)
 
 DRIVE_US = 100    # offset from neutral at 100% commanded speed (lower = slower)
-DEADBAN D = 0.05   # |speed| below this cuts the channel entirely
+DEADBAND = 0.05   # |speed| below this cuts the channel entirely
 
 # ─── Stall-protection workaround: command dithering ───────────────────────────
 # With the pot frozen, the servo firmware sees a position error that never
@@ -131,9 +128,9 @@ REST_NEUTRAL = True
 # Three wheels tangent to the chassis circle — TWO IN FRONT, ONE IN BACK
 # (top-down view, positions measured clockwise from straight ahead):
 #
-#     FL ╱     ╲ FR       front-left  at 300°  → PCA channel 0
-#                          front-right at  60°  → PCA channel 1
-#         ───              back        at 180°  → PCA channel 2
+#     FL ╱     ╲ FR       front-left  at 300°  → pin 11 (ch 0)
+#                          front-right at  60°  → pin 13 (ch 1)
+#         ───              back        at 180°  → pin 15 (ch 2)
 #          B
 #
 # Wheel drive-direction unit vector = (-sin(pos), cos(pos)) in the
@@ -154,55 +151,50 @@ WHEEL_GAIN  = [1.0, 1.1, 1.0]
 
 
 class Servos:
-    """PCA9685 over the Pi's I2C bus. Degrades gracefully if absent."""
-
-    _MODE1     = 0x00
-    _PRESCALE  = 0xFE
-    _LED0_ON_L = 0x06
+    """Software PWM straight on the Pi's GPIO header (RPi.GPIO, BOARD pins).
+    Degrades gracefully if absent. Software PWM has some jitter, but these
+    are continuous-rotation wheels, not positional servos — close enough."""
 
     def __init__(self):
-        self.bus = None
-        self.targets = [0.0] * NUM_SERVOS  # commanded drive speed per channel
+        self.gpio = None
+        self.pwm = []
+        self.active = [False] * NUM_SERVOS  # PWM currently emitting pulses?
+        self.targets = [0.0] * NUM_SERVOS   # commanded drive speed per channel
         try:
-            from smbus2 import SMBus
-            self.bus = SMBus(1)  # Pi 3: I2C bus 1 (GPIO2/GPIO3)
-            self._init_chip()
+            import RPi.GPIO as GPIO
+            GPIO.setmode(GPIO.BOARD)
+            GPIO.setwarnings(False)
+            for pin in SERVO_PINS:
+                GPIO.setup(pin, GPIO.OUT, initial=GPIO.LOW)
+            self.pwm = [GPIO.PWM(pin, SERVO_FREQ) for pin in SERVO_PINS]
+            self.gpio = GPIO
             self.stop_all()
-            log.info("[srv] PCA9685 ready — all outputs off until driven")
+            log.info("[srv] GPIO servos ready (pins %s) — all outputs off until driven",
+                     SERVO_PINS)
         except Exception as e:
-            self.bus = None
-            log.warning("[srv] PCA9685 unavailable (%s) — drive disabled", e)
+            self.gpio = None
+            log.warning("[srv] GPIO unavailable (%s) — drive disabled", e)
 
-    def _init_chip(self):
-        prescale = round(PCA_OSC_HZ / (4096 * SERVO_FREQ)) - 1
-        self.bus.write_byte_data(PCA_ADDR, self._MODE1, 0x00)         # wake
-        self.bus.write_byte_data(PCA_ADDR, self._MODE1, 0x10)         # sleep
-        self.bus.write_byte_data(PCA_ADDR, self._PRESCALE, prescale)  # set freq
-        self.bus.write_byte_data(PCA_ADDR, self._MODE1, 0x00)         # wake
-        time.sleep(0.005)
-        self.bus.write_byte_data(PCA_ADDR, self._MODE1, 0xA0)         # restart + auto-inc
-        ticks = round(us * SERVO_FREQ * 4096 / 1_000_000)
-        try:
-            self.bus.write_i2c_block_data(
-                PCA_ADDR, self._LED0_ON_L + 4 * ch,
-                [0, 0, ticks & 0xFF, ticks >> 8])
-            log.debug("[srv] ch%d → %.0fµs", ch, us)
-        except OSError as e:
-            log.warning("[srv] i2c write failed: %s", e)
+    def _write_us(self, ch: int, us: float):
+        # duty% = pulse / period = us / (1e6 / SERVO_FREQ) * 100
+        duty = us * SERVO_FREQ / 10_000
+        if self.active[ch]:
+            self.pwm[ch].ChangeDutyCycle(duty)
+        else:
+            self.pwm[ch].start(duty)
+            self.active[ch] = True
+        log.debug("[srv] ch%d → %.0fµs", ch, us)
 
     def _off(self, ch: int):
-        """Cut the channel entirely — no pulse, servo goes idle/limp.
-        Bit 4 of LED_OFF_H is the PCA9685 full-off flag."""
-        try:
-            self.bus.write_i2c_block_data(
-                PCA_ADDR, self._LED0_ON_L + 4 * ch, [0, 0, 0, 0x10])
+        """Cut the channel entirely — no pulse, servo goes idle/limp."""
+        if self.active[ch]:
+            self.pwm[ch].stop()
+            self.active[ch] = False
             log.debug("[srv] ch%d → off", ch)
-        except OSError as e:
-            log.warning("[srv] i2c write failed: %s", e)
 
     def set_speed(self, ch: int, speed: float):
         """speed -1..1 → pulse around this channel's neutral; 0 → output off."""
-        if self.bus is None or not (0 <= ch < NUM_SERVOS):
+        if self.gpio is None or not (0 <= ch < NUM_SERVOS):
             return
         speed = max(-1.0, min(1.0, speed))
         if abs(speed) < DEADBAND:
@@ -244,7 +236,7 @@ class Servos:
         1° ≈ 11µs; fractional angles allowed for fine steps). The µs value
         is logged — when you find the angle where the wheel stops, put that
         µs into NEUTRAL_US. angle < 0 cuts the channel (off)."""
-        if self.bus is None or not (0 <= ch < NUM_SERVOS):
+        if self.gpio is None or not (0 <= ch < NUM_SERVOS):
             return
         if angle < 0:
             self._off(ch)
@@ -256,10 +248,17 @@ class Servos:
     def stop_all(self):
         """All outputs off — nothing is driven, nothing hums."""
         self.targets = [0.0] * NUM_SERVOS
-        if self.bus is None:
+        if self.gpio is None:
             return
         for i in range(NUM_SERVOS):
             self._off(i)
+
+    def close(self):
+        """Full shutdown: stop every channel and release the GPIO pins."""
+        self.stop_all()
+        if self.gpio:
+            self.gpio.cleanup(SERVO_PINS)
+            self.gpio = None
 
     def drive(self, vx: float, vy: float):
         for i in range(NUM_SERVOS):
@@ -499,9 +498,6 @@ class Microphone:
         try:
             return await self.proc.stdout.readexactly(self.CHUNK_BYTES)
         except (asyncio.IncompleteReadError, Exception):
-        try:
-            return await self.proc.stdout.readexactly(self.CHUNK_BYTES)
-        except (asyncio.IncompleteReadError, Exception):
             # Surface WHY arecord died — device name/format errors land here.
             try:
                 err = (await self.proc.stderr.read()).decode(errors="replace").strip()
@@ -648,7 +644,7 @@ class Buddy:
             await asyncio.sleep(3)
 
     def shutdown(self):
-        self.servos.stop_all()
+        self.servos.close()
         self.speaker.stop()
         self.microphone.stop()
         self.camera.release()

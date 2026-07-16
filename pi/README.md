@@ -9,28 +9,24 @@ unchanged — enter the same `BDY-XXXXX` ID in the browser and drive.
 | Part | Connection |
 |---|---|
 | USB camera | any USB port (`/dev/video0`) |
-| PCA9685 servo driver | SDA → GPIO2 (pin 3), SCL → GPIO3 (pin 5), VCC → 3.3V (pin 1), GND → GND (pin 6) |
-| Wheel servos ×3 | PCA ch 0 = front-left, ch 1 = front-right, ch 2 = back (two in front, one sideways in back) |
+| Wheel servos ×3 | signal wires straight on the GPIO header: pin 11 (GPIO17) = front-left, pin 13 (GPIO27) = front-right, pin 15 (GPIO22) = back (two in front, one sideways in back) |
 | Speaker (optional) | 3.5mm jack, HDMI, or USB audio |
 
-> The PCA9685's servo power (V+) still needs its own 5V supply, same as with
-> the ESP32 — don't power servos from the Pi's 5V rail.
+> The servos still need their own 5V supply — don't power them from the Pi's
+> 5V rail. Tie the supply's ground to a Pi GND pin so the signal has a
+> common reference.
 
 ## Setup (Raspberry Pi OS)
 
 ```bash
-# 1. Enable I2C
-sudo raspi-config          # Interface Options → I2C → Enable
-
-# 2. System packages
+# 1. System packages
 sudo apt update
-sudo apt install -y python3-opencv ffmpeg i2c-tools python3-pip
+sudo apt install -y python3-opencv ffmpeg python3-rpi.gpio python3-pip
 
-# 3. Python packages
-pip3 install websockets smbus2
+# 2. Python packages
+pip3 install websockets
 
-# 4. Sanity checks
-i2cdetect -y 1             # should show 40 (the PCA9685)
+# 3. Sanity check
 ls /dev/video*             # should show video0 (the USB camera)
 ```
 
@@ -58,9 +54,12 @@ For a local hub: `python3 buddy_pi.py --host 192.168.1.50 --port 3000`
 These are pot-decoupled continuous-rotation conversions: the servo board
 still thinks it's positional, but its pot is frozen, so ANY pulse drives the
 motor toward wherever the frozen pot happens to sit. There is no universally
-safe "stop pulse" — so at idle the code sends **no signal at all** (PCA9685
-channels fully off; wheels limp and silent). Pulses only flow while a
+safe "stop pulse" — so at idle the code sends **no signal at all** (GPIO PWM
+stopped, pins low; wheels limp and silent). Pulses only flow while a
 button is held, and releasing the button / losing the connection cuts them.
+
+Pulses come from RPi.GPIO software PWM on pins 11/13/15, which carries a bit
+of timing jitter — harmless for continuous-rotation wheels.
 
 ## Servo calibration (finding each wheel's neutral)
 
@@ -114,6 +113,6 @@ journalctl -u buddy -f      # watch logs
 - **Speaker**: the hold-to-talk audio path is now actually enabled — incoming
   browser audio plays through the Pi's audio output via `ffplay`. (It was
   disabled on the ESP32-CAM.)
-- **Servos**: same PCA9685, same channels, same drive math — just wired to
-  the Pi's I2C pins instead of GPIO14/13.
+- **Servos**: no PCA9685 anymore — signal wires go straight to the Pi's GPIO
+  header (pins 11/13/15, software PWM). Same channels, same drive math.
 - The `firmware/` directory and `flash.html` flashing tool are now legacy.
