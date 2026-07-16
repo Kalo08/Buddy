@@ -146,8 +146,12 @@ WHEEL_RIGHT = [ 0.5,        0.5,       -1.0]
 # both front wheels run reversed on this chassis.
 WHEEL_DIR   = [-1.0, -1.0, 1.0]                # FL, FR, B
 
-# Per-wheel speed multiplier to correct drift (robot pulled left → boost FR)
-WHEEL_GAIN  = [1.0, 1.1, 1.0]
+# Per-wheel speed multiplier to correct drift. The FL servo is mechanically
+# weaker/draggy (robot veers LEFT going forward), so it gets a boost. Note a
+# faster RIGHT wheel also turns the robot left — boost the slow side, don't
+# speed up the good one. Keep FL·0.866 ≤ 1 (set_speed clamps at ±1), i.e.
+# FL gain ≤ ~1.15; if that's not enough, lower the FR gain below 1.0 instead.
+WHEEL_GAIN  = [1.15, 1.0, 1.0]
 
 
 class Servos:
