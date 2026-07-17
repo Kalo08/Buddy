@@ -96,8 +96,13 @@ SERVO_PINS = [11, 13, 15]
 # Measured per-wheel: [front-left (ch0), front-right (ch1), back (ch2)]
 NEUTRAL_US = [1489, 1494, 1494]   # FL: 89 · FR: 89.5 · back: 89.5 (stop angles)
 
-DRIVE_US = 100    # offset from neutral at 100% commanded speed (lower = slower)
+DRIVE_US = 70     # offset from neutral at 100% commanded speed (lower = slower)
 DEADBAND = 0.05   # |speed| below this cuts the channel entirely
+
+# When steering WHILE driving (W+A/D), the sideways component is scaled down
+# so corrections nudge the heading instead of yanking it. Pure left/right
+# (A/D alone) is unaffected. 1.0 = no softening.
+STEER_MIX = 0.5
 
 # ─── Stall-protection workaround: command dithering ───────────────────────────
 # With the pot frozen, the servo firmware sees a position error that never
@@ -628,6 +633,8 @@ class Buddy:
                 # Normalize diagonals so no wheel gets clipped at the clamp.
                 vx = max(-1.0, min(1.0, float(doc.get("vx", 0))))
                 vy = max(-1.0, min(1.0, float(doc.get("vy", 0))))
+                if vx and vy:
+                    vy *= STEER_MIX  # soften steering while driving
                 mag = (vx * vx + vy * vy) ** 0.5
                 if mag > 1.0:
                     vx, vy = vx / mag, vy / mag
