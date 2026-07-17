@@ -43,7 +43,7 @@ Defaults match the old firmware config (Railway host, wss on 443). Options:
 --port    hub port, 443 = wss          (default: 443)
 --id      buddy ID                     (default: BDY-00001)
 --camera  /dev/videoN index            (default: 0)
---width / --height / --fps / --quality video settings (default: 640x480 @ 15fps, q70)
+--width / --height / --fps / --quality video settings (default: 320x240 @ 15fps, q50 — low for latency)
 -v        verbose logging (per-servo writes, etc.)
 ```
 
@@ -107,9 +107,9 @@ journalctl -u buddy -f      # watch logs
 
 ## What changed vs the ESP32
 
-- **Camera**: onboard OV2640 → USB UVC camera via OpenCV. Default bumped to
-  640×480 (the Pi can afford it); use `--width 320 --height 240` to match the
-  old QVGA feel if latency matters.
+- **Camera**: onboard OV2640 → USB UVC camera via OpenCV. Default is
+  320×240 @ q50 to keep latency down; raise with `--width 640 --height 480
+  --quality 70` if you want a sharper picture.
 - **Speaker**: the hold-to-talk audio path is now actually enabled — incoming
   browser audio plays through the Pi's audio output via `ffplay`. (It was
   disabled on the ESP32-CAM.)

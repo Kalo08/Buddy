@@ -668,10 +668,13 @@ def parse_args():
     # hw: refuses to convert — plughw lets ALSA resample to what we ask for.
     p.add_argument("--mic-device", default="plughw:1,0",
                    help="ALSA capture device (run 'arecord -l' to list). Default: %(default)s")
-    p.add_argument("--width",   default=640, type=int)
-    p.add_argument("--height",  default=480, type=int)
+    # Low defaults on purpose: smaller frames = less to encode and upload
+    # per frame = lower glass-to-glass latency. Raise with --width/--height/
+    # --quality if the picture matters more than the lag.
+    p.add_argument("--width",   default=320, type=int)
+    p.add_argument("--height",  default=240, type=int)
     p.add_argument("--fps",     default=15, type=int)
-    p.add_argument("--quality", default=70, type=int, help="JPEG quality 0-100")
+    p.add_argument("--quality", default=50, type=int, help="JPEG quality 0-100")
     # Servo experiment knobs — override the file constants without editing code
     p.add_argument("--drive-us",  default=DRIVE_US, type=int,
                    help="pulse offset from neutral at full speed (default %(default)s)")
