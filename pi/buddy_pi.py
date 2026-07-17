@@ -146,12 +146,16 @@ WHEEL_RIGHT = [ 0.5,        0.5,       -1.0]
 # both front wheels run reversed on this chassis.
 WHEEL_DIR   = [-1.0, -1.0, 1.0]                # FL, FR, B
 
-# Per-wheel speed multiplier to correct drift. The FL servo is mechanically
-# weaker/draggy (robot veers LEFT going forward), so it gets a boost. Note a
-# faster RIGHT wheel also turns the robot left — boost the slow side, don't
-# speed up the good one. Keep FL·0.866 ≤ 1 (set_speed clamps at ±1), i.e.
-# FL gain ≤ ~1.15; if that's not enough, lower the FR gain below 1.0 instead.
-WHEEL_GAIN  = [1.15, 1.0, 1.0]
+# Per-wheel speed multiplier (FL, FR, B). Even gains — the left-drag is
+# corrected by the back wheel instead, see BACK_ASSIST.
+WHEEL_GAIN  = [1.0, 1.0, 1.0]
+
+# The FL servo drags, so the nose pulls LEFT when driving fwd/back. Instead
+# of over-driving FL (it's already near the speed clamp), the sideways BACK
+# wheel counter-steers: while driving fwd/back it runs at BACK_ASSIST × vx.
+# Tune magnitude to taste; FLIP THE SIGN if it makes the pull worse.
+# Must exceed DEADBAND (0.05) to do anything. 0 disables.
+BACK_ASSIST = 0.15
 
 
 class Servos:
@@ -269,6 +273,8 @@ class Servos:
     def drive(self, vx: float, vy: float):
         for i in range(NUM_SERVOS):
             speed = WHEEL_DIR[i] * (WHEEL_FWD[i] * vx + WHEEL_RIGHT[i] * vy)
+            if i == 2:
+                speed += WHEEL_DIR[2] * BACK_ASSIST * vx  # counter the FL drag
             self.set_speed(i, WHEEL_GAIN[i] * speed)
 
     def cmd(self, direction: str):
@@ -695,6 +701,9 @@ def parse_args():
 
     p.add_argument("--gain",      default=None,
                    help="per-wheel speed multipliers (FL,FR,B), e.g. --gain 1.0,1.1,1.0")
+    p.add_argument("--back-assist", default=BACK_ASSIST, type=float,
+                   help="back-wheel counter-steer while driving fwd/back; "
+                        "negative flips direction, 0 disables (default %(default)s)")
     p.add_argument("--dump-audio", default=None, metavar="PATH",
                    help="also save incoming browser audio to this file (debug)")
     p.add_argument("-v", "--verbose", action="store_true")
@@ -720,6 +729,7 @@ def main():
         REST_ON_MS=args.rest_on,
         REST_OFF_MS=args.rest_off,
         REST_NEUTRAL=not args.rest_silence,
+        BACK_ASSIST=args.back_assist,
     )
     if args.neutral:
         vals = [int(v) for v in args.neutral.split(",")]
