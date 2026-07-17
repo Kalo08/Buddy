@@ -28,6 +28,7 @@ Protocol (same as ESP32 firmware):
   Receives text JSON:
     { "type": "client_connected" / "client_disconnected" }
     { "type": "cmd",   "dir": "fwd"|"back"|"left"|"right"|"stop" }
+    { "type": "vec",   "vx": -1..1, "vy": -1..1 }   — combined-key driving
     { "type": "servo", "ch": 0-2, "angle": 0-180 }
 
 Dependencies (see pi/README.md):
@@ -622,6 +623,15 @@ class Buddy:
                 self.servos.set(int(doc.get("ch", 0)), float(doc.get("angle", 90)))
             elif t == "cmd":
                 self.servos.cmd(doc.get("dir", "stop"))
+            elif t == "vec":
+                # Combined-key driving from the browser (e.g. W+A held).
+                # Normalize diagonals so no wheel gets clipped at the clamp.
+                vx = max(-1.0, min(1.0, float(doc.get("vx", 0))))
+                vy = max(-1.0, min(1.0, float(doc.get("vy", 0))))
+                mag = (vx * vx + vy * vy) ** 0.5
+                if mag > 1.0:
+                    vx, vy = vx / mag, vy / mag
+                self.servos.drive(vx, vy)
 
     # ── Main connect/reconnect loop ──────────────────────────────────────────
     async def run(self):

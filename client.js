@@ -35,7 +35,7 @@ let micStream     = null;
 let mediaRecorder = null;
 let speakerMuted  = false;
 let micMuted      = false;
-let activeDir     = null;
+const heldDirs    = new Set();  // directions currently held (keys + buttons)
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -390,23 +390,41 @@ function sendCmd(dir) {
   ws.send(JSON.stringify({ type: 'cmd', dir }));
 }
 
-function pressDpad(dir) {
-  if (activeDir === dir) return;
-  activeDir = dir;
-  sendCmd(dir);
-  // Visual feedback
+// Held directions combine into one drive vector, so W+A/W+D steers while
+// driving. Opposite keys cancel out. All released → plain "stop" (the old
+// message, so an un-updated device still stops).
+function sendDrive() {
+  if (!ws || ws.readyState !== WebSocket.OPEN) return;
+  const vx = (heldDirs.has('fwd')   ? 1 : 0) - (heldDirs.has('back') ? 1 : 0);
+  const vy = (heldDirs.has('right') ? 1 : 0) - (heldDirs.has('left') ? 1 : 0);
+  if (vx === 0 && vy === 0) sendCmd('stop');
+  else ws.send(JSON.stringify({ type: 'vec', vx, vy }));
+}
+
+function updateDpadUI() {
   document.querySelectorAll('.d-btn[data-dir]').forEach(btn => {
-    btn.classList.toggle('d-btn-active', btn.dataset.dir === dir);
+    btn.classList.toggle('d-btn-active', heldDirs.has(btn.dataset.dir));
   });
 }
 
-function releaseDpad() {
-  if (!activeDir) return;
-  activeDir = null;
-  sendCmd('stop');
-  document.querySelectorAll('.d-btn[data-dir]').forEach(btn => {
-    btn.classList.remove('d-btn-active');
-  });
+function pressDpad(dir) {
+  if (heldDirs.has(dir)) return;
+  heldDirs.add(dir);
+  sendDrive();
+  updateDpadUI();
+}
+
+// Call with a direction to release just that one (key/button up), or with
+// no argument to release everything (safety stop).
+function releaseDpad(dir) {
+  if (dir === undefined) {
+    if (!heldDirs.size) return;
+    heldDirs.clear();
+  } else {
+    if (!heldDirs.delete(dir)) return;
+  }
+  sendDrive();
+  updateDpadUI();
 }
 
 // D-pad button events
@@ -417,10 +435,10 @@ document.querySelectorAll('.d-btn[data-dir]').forEach(btn => {
   const dir = btn.dataset.dir;
   btn.addEventListener('mousedown',   () => pressDpad(dir));
   btn.addEventListener('touchstart',  e => { e.preventDefault(); pressDpad(dir); });
-  btn.addEventListener('mouseup',     releaseDpad);
-  btn.addEventListener('mouseleave',  releaseDpad);
-  btn.addEventListener('touchend',    e => { e.preventDefault(); releaseDpad(); });
-  btn.addEventListener('touchcancel', e => { e.preventDefault(); releaseDpad(); });
+  btn.addEventListener('mouseup',     () => releaseDpad(dir));
+  btn.addEventListener('mouseleave',  () => releaseDpad(dir));
+  btn.addEventListener('touchend',    e => { e.preventDefault(); releaseDpad(dir); });
+  btn.addEventListener('touchcancel', e => { e.preventDefault(); releaseDpad(dir); });
 });
 
 // Keyboard support
@@ -432,8 +450,12 @@ document.addEventListener('keydown', e => {
 });
 
 document.addEventListener('keyup', e => {
-  if (KEY_MAP[e.key]) releaseDpad();
+  const dir = KEY_MAP[e.key];
+  if (dir) releaseDpad(dir);
 });
+
+// If the tab loses focus mid-drive, keyup never arrives — stop everything.
+window.addEventListener('blur', () => releaseDpad());
 
 // ── Binary message router ─────────────────────────────────────────────────────
 
