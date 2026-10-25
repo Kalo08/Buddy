@@ -35,6 +35,8 @@ let micStream     = null;
 let mediaRecorder = null;
 let speakerMuted  = false;
 let micMuted      = false;
+let devicePcm     = false;  // device asked for raw PCM16 instead of opus (ESP32-P4)
+let pcmCapture    = null;
 const heldDirs    = new Set();  // directions currently held (keys + buttons)
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -102,6 +104,7 @@ function connect() {
     ws.close();
     ws = null;
   }
+  devicePcm = false;
 
   setHint('opening connection...');
   setLiveState('connecting');
@@ -164,6 +167,11 @@ function handleTextMessage(msg, id) {
       setHint('buddy went offline.', true);
       hideCamera();
       stopMic();
+      break;
+
+    case 'hello':
+      // Sent by devices that can't decode opus — they get raw PCM16 @ 16 kHz.
+      devicePcm = msg.audio === 'pcm16';
       break;
 
     default:
@@ -296,7 +304,7 @@ async function startSpeaking() {
     setHint('mic is muted — tap the MIC toggle first.', true);
     return;
   }
-  if (mediaRecorder) return; // already recording (e.g. ghost mousedown after touchstart)
+  if (mediaRecorder || pcmCapture) return; // already recording (e.g. ghost mousedown after touchstart)
 
   const session = ++speakSession;
   el.speakBtn.classList.add('speaking');
@@ -313,6 +321,10 @@ async function startSpeaking() {
     }
 
     micStream = stream;
+    if (devicePcm) {
+      await startPcmCapture(stream, session);
+      return;
+    }
     mediaRecorder = new MediaRecorder(micStream);
 
     mediaRecorder.ondataavailable = async e => {
@@ -340,7 +352,79 @@ async function startSpeaking() {
   } catch (err) {
     setHint(`mic access failed: ${err.name || err}`, true);
     el.speakBtn.classList.remove('speaking');
+    stopMic();
   }
+}
+
+// Raw PCM path. An AudioWorklet taps the mic at the context's rate (usually
+// 48 kHz); we box-filter it down to 16 kHz mono and send ~40 ms packets of
+// little-endian PCM16 — no container or codec for the device to deal with.
+
+const PCM_RATE  = 16000;
+const PCM_CHUNK = 640;  // samples per packet (40 ms)
+const TAP_WORKLET = `
+registerProcessor('buddy-tap', class extends AudioWorkletProcessor {
+  process(inputs) {
+    const ch = inputs[0] && inputs[0][0];
+    if (ch) this.port.postMessage(ch.slice(0));
+    return true;
+  }
+});`;
+let tapLoadedFor = null;  // AudioContext the worklet module was added to
+
+function sendPcm(samples) {
+  if (!ws || ws.readyState !== WebSocket.OPEN) return;
+  const typed = new Uint8Array(samples.byteLength + 1);
+  typed[0] = 0x02;
+  typed.set(new Uint8Array(samples.buffer, samples.byteOffset, samples.byteLength), 1);
+  ws.send(typed.buffer);
+  sentBytes += samples.byteLength;
+  setHint(`sending audio... ${(sentBytes / 1024).toFixed(1)} KB`);
+}
+
+async function startPcmCapture(stream, session) {
+  const ctx = getAudioCtx();
+  if (tapLoadedFor !== ctx) {
+    const url = URL.createObjectURL(new Blob([TAP_WORKLET], { type: 'application/javascript' }));
+    await ctx.audioWorklet.addModule(url);
+    URL.revokeObjectURL(url);
+    tapLoadedFor = ctx;
+  }
+  // Released while the worklet was loading.
+  if (session !== speakSession || !el.speakBtn.classList.contains('speaking')) return;
+
+  const src  = ctx.createMediaStreamSource(stream);
+  const tap  = new AudioWorkletNode(ctx, 'buddy-tap');
+  const mute = ctx.createGain();  // the graph must pull the tap, but we don't want to hear ourselves
+  mute.gain.value = 0;
+
+  const step = ctx.sampleRate / PCM_RATE;
+  const out  = new Int16Array(PCM_CHUNK);
+  let fill = 0, acc = 0, cnt = 0, phase = 0;
+
+  tap.port.onmessage = e => {
+    for (const s of e.data) {
+      acc += s; cnt++;
+      if (++phase >= step) {
+        phase -= step;
+        out[fill++] = Math.max(-1, Math.min(1, acc / cnt)) * 32767;
+        acc = cnt = 0;
+        if (fill === PCM_CHUNK) { sendPcm(out); fill = 0; }
+      }
+    }
+  };
+
+  src.connect(tap);
+  tap.connect(mute).connect(ctx.destination);
+  pcmCapture = {
+    stop() {
+      tap.port.onmessage = null;
+      if (fill) sendPcm(out.subarray(0, fill));
+      src.disconnect();
+      tap.disconnect();
+      mute.disconnect();
+    },
+  };
 }
 
 function stopSpeaking() {
@@ -351,6 +435,10 @@ function stopSpeaking() {
 function stopMic() {
   if (mediaRecorder && mediaRecorder.state !== 'inactive') {
     mediaRecorder.stop();
+  }
+  if (pcmCapture) {
+    pcmCapture.stop();
+    pcmCapture = null;
   }
   if (micStream) {
     micStream.getTracks().forEach(t => t.stop());
