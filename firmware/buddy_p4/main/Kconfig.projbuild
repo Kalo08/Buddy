@@ -1,0 +1,152 @@
+menu "Buddy"
+
+    menu "Connection"
+        config BUDDY_WIFI_SSID
+            string "WiFi SSID"
+            default "Hack Club"
+        config BUDDY_WIFI_PASS
+            string "WiFi password"
+            default "bettertobeapiratethanjointhenavy"
+        config BUDDY_HUB_HOST
+            string "Hub server hostname"
+            default "buddy-production-948c.up.railway.app"
+        config BUDDY_HUB_PORT
+            int "Hub server port (443 = wss)"
+            default 443
+        config BUDDY_ID
+            string "Buddy ID"
+            default "BDY-00001"
+    endmenu
+
+    menu "I2C bus (camera SCCB + ES8311 share it)"
+        config BUDDY_I2C_SDA_GPIO
+            int "SDA GPIO"
+            default 7
+        config BUDDY_I2C_SCL_GPIO
+            int "SCL GPIO"
+            default 8
+    endmenu
+
+    menu "Speaker (ES8311 codec + amp)"
+        config BUDDY_SPK_ENABLE
+            bool "Enable speaker"
+            default y
+        config BUDDY_I2S_MCLK_GPIO
+            int "I2S MCLK GPIO"
+            default 13
+        config BUDDY_I2S_BCLK_GPIO
+            int "I2S BCLK GPIO"
+            default 12
+        config BUDDY_I2S_WS_GPIO
+            int "I2S WS/LRCK GPIO"
+            default 10
+        config BUDDY_I2S_DOUT_GPIO
+            int "I2S DOUT GPIO (to codec DSDIN)"
+            default 9
+        config BUDDY_SPK_PA_GPIO
+            int "Speaker amp enable GPIO (-1 = none)"
+            default 53
+        config BUDDY_SPK_VOLUME
+            int "Speaker volume (0-100)"
+            range 0 100
+            default 75
+    endmenu
+
+    menu "Wheel servos"
+        config BUDDY_SERVO_FL_GPIO
+            int "Front-left servo signal GPIO"
+            default 20
+        config BUDDY_SERVO_FR_GPIO
+            int "Front-right servo signal GPIO"
+            default 21
+        config BUDDY_SERVO_BACK_GPIO
+            int "Back servo signal GPIO"
+            default 22
+    endmenu
+
+    menu "Camera (OV5640)"
+        choice BUDDY_CAM_IFACE
+            prompt "OV5640 interface"
+            default BUDDY_CAM_MIPI
+            config BUDDY_CAM_MIPI
+                bool "MIPI-CSI (ribbon cable to the CSI connector)"
+            config BUDDY_CAM_DVP
+                bool "DVP (24-pin parallel module, wired to GPIOs)"
+        endchoice
+
+        config BUDDY_CAM_RESET_GPIO
+            int "Sensor RESET GPIO (-1 = none)"
+            default -1
+        config BUDDY_CAM_PWDN_GPIO
+            int "Sensor PWDN GPIO (-1 = none)"
+            default -1
+
+        menu "DVP pins"
+            depends on BUDDY_CAM_DVP
+            config BUDDY_DVP_XCLK_GPIO
+                int "XCLK"
+                default -1
+            config BUDDY_DVP_PCLK_GPIO
+                int "PCLK"
+                default -1
+            config BUDDY_DVP_VSYNC_GPIO
+                int "VSYNC"
+                default -1
+            config BUDDY_DVP_HREF_GPIO
+                int "HREF / DE"
+                default -1
+            config BUDDY_DVP_D0_GPIO
+                int "D0 (Y2)"
+                default -1
+            config BUDDY_DVP_D1_GPIO
+                int "D1 (Y3)"
+                default -1
+            config BUDDY_DVP_D2_GPIO
+                int "D2 (Y4)"
+                default -1
+            config BUDDY_DVP_D3_GPIO
+                int "D3 (Y5)"
+                default -1
+            config BUDDY_DVP_D4_GPIO
+                int "D4 (Y6)"
+                default -1
+            config BUDDY_DVP_D5_GPIO
+                int "D5 (Y7)"
+                default -1
+            config BUDDY_DVP_D6_GPIO
+                int "D6 (Y8)"
+                default -1
+            config BUDDY_DVP_D7_GPIO
+                int "D7 (Y9)"
+                default -1
+            config BUDDY_DVP_XCLK_HZ
+                int "XCLK frequency (Hz)"
+                default 24000000
+        endmenu
+
+        # Low defaults on purpose, same as the Pi: small frames = low latency.
+        config BUDDY_CAM_WIDTH
+            int "Max streamed width"
+            default 320
+        config BUDDY_CAM_HEIGHT
+            int "Max streamed height"
+            default 240
+        config BUDDY_CAM_FPS
+            int "Streamed frames per second"
+            default 15
+        config BUDDY_CAM_JPEG_QUALITY
+            int "JPEG quality (1-100)"
+            range 1 100
+            default 50
+        config BUDDY_CAM_MIRROR
+            bool "Mirror image horizontally"
+            default n
+        config BUDDY_CAM_FLIP
+            bool "Flip image vertically"
+            default n
+        config BUDDY_CAM_SWAP_BYTES
+            bool "Swap RGB565 byte order (fix if colors look wrong)"
+            default n
+    endmenu
+
+endmenu
