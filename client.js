@@ -267,6 +267,8 @@ function getAudioCtx() {
   return audioCtx;
 }
 
+let pcmPlayAt = 0;  // AudioContext time the next device-audio chunk starts
+
 function playPCM16(arrayBuffer) {
   if (speakerMuted) return;
 
@@ -280,10 +282,17 @@ function playPCM16(arrayBuffer) {
   const buffer = ctx.createBuffer(1, float32.length, 16000);
   buffer.copyToChannel(float32, 0);
 
+  // Queue chunks back to back instead of playing each on arrival — network
+  // jitter otherwise turns 30 ms chunks into gaps and overlaps (crackle).
+  // A small 60 ms cushion absorbs jitter; if we fall too far behind, resync.
+  const now = ctx.currentTime;
+  if (pcmPlayAt < now || pcmPlayAt - now > 0.5) pcmPlayAt = now + 0.06;
+
   const source = ctx.createBufferSource();
   source.buffer = buffer;
   source.connect(ctx.destination);
-  source.start();
+  source.start(pcmPlayAt);
+  pcmPlayAt += buffer.duration;
 }
 
 // Speak button — hold to talk

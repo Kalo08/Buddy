@@ -28,6 +28,7 @@
  * Protocol (same as the Pi / ESP32-CAM — server.js and the web UI unchanged):
  *   Connects wss://host/ws?id=BDY-XXXXX&role=device
  *   Sends    binary 0x01 + JPEG          — video (only while a browser is paired)
+ *   Sends    binary 0x02 + PCM16 mono 16 kHz — onboard mic (muted while the speaker plays)
  *   Sends    text   { "type": "hello", "audio": "pcm16" } on pairing, so the
  *                   browser sends raw PCM instead of opus (the P4 can't decode it)
  *   Receives binary 0x02 + PCM16 mono 16 kHz — hold-to-talk audio
@@ -54,13 +55,16 @@
 #include "driver/ppa.h"
 #include "esp_timer.h"
 #include "freertos/stream_buffer.h"
+#include "esp_intr_alloc.h"
+#include "usb/usb_host.h"
+#include "usb/uvc_host.h"
 
 // ─── Config block ─────────────────────────────────────────────────────────────
 // Same layout + magic as the ESP32-CAM firmware. DO NOT reorder fields.
 
 struct __attribute__((packed)) BuddyConfig {
   uint8_t magic[8] = { 0xBD, 0xBD, 0xBD, 0xBD, 0x42, 0x55, 0x44, 0x59 };
-  char ssid[32] = "Gavin's iphone";
+  char ssid[32] = "gavin iphone";
   char pass[64] = "12441122";
   char host[40] = "buddy-production-948c.up.railway.app";
   uint32_t port = 443;
@@ -74,6 +78,7 @@ struct __attribute__((packed)) BuddyConfig {
 #define I2S_BCLK      12
 #define I2S_WS        10
 #define I2S_DOUT       9    // → ES8311 DSDIN
+#define I2S_DIN       11    // ← ES8311 ASDOUT (onboard mic)
 #define SPK_PA_EN     53    // speaker amp enable
 
 #define SERVO_PIN_FL  20
@@ -92,9 +97,21 @@ struct __attribute__((packed)) BuddyConfig {
 #define CAM_FLIP     false
 #define CAM_SWAP     false     // set true if colors look wrong (red/blue noise)
 
+// Camera source: true = USB webcam on the USB OTG port, false = OV5640 on the
+// MIPI-CSI ribbon. CAM_MAX_W/H and CAM_FPS apply to both.
+#define USE_USB_WEBCAM true
+
 // ─── Speaker settings ─────────────────────────────────────────────────────────
 #define SPK_RATE     16000
 #define SPK_VOLUME      90     // 0-100 (100 = 0 dB, each step below = -1 dB)
+
+// ─── Microphone settings ──────────────────────────────────────────────────────
+// Onboard mic → ES8311 → browser, as PCM16 mono 16 kHz (same as the Pi).
+#define MIC_ENABLED   true
+#define MIC_GAIN         5     // 0-7, each step = +6 dB (5 = 30 dB). Raise if quiet.
+// Half duplex: while the speaker is playing (and briefly after), the mic is
+// muted, so the browser doesn't hear its own voice echoed back.
+#define MIC_ECHO_GUARD_MS 300
 
 // ─── Frame type bytes ─────────────────────────────────────────────────────────
 #define TYPE_VIDEO  0x01
@@ -109,6 +126,8 @@ i2c_master_bus_handle_t i2cBus;
 struct Frame { uint8_t* buf; size_t len; };
 QueueHandle_t txQueue;
 #define TX_QUEUE_DEPTH 2   // keep small to minimise frame lag
+QueueHandle_t micQueue;    // mic chunks waiting for loop() to send
+#define MIC_QUEUE_DEPTH 8  // ~240 ms of audio
 
 // ═════════════════════════════════════════════════════════════════════════════
 // Wheels — ported from pi/buddy_pi.py
@@ -129,7 +148,9 @@ static const int SERVO_PINS[NUM_SERVOS] = { SERVO_PIN_FL, SERVO_PIN_FR, SERVO_PI
 // [front-left (ch0), front-right (ch1), back (ch2)]
 static float NEUTRAL_US[NUM_SERVOS] = { 1489, 1494, 1494 };
 
-#define DRIVE_US   70.0f   // offset from neutral at 100% commanded speed
+#define DRIVE_US  150.0f   // offset from neutral at 100% commanded speed.
+                           // 70 (the Pi's value) was too weak to move one of
+                           // the front servos here; lower it if too fast.
 #define DEADBAND   0.05f   // |speed| below this cuts the channel entirely
 #define STEER_MIX  0.5f    // sideways component scale while also driving fwd/back
 
@@ -147,6 +168,22 @@ static const float WHEEL_GAIN[NUM_SERVOS]  = { 1.0f, 1.0f, 1.0f };
 // FL drags → nose pulls left on fwd/back; the back wheel counter-steers.
 // Flip the sign if it makes the pull worse. 0 disables.
 #define BACK_ASSIST 0.15f
+
+// Two-wheel mode (back wheel broken): the back servo gets no signal, and the
+// two front wheels drive like a tank. W/S = forward/back, A/D = turn in place
+// (no more sliding sideways). W+A / W+D = curve while driving.
+// Set false to go back to three-wheel holonomic driving.
+#define TWO_WHEEL_MODE true
+#define TURN_GAIN      0.7f   // spin speed for A/D (1.0 = full speed)
+
+// Which servo channel drives each side: 0 = GPIO20, 1 = GPIO21, 2 = GPIO22.
+// Any working servo can be either wheel — e.g. if the GPIO21 servo is dead,
+// mount the GPIO22 servo as the right wheel and set RIGHT_WHEEL_CH to 2.
+#define LEFT_WHEEL_CH    0
+#define RIGHT_WHEEL_CH   1
+// Flip a sign (1.0 ↔ -1.0) if that wheel rolls backward when you press W.
+#define LEFT_WHEEL_SIGN  -1.0f
+#define RIGHT_WHEEL_SIGN  1.0f
 
 static float servoTarget[NUM_SERVOS];   // commanded speed per channel, 0 = off
 static SemaphoreHandle_t servoLock;
@@ -169,12 +206,29 @@ static void setSpeed(int ch, float speed) {
 
 static void drive(float vx, float vy) {
   xSemaphoreTake(servoLock, portMAX_DELAY);
-  for (int i = 0; i < NUM_SERVOS; i++) {
-    float speed = WHEEL_DIR[i] * (WHEEL_FWD[i] * vx + WHEEL_RIGHT[i] * vy);
-    if (i == 2) speed += WHEEL_DIR[2] * BACK_ASSIST * vx;  // counter the FL drag
-    setSpeed(i, WHEEL_GAIN[i] * speed);
+  if (TWO_WHEEL_MODE) {
+    // Tank steering: each side's travel speed, + = rolling forward.
+    // Turning right = left side forward, right side back (and vice versa).
+    float left  = vx + vy * TURN_GAIN;
+    float right = vx - vy * TURN_GAIN;
+    float peak  = max(fabsf(left), fabsf(right));
+    if (peak > 1.0f) { left /= peak; right /= peak; }
+    // 0.87 keeps W/S at the same speed as three-wheel mode.
+    for (int i = 0; i < NUM_SERVOS; i++) {
+      if      (i == LEFT_WHEEL_CH)  setSpeed(i, WHEEL_GAIN[i] * LEFT_WHEEL_SIGN  * 0.87f * left);
+      else if (i == RIGHT_WHEEL_CH) setSpeed(i, WHEEL_GAIN[i] * RIGHT_WHEEL_SIGN * 0.87f * right);
+      else                          setSpeed(i, 0.0f);  // unused servo: no signal
+    }
+  } else {
+    for (int i = 0; i < NUM_SERVOS; i++) {
+      float speed = WHEEL_DIR[i] * (WHEEL_FWD[i] * vx + WHEEL_RIGHT[i] * vy);
+      if (i == 2) speed += WHEEL_DIR[2] * BACK_ASSIST * vx;  // counter the FL drag
+      setSpeed(i, WHEEL_GAIN[i] * speed);
+    }
   }
   xSemaphoreGive(servoLock);
+  Serial.printf("[srv] drive vx=%.2f vy=%.2f → FL %+.2f  FR %+.2f  B %+.2f\n",
+                vx, vy, servoTarget[0], servoTarget[1], servoTarget[2]);
 }
 
 static void driveCmd(const char* dir) {
@@ -256,7 +310,8 @@ void restTask(void*) {
 void initServos() {
   servoLock = xSemaphoreCreateMutex();
   for (int i = 0; i < NUM_SERVOS; i++) {
-    ledcAttach(SERVO_PINS[i], SERVO_FREQ, SERVO_BITS);
+    if (!ledcAttach(SERVO_PINS[i], SERVO_FREQ, SERVO_BITS))
+      Serial.printf("[srv] ch%d: PWM attach FAILED on GPIO%d\n", i, SERVO_PINS[i]);
     servoOff(i);  // no pulses until driven
   }
   xTaskCreate(restTask, "rest", 3072, NULL, 4, NULL);
@@ -276,6 +331,8 @@ void initServos() {
 
 static i2c_master_dev_handle_t es8311;
 static i2s_chan_handle_t i2sTx;
+static i2s_chan_handle_t i2sRx;
+static volatile int64_t spkLastPlayUs = 0;   // for the mic's echo guard
 static StreamBufferHandle_t spkBuf;
 static bool spkReady = false;
 
@@ -293,7 +350,7 @@ static bool initES8311() {
   ok &= esWrite(0x01, 0x30);
   ok &= esWrite(0x02, 0x00);
   ok &= esWrite(0x03, 0x10);
-  ok &= esWrite(0x16, 0x24);
+  ok &= esWrite(0x16, 0x20 | constrain(MIC_GAIN, 0, 7));  // mic PGA gain
   ok &= esWrite(0x04, 0x10);
   ok &= esWrite(0x05, 0x00);
   ok &= esWrite(0x0B, 0x00);
@@ -361,8 +418,12 @@ void speakerTask(void*) {
     if (n == 0) { playing = false; continue; }  // underrun — rebuild the cushion
     size_t written;
     i2s_channel_write(i2sTx, chunk, n, &written, portMAX_DELAY);  // paced by the DAC
+    spkLastPlayUs = esp_timer_get_time();
   }
 }
+
+static void speakerBeep();
+void micTask(void*);
 
 void initSpeaker() {
   i2c_device_config_t dev = {};
@@ -376,7 +437,8 @@ void initSpeaker() {
   // I2S first: the ES8311 needs MCLK running before it's configured.
   i2s_chan_config_t chanCfg = I2S_CHANNEL_DEFAULT_CONFIG(I2S_NUM_0, I2S_ROLE_MASTER);
   chanCfg.auto_clear = true;  // silence, not a looping buzz, on underrun
-  if (i2s_new_channel(&chanCfg, &i2sTx, NULL) != ESP_OK) {
+  // Full duplex: TX → speaker, RX ← mic, sharing the same clocks.
+  if (i2s_new_channel(&chanCfg, &i2sTx, MIC_ENABLED ? &i2sRx : NULL) != ESP_OK) {
     Serial.println("[spk] init FAILED — I2S channel"); return;
   }
   i2s_std_config_t std = {};
@@ -387,9 +449,14 @@ void initSpeaker() {
   std.gpio_cfg.bclk = (gpio_num_t)I2S_BCLK;
   std.gpio_cfg.ws   = (gpio_num_t)I2S_WS;
   std.gpio_cfg.dout = (gpio_num_t)I2S_DOUT;
-  std.gpio_cfg.din  = I2S_GPIO_UNUSED;
+  std.gpio_cfg.din  = MIC_ENABLED ? (gpio_num_t)I2S_DIN : I2S_GPIO_UNUSED;
   if (i2s_channel_init_std_mode(i2sTx, &std) != ESP_OK || i2s_channel_enable(i2sTx) != ESP_OK) {
     Serial.println("[spk] init FAILED — I2S config"); return;
+  }
+  if (MIC_ENABLED &&
+      (i2s_channel_init_std_mode(i2sRx, &std) != ESP_OK || i2s_channel_enable(i2sRx) != ESP_OK)) {
+    Serial.println("[mic] I2S input init FAILED — mic disabled");
+    i2sRx = NULL;
   }
 
   if (!initES8311()) {
@@ -402,6 +469,74 @@ void initSpeaker() {
   xTaskCreate(speakerTask, "spk", 4096, NULL, 6, NULL);
   spkReady = true;
   Serial.printf("[spk] ES8311 ready — PCM16 mono %d Hz\n", SPK_RATE);
+  speakerBeep();
+
+  if (MIC_ENABLED && i2sRx) {
+    xTaskCreate(micTask, "mic", 4096, NULL, 6, NULL);
+    Serial.printf("[mic] ready — gain %d (+%d dB), streams while a browser is paired\n",
+                  MIC_GAIN, MIC_GAIN * 6);
+  }
+}
+
+// Mic → browser: 30 ms chunks of PCM16 mono 16 kHz as 0x02 frames, which
+// client.js already plays (playPCM16). Handed to loop() via micQueue because
+// the WebSockets library isn't thread-safe.
+void micTask(void*) {
+  static int16_t buf[SPK_RATE * 30 / 1000];   // 480 samples
+  int peak = 0, sent = 0, muted = 0;
+  int64_t lastReport = esp_timer_get_time();
+  for (;;) {
+    size_t got = 0;
+    if (i2s_channel_read(i2sRx, buf, sizeof(buf), &got, portMAX_DELAY) != ESP_OK || got == 0) continue;
+
+    // Once a second: how loud the mic is and what happened to the audio.
+    // Peak near 0 → no sound reaching the chip. Talk near the board: it should jump.
+    for (size_t i = 0; i < got / 2; i++) peak = max(peak, abs((int)buf[i]));
+    int64_t now = esp_timer_get_time();
+    if (now - lastReport >= 1000000) {
+      Serial.printf("[mic] peak %5d / 32767   sent %2d   muted %2d   (%s)\n", peak, sent, muted,
+                    !wsLive ? "no server" : !peerOnline ? "no browser" : "streaming");
+      peak = sent = muted = 0;
+      lastReport = now;
+    }
+
+    if (!peerOnline || !wsLive) continue;
+    if (now - spkLastPlayUs < MIC_ECHO_GUARD_MS * 1000LL) { muted++; continue; }  // echo guard
+    sent++;
+
+    uint8_t* out = (uint8_t*)malloc(1 + got);
+    if (!out) continue;
+    out[0] = TYPE_AUDIO;
+    memcpy(out + 1, buf, got);
+    Frame f = { out, 1 + got };
+    if (xQueueSend(micQueue, &f, 0) != pdTRUE) free(out);  // network behind — drop
+  }
+}
+
+// Boot test: two short rising beeps, so the speaker can be checked without
+// the browser. Goes through the same buffer + task as browser audio.
+#define BEEP_ON_BOOT true
+
+static void beepTone(float freq, int ms, float amp) {
+  static int16_t chunk[256];
+  const int total = SPK_RATE * ms / 1000;
+  const int fade  = SPK_RATE / 200;  // 5 ms fade in/out — no clicks
+  for (int i = 0; i < total; ) {
+    int n = min(256, total - i);
+    for (int j = 0; j < n; j++, i++) {
+      float env = min(1.0f, min((float)i / fade, (float)(total - i) / fade));
+      chunk[j] = (int16_t)(sinf(2.0f * PI * freq * i / SPK_RATE) * amp * env * 32767);
+    }
+    xStreamBufferSend(spkBuf, chunk, n * 2, pdMS_TO_TICKS(100));
+  }
+}
+
+static void speakerBeep() {
+  if (!BEEP_ON_BOOT || !spkReady) return;
+  beepTone(660, 120, 0.4f);
+  beepTone(0,    60, 0.0f);   // gap
+  beepTone(990, 120, 0.4f);
+  Serial.println("[spk] test beep — you should hear two rising beeps");
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -585,6 +720,164 @@ void cameraTask(void*) {
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
+// USB webcam (UVC) — the P4 is the USB host on its OTG port
+// ═════════════════════════════════════════════════════════════════════════════
+// Webcams already send MJPEG, i.e. a JPEG per frame, so frames go straight to
+// the browser — no scaling or re-encoding. We ask for the smallest MJPEG size
+// that still covers CAM_MAX_W × CAM_MAX_H, to keep frames small and lag low.
+// Plugging and unplugging is handled: the stream reopens on reconnect.
+
+static volatile int  uvcNewAddr   = -1;  // set when a webcam is plugged in
+static volatile int  uvcNewIdx    = 0;
+static volatile int  uvcNewFrames = 0;
+static volatile bool uvcLost      = false;
+static uvc_host_stream_hdl_t uvcStream = NULL;
+static int64_t uvcNextUs = 0;
+
+static void usbHostTask(void*) {
+  for (;;) {
+    uint32_t flags = 0;
+    usb_host_lib_handle_events(portMAX_DELAY, &flags);
+    if (flags & USB_HOST_LIB_EVENT_FLAGS_NO_CLIENTS) usb_host_device_free_all();
+  }
+}
+
+static void uvcDriverEvent(const uvc_host_driver_event_data_t* e, void*) {
+  if (e->type != UVC_HOST_DRIVER_EVENT_DEVICE_CONNECTED) return;
+  uvcNewIdx    = e->device_connected.uvc_stream_index;
+  uvcNewFrames = e->device_connected.frame_info_num;
+  uvcNewAddr   = e->device_connected.dev_addr;
+}
+
+static void uvcStreamEvent(const uvc_host_stream_event_data_t* e, void*) {
+  if (e->type == UVC_HOST_DEVICE_DISCONNECTED) uvcLost = true;
+}
+
+// Runs in the UVC driver task: copy the frame out and hand the buffer back.
+static bool uvcFrame(const uvc_host_frame_t* f, void*) {
+  int64_t now = esp_timer_get_time();
+  if (peerOnline && f->data_len > 0 && now >= uvcNextUs) {
+    uvcNextUs = now + 1000000 / CAM_FPS;
+    uint8_t* out = (uint8_t*)ps_malloc(1 + f->data_len);
+    if (out) {
+      out[0] = TYPE_VIDEO;
+      memcpy(out + 1, f->data, f->data_len);
+      Frame fr = { out, 1 + f->data_len };
+      if (xQueueSend(txQueue, &fr, 0) != pdTRUE) free(out);  // loop() sends it
+    }
+  }
+  return true;  // frame buffer can be reused right away
+}
+
+// Smallest MJPEG size that covers CAM_MAX_W × CAM_MAX_H (or the biggest
+// available if none does). Falls back to the camera's default format.
+static uvc_host_stream_format_t pickWebcamFormat(uint8_t addr, uint8_t idx, int count) {
+  uvc_host_stream_format_t fmt = { 0, 0, 0, UVC_VS_FORMAT_DEFAULT };
+  size_t n = count > 0 ? count : 16;
+  uvc_host_frame_info_t* list = (uvc_host_frame_info_t*)calloc(n, sizeof(uvc_host_frame_info_t));
+  if (!list) return fmt;
+  if (uvc_host_get_frame_list(addr, idx, (uvc_host_frame_info_t (*)[])list, &n) != ESP_OK) n = 0;
+
+  int best = -1, biggest = -1;
+  for (size_t i = 0; i < n; i++) {
+    Serial.printf("[usb]   %s %ux%u\n", list[i].format == UVC_VS_FORMAT_MJPEG ? "MJPEG" : "other",
+                  list[i].h_res, list[i].v_res);
+    if (list[i].format != UVC_VS_FORMAT_MJPEG) continue;
+    unsigned area = list[i].h_res * list[i].v_res;
+    if (biggest < 0 || area > list[biggest].h_res * list[biggest].v_res) biggest = i;
+    if (list[i].h_res >= CAM_MAX_W && list[i].v_res >= CAM_MAX_H &&
+        (best < 0 || area < list[best].h_res * list[best].v_res)) best = i;
+  }
+  if (best < 0) best = biggest;
+  if (best >= 0) {
+    fmt.h_res  = list[best].h_res;
+    fmt.v_res  = list[best].v_res;
+    fmt.format = UVC_VS_FORMAT_MJPEG;
+  }
+  free(list);
+  return fmt;
+}
+
+static void openWebcam(uint8_t addr, uint8_t idx, int frameCount) {
+  Serial.printf("[usb] webcam connected (addr %u) — formats:\n", addr);
+  uvc_host_stream_format_t fmt = pickWebcamFormat(addr, idx, frameCount);
+  if (fmt.format != UVC_VS_FORMAT_MJPEG)
+    Serial.println("[usb] no MJPEG mode found — this webcam may not work with Buddy");
+
+  uvc_host_stream_config_t sc = {};
+  sc.event_cb = uvcStreamEvent;
+  sc.frame_cb = uvcFrame;
+  sc.usb.dev_addr         = addr;
+  sc.usb.uvc_stream_index = idx;
+  sc.vs_format = fmt;
+  sc.advanced.number_of_frame_buffers = 3;
+  sc.advanced.frame_size      = 0;                  // size from the camera's negotiation
+  sc.advanced.frame_heap_caps = MALLOC_CAP_SPIRAM;
+  sc.advanced.number_of_urbs  = 3;
+  sc.advanced.urb_size        = 10 * 1024;
+
+  // Ask for CAM_FPS first; if the camera refuses, take its default rate
+  // (extra frames are skipped in uvcFrame anyway).
+  sc.vs_format.fps = CAM_FPS;
+  esp_err_t err = uvc_host_stream_open(&sc, pdMS_TO_TICKS(5000), &uvcStream);
+  if (err != ESP_OK) {
+    sc.vs_format.fps = 0;
+    err = uvc_host_stream_open(&sc, pdMS_TO_TICKS(5000), &uvcStream);
+  }
+  if (err != ESP_OK) {
+    Serial.printf("[usb] webcam open FAILED (%s)\n", esp_err_to_name(err));
+    uvcStream = NULL;
+    return;
+  }
+  if (uvc_host_stream_start(uvcStream) != ESP_OK) {
+    Serial.println("[usb] webcam start FAILED");
+    uvc_host_stream_close(uvcStream);
+    uvcStream = NULL;
+    return;
+  }
+  camReady = true;
+  Serial.printf("[usb] webcam streaming MJPEG %ux%u\n", fmt.h_res, fmt.v_res);
+}
+
+void webcamTask(void*) {
+  for (;;) {
+    if (uvcLost) {
+      uvcLost = false;
+      Serial.println("[usb] webcam unplugged");
+      if (uvcStream) { uvc_host_stream_close(uvcStream); uvcStream = NULL; }
+      camReady = false;
+    }
+    if (!uvcStream && uvcNewAddr >= 0) {
+      int addr = uvcNewAddr;
+      uvcNewAddr = -1;
+      openWebcam(addr, uvcNewIdx, uvcNewFrames);
+    }
+    vTaskDelay(pdMS_TO_TICKS(200));
+  }
+}
+
+void initWebcam() {
+  usb_host_config_t hc = {};
+  hc.intr_flags = ESP_INTR_FLAG_LEVEL1;   // peripheral_map 0 = the high-speed OTG port
+  if (usb_host_install(&hc) != ESP_OK) {
+    Serial.println("[usb] USB host init FAILED — webcam disabled"); return;
+  }
+  xTaskCreatePinnedToCore(usbHostTask, "usbh", 4096, NULL, 10, NULL, 0);
+
+  uvc_host_driver_config_t dc = {};
+  dc.driver_task_stack_size = 6144;
+  dc.driver_task_priority   = 9;
+  dc.xCoreID                = tskNO_AFFINITY;
+  dc.create_background_task = true;
+  dc.event_cb               = uvcDriverEvent;
+  if (uvc_host_install(&dc) != ESP_OK) {
+    Serial.println("[usb] UVC driver init FAILED — webcam disabled"); return;
+  }
+  xTaskCreate(webcamTask, "webcam", 6144, NULL, 5, NULL);
+  Serial.println("[usb] waiting for a webcam on the USB OTG port...");
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
 // WebSocket
 // ═════════════════════════════════════════════════════════════════════════════
 
@@ -629,7 +922,8 @@ void onWsEvent(WStype_t type, uint8_t* payload, size_t len) {
       wsLive = false;
       peerOnline = false;
       driveStop();
-      Serial.println("[ws]  disconnected");
+      Serial.printf("[ws]  disconnected (WiFi %s)\n",
+                    WiFi.status() == WL_CONNECTED ? WiFi.localIP().toString().c_str() : "NOT connected");
       break;
 
     case WStype_TEXT:
@@ -654,7 +948,8 @@ void setup() {
   Serial.printf("\n[buddy] booting (ESP32-P4) — id: %s\n", cfg.id);
   if (!psramFound()) Serial.println("[buddy] WARNING: no PSRAM — Tools → PSRAM → Enabled");
 
-  txQueue = xQueueCreate(TX_QUEUE_DEPTH, sizeof(Frame));
+  txQueue  = xQueueCreate(TX_QUEUE_DEPTH, sizeof(Frame));
+  micQueue = xQueueCreate(MIC_QUEUE_DEPTH, sizeof(Frame));
 
   // One I2C bus for the ES8311 and the camera's SCCB.
   i2c_master_bus_config_t busCfg = {};
@@ -668,12 +963,27 @@ void setup() {
 
   initServos();
   initSpeaker();
-  initCamera();
+  if (USE_USB_WEBCAM) initWebcam();
+  else                initCamera();
 
   // WiFi (through the onboard ESP32-C6)
   Serial.printf("[wifi] connecting to \"%s\"\n", cfg.ssid);
   WiFi.mode(WIFI_STA);
   WiFi.setSleep(false);  // power save adds tens of ms of latency
+
+  // Report the C6 coprocessor link. If the C6 isn't answering, or its
+  // firmware is older than this core expects, WiFi sees nothing at all.
+  uint32_t hMaj, hMin, hPat, sMaj, sMin, sPat;
+  hostedGetHostVersion(&hMaj, &hMin, &hPat);
+  hostedGetSlaveVersion(&sMaj, &sMin, &sPat);
+  Serial.printf("[wifi] C6 link: %s — host fw %lu.%lu.%lu, C6 fw %lu.%lu.%lu (%s)\n",
+                hostedIsWiFiActive() ? "up" : "DOWN",
+                (unsigned long)hMaj, (unsigned long)hMin, (unsigned long)hPat,
+                (unsigned long)sMaj, (unsigned long)sMin, (unsigned long)sPat,
+                hostedGetSlaveTargetName() ? hostedGetSlaveTargetName() : "?");
+  if (hostedHasUpdate())
+    Serial.printf("[wifi] C6 firmware is OUTDATED — update it (see README). Image: %s\n",
+                  hostedGetUpdateURL());
   WiFi.begin(cfg.ssid, cfg.pass);
   WiFi.setAutoReconnect(true);
   for (int i = 0; i < 40 && WiFi.status() != WL_CONNECTED; i++) {
@@ -682,8 +992,17 @@ void setup() {
   }
   if (WiFi.status() == WL_CONNECTED)
     Serial.printf("\n[wifi] %s\n", WiFi.localIP().toString().c_str());
-  else
-    Serial.println("\n[wifi] timed out — will retry");
+  else {
+    // Show what the radio can actually see — catches 5 GHz-only hotspots and
+    // look-alike names (iPhones use a curly ’ in "Name’s iPhone").
+    Serial.printf("\n[wifi] could not join \"%s\" — networks visible (2.4 GHz only):\n", cfg.ssid);
+    int n = WiFi.scanNetworks();
+    for (int i = 0; i < n; i++)
+      Serial.printf("[wifi]   \"%s\"  (%d dBm)\n", WiFi.SSID(i).c_str(), WiFi.RSSI(i));
+    if (n == 0) Serial.println("[wifi]   (none)");
+    if (n < 0)  Serial.printf("[wifi]   scan FAILED (code %d) — the C6 WiFi chip isn't responding\n", n);
+    WiFi.begin(cfg.ssid, cfg.pass);  // the scan interrupts the join — start it again
+  }
 
   // WebSocket — WSS on 443 (Railway), plain WS otherwise (local hub)
   String path = String("/ws?id=") + cfg.id + "&role=device";
@@ -696,13 +1015,18 @@ void setup() {
   ws.setReconnectInterval(3000);
   ws.enableHeartbeat(15000, 3000, 2);
 
-  if (camReady) xTaskCreatePinnedToCore(cameraTask, "cam", 6144, NULL, 5, NULL, 1);
+  if (!USE_USB_WEBCAM && camReady) xTaskCreatePinnedToCore(cameraTask, "cam", 6144, NULL, 5, NULL, 1);
 
   Serial.println("[buddy] running");
 }
 
 void loop() {
   Frame f;
+  // Mic audio first — it's small and late audio is worse than a late frame.
+  while (xQueueReceive(micQueue, &f, 0) == pdTRUE) {
+    if (wsLive && peerOnline) ws.sendBIN(f.buf, f.len);
+    free(f.buf);
+  }
   while (xQueueReceive(txQueue, &f, 0) == pdTRUE) {
     if (wsLive && peerOnline) ws.sendBIN(f.buf, f.len);
     free(f.buf);

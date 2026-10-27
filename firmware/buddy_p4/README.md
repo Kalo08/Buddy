@@ -36,6 +36,40 @@ and drive.
 
 > The servos need their own 5 V supply. Tie its ground to the board's GND.
 
+## USB webcam (instead of the OV5640)
+
+`USE_USB_WEBCAM` near the top of the sketch picks the camera:
+`true` = USB webcam (the default now), `false` = OV5640 on the MIPI-CSI ribbon.
+
+- Plug the webcam into the **USB OTG** port. Keep the board powered and
+  connected to your PC through the **USB to UART** port.
+- It needs a standard UVC webcam that can send **MJPEG**. Most cheap USB
+  webcams can.
+- The sketch picks the webcam's smallest MJPEG size that's at least 320×240.
+  It forwards the camera's own JPEG frames without re-encoding, capped at
+  `CAM_FPS`.
+- Plugging and unplugging while it runs is fine. The stream restarts on its own.
+
+Serial Monitor when it works:
+
+```
+[usb] waiting for a webcam on the USB OTG port...
+[usb] webcam connected (addr 1) — formats:
+[usb]   MJPEG 640x480
+[usb]   MJPEG 320x240
+[usb] webcam streaming MJPEG 320x240
+```
+
+If something goes wrong:
+
+- **No `webcam connected` line:** the port may not be powering the camera.
+  Check whether the webcam's LED lights up. If it doesn't, go through a
+  powered USB hub.
+- **`USB host init FAILED`:** set **Tools → USB Mode → Hardware CDC and
+  JTAG** and upload again.
+- **`no MJPEG mode found`:** that webcam only sends raw video. Use a
+  different webcam.
+
 ## What the sketch does
 
 - **Camera:** the OV5640 captures RGB565 at 1280×720. The P4's PPA scales it
@@ -78,7 +112,15 @@ ws.send(JSON.stringify({type:"servo", ch:0, angle:-1}))   // -1 = output off
 The serial monitor prints the µs value for each command. Put the one where
 the wheel stops into `NEUTRAL_US[ch]`.
 
-## Not included (yet)
+## Microphone
 
-- Mic → browser. The board has an ES8311 ADC and a mic input, but this
-  isn't wired up.
+The onboard mic streams to the browser while a browser is paired, the same
+way the Pi's mic did. Sound comes out of the page when the **SPEAKER** toggle
+is on.
+
+- **Echo:** while the robot's speaker is playing, plus 300 ms after, the mic
+  is muted, so you don't hear your own voice echoed back. Set the time with
+  `MIC_ECHO_GUARD_MS`.
+- **Too quiet or too loud:** change `MIC_GAIN` (0–7, 6 dB per step;
+  default 5).
+- **Turn it off:** set `MIC_ENABLED false`.
