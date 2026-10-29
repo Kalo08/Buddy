@@ -12,9 +12,8 @@ src, dst, ses_path = sys.argv[1:4]
 board = pcbnew.LoadBoard(src)
 FM = pcbnew.FromMM
 routes = json.load(open("routes.json"))
-gnd = json.load(open("gnd.json"))
-tracks = routes["tracks"] + gnd["tracks"]
-vias = routes["vias"] + gnd["vias"]
+tracks = routes["tracks"]
+vias = routes["vias"]
 nets = board.GetNetsByName()
 
 for l, xa, ya, xb, yb, w, net in tracks:
@@ -34,12 +33,14 @@ for x, y, d, dr, net in vias:
     v.SetNet(nets[net])
     board.Add(v)
 
-# GND pours, both layers, over the whole board (KiCad clips to Edge.Cuts)
-for layer in (pcbnew.F_Cu, pcbnew.B_Cu):
+# planes: In1 = GND, In2 = 3V3; outer layers get GND fill (KiCad clips to Edge.Cuts)
+for layer, net, name, prio in ((pcbnew.In1_Cu, "GND", "GND_PLANE", 0), (pcbnew.In2_Cu, "3V3", "3V3_PLANE", 0),
+                               (pcbnew.F_Cu, "GND", "GND_TOP", 0), (pcbnew.B_Cu, "GND", "GND_BOTTOM", 0)):
     z = pcbnew.ZONE(board)
     z.SetLayer(layer)
-    z.SetNet(nets["GND"])
-    z.SetZoneName("GND_" + ("F" if layer == pcbnew.F_Cu else "B"))
+    z.SetNet(nets[net])
+    z.SetZoneName(name)
+    z.SetAssignedPriority(prio)
     ol = z.Outline()
     ol.NewOutline()
     for x, y in ((99.5, 99.5), (164.5, 99.5), (164.5, 156.5), (99.5, 156.5)):

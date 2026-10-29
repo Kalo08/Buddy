@@ -25,7 +25,8 @@ CLR = 0.15            # board clearance rule
 MARGIN = 0.07         # raster safety margin (half a cell diagonal)
 EDGE_CLR = 0.5        # copper to board edge
 HOLE_CLR = 0.25       # copper to NPTH hole
-B_COST = 1.4          # prefer F.Cu so B.Cu stays a GND plane
+B_COST = 1.1          # slight preference for F.Cu
+PLANES = {"GND": "In1.Cu", "3V3": "In2.Cu"}   # these nets drop to inner planes
 VIA_COST = 14.0
 NARROW = 0.2
 POWER = {"VSYS": 0.5, "/Power and Protection/VBAT_IN": 0.5, "/Power and Protection/VBAT_F": 0.5,
@@ -161,7 +162,7 @@ def pin_center(key):
 conns = []           # (net, pin key) ; first pin of each net is the seed
 seeds = {}
 for net in net_names:
-    if net == "GND" or net.startswith("unconnected"):
+    if net in PLANES or net.startswith("unconnected"):
         continue
     keys = [k for k, v in pins.items() if v["net"] == net]
     if len(keys) < 2:
@@ -476,8 +477,73 @@ def victims_of(cells, net):
     return out
 
 
+fanout = {"tracks": [], "vias": [], "skipped": []}
+
+
+def plane_fanout():
+    """Stub + via from every SMD pad of a plane net down to its inner plane.
+
+    The stubs and vias become static copper (pad_owner) so signal routing
+    treats them like pads and never rips them up.
+    """
+    VD, VDR = 0.6, 0.3
+    placed = []
+    keys = [k for k, v in pins.items() if v["net"] in PLANES]
+    # tightest pads first: smallest pad gets first pick of via sites
+    keys.sort(key=lambda k: min(p["bbox"][2] - p["bbox"][0] for p in pins[k]["pads"]) *
+              min(p["bbox"][3] - p["bbox"][1] for p in pins[k]["pads"]))
+    for key in keys:
+        net = pins[key]["net"]
+        pads = pins[key]["pads"]
+        if any(len(p["layers"]) == 2 for p in pads):
+            continue                          # through-hole / via-in-pad already reaches the plane
+        nid = net_id[net]
+        p = pads[0]
+        l = 0 if "F" in p["layers"] else 1
+        px, py = p["x"], p["y"]
+        copper = np.where(pad_owner != 0, pad_owner, track_owner)
+        foreign = (copper != 0) & (copper != nid)
+        acc = access_mask(net)
+        tw = 0.3 if min(p["bbox"][2] - p["bbox"][0], p["bbox"][3] - p["bbox"][1]) >= 0.5 else NARROW
+        blk = dilate(foreign[l] | hard, tw / 2 + CLR + MARGIN) & ~acc[l]
+        r_v = VD / 2 + CLR + MARGIN
+        via_bad = dilate(pad_any[0] | pad_any[1] | hard | foreign[0] | foreign[1], r_v)
+        best = None
+        for rr in np.arange(0.5, 3.01, 0.1):
+            for a in range(0, 360, 10):
+                vx = px + rr * math.cos(math.radians(a)); vy = py + rr * math.sin(math.radians(a))
+                j, i = cell(vx, vy)
+                if not (0 <= j < H and 0 <= i < W) or via_bad[j, i]:
+                    continue
+                if any(math.hypot(vx - qx, vy - qy) < VD + 0.35 for qx, qy in placed):
+                    continue
+                if seg_ok(l, px, py, vx, vy, np.stack([blk, blk]), nid, copper):
+                    best = (round(vx, 3), round(vy, 3))
+                    break
+            if best:
+                break
+        big = (p["bbox"][2] - p["bbox"][0]) * (p["bbox"][3] - p["bbox"][1]) >= 1.0
+        if best is None and big:
+            best = (px, py)                   # exposed pad: via in the pad centre
+        if best is None:
+            fanout["skipped"].append([net, list(key)])
+            continue
+        vx, vy = best
+        placed.append(best)
+        fanout["tracks"].append([l, px, py, vx, vy, tw, net])
+        fanout["vias"].append([vx, vy, VD, VDR, net])
+        (j0, j1, i0, i1), m = raster_segment(px, py, vx, vy, tw / 2)
+        pad_owner[l, j0:j1, i0:i1][m] = nid
+        (j0, j1, i0, i1), m = raster_segment(vx, vy, vx, vy, VD / 2)
+        for li in (0, 1):
+            pad_owner[li, j0:j1, i0:i1][m] = nid
+            pad_any[li, j0:j1, i0:i1] |= m
+    print(f"plane fan-out: {len(fanout['vias'])} vias, skipped {fanout['skipped']}", flush=True)
+
+
 def main():
     t0 = time.time()
+    plane_fanout()
     key_of = {i: (c[0], c[1]) for i, c in enumerate(conns)}
     queue = list(range(len(conns)))
     attempts = {}
@@ -520,7 +586,8 @@ def main():
         connected[net].add(key)
         if len(routes) % 20 == 0:
             print(f"  {len(routes)}/{len(conns)} routed, queue {len(queue)}, {time.time() - t0:.0f}s", flush=True)
-    out = {"tracks": [], "vias": [], "failed": []}
+    out = {"tracks": list(fanout["tracks"]), "vias": list(fanout["vias"]), "failed": [],
+           "fanout_skipped": fanout["skipped"]}
     for (net, key), r in routes.items():
         out["tracks"] += [[l, a, b, c, d, w, net] for l, a, b, c, d, w in r["tracks"]]
         out["vias"] += [[x, y, d, dr, net] for x, y, d, dr in r["vias"]]
