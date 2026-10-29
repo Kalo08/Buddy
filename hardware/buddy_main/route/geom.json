@@ -1,0 +1,8039 @@
+{
+"pads": [
+{
+"ref": "SW1",
+"num": "",
+"net": "",
+"layers": [
+"F"
+],
+"x": 116.15,
+"y": 104.43,
+"bbox": [
+115.65,
+104.03,
+116.65,
+104.83
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "SW1",
+"num": "",
+"net": "",
+"layers": [
+"F"
+],
+"x": 116.15,
+"y": 102.22,
+"bbox": [
+115.65,
+101.82,
+116.65,
+102.62
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "SW1",
+"num": "",
+"net": "",
+"layers": [
+"F",
+"B"
+],
+"x": 114.0,
+"y": 103.32,
+"bbox": [
+113.55,
+102.87,
+114.45,
+103.77
+],
+"circle": true,
+"drill": 0.9,
+"npth": true
+},
+{
+"ref": "SW1",
+"num": "",
+"net": "",
+"layers": [
+"F",
+"B"
+],
+"x": 111.0,
+"y": 103.32,
+"bbox": [
+110.55,
+102.87,
+111.45,
+103.77
+],
+"circle": true,
+"drill": 0.9,
+"npth": true
+},
+{
+"ref": "SW1",
+"num": "",
+"net": "",
+"layers": [
+"F"
+],
+"x": 108.85,
+"y": 104.43,
+"bbox": [
+108.35,
+104.03,
+109.35,
+104.83
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "SW1",
+"num": "",
+"net": "",
+"layers": [
+"F"
+],
+"x": 108.85,
+"y": 102.22,
+"bbox": [
+108.35,
+101.82,
+109.35,
+102.62
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "SW1",
+"num": "1",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 114.75,
+"y": 105.08,
+"bbox": [
+114.4,
+104.33,
+115.1,
+105.83
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "SW1",
+"num": "2",
+"net": "/Power and Protection/~{SHDN}",
+"layers": [
+"F"
+],
+"x": 111.75,
+"y": 105.08,
+"bbox": [
+111.4,
+104.33,
+112.1,
+105.83
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "SW1",
+"num": "3",
+"net": "unconnected-(SW1-C-Pad3)",
+"layers": [
+"F"
+],
+"x": 110.25,
+"y": 105.08,
+"bbox": [
+109.9,
+104.33,
+110.6,
+105.83
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C34",
+"num": "1",
+"net": "2V8",
+"layers": [
+"F"
+],
+"x": 137.225,
+"y": 139.3,
+"bbox": [
+136.775,
+138.825,
+137.675,
+139.775
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C34",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 138.775,
+"y": 139.3,
+"bbox": [
+138.325,
+138.825,
+139.225,
+139.775
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J1",
+"num": "1",
+"net": "/Power and Protection/VBAT_IN",
+"layers": [
+"F",
+"B"
+],
+"x": 103.5,
+"y": 115.5,
+"bbox": [
+101.6,
+113.6,
+105.4,
+117.4
+],
+"circle": false,
+"drill": 2.7,
+"npth": false
+},
+{
+"ref": "J1",
+"num": "2",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 103.5,
+"y": 110.5,
+"bbox": [
+101.6,
+108.6,
+105.4,
+112.4
+],
+"circle": true,
+"drill": 2.7,
+"npth": false
+},
+{
+"ref": "U4",
+"num": "1",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 123.8625,
+"y": 138.05,
+"bbox": [
+123.2,
+137.75,
+124.525,
+138.35
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U4",
+"num": "2",
+"net": "2V8",
+"layers": [
+"F"
+],
+"x": 123.8625,
+"y": 139.95,
+"bbox": [
+123.2,
+139.65,
+124.525,
+140.25
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U4",
+"num": "3",
+"net": "3V3",
+"layers": [
+"F"
+],
+"x": 126.1375,
+"y": 139.0,
+"bbox": [
+125.475,
+138.7,
+126.8,
+139.3
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R17",
+"num": "1",
+"net": "/Motor Drivers/AISEN2",
+"layers": [
+"F"
+],
+"x": 152.9375,
+"y": 118.5,
+"bbox": [
+152.375,
+117.625,
+153.5,
+119.375
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R17",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 155.8625,
+"y": 118.5,
+"bbox": [
+155.3,
+117.625,
+156.425,
+119.375
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C27",
+"num": "1",
+"net": "VSYS",
+"layers": [
+"F"
+],
+"x": 153.625,
+"y": 124.2,
+"bbox": [
+153.175,
+123.725,
+154.075,
+124.675
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C27",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 155.175,
+"y": 124.2,
+"bbox": [
+154.725,
+123.725,
+155.625,
+124.675
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "Q1",
+"num": "1",
+"net": "/Power and Protection/Q_SRC",
+"layers": [
+"F"
+],
+"x": 109.525,
+"y": 120.095,
+"bbox": [
+108.55,
+119.795,
+110.5,
+120.395
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "Q1",
+"num": "2",
+"net": "/Power and Protection/GATE",
+"layers": [
+"F"
+],
+"x": 109.525,
+"y": 121.365,
+"bbox": [
+108.55,
+121.065,
+110.5,
+121.665
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "Q1",
+"num": "3",
+"net": "/Power and Protection/Q_SRC",
+"layers": [
+"F"
+],
+"x": 109.525,
+"y": 122.635,
+"bbox": [
+108.55,
+122.335,
+110.5,
+122.935
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "Q1",
+"num": "4",
+"net": "/Power and Protection/GATE",
+"layers": [
+"F"
+],
+"x": 109.525,
+"y": 123.905,
+"bbox": [
+108.55,
+123.605,
+110.5,
+124.205
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "Q1",
+"num": "5",
+"net": "VSYS",
+"layers": [
+"F"
+],
+"x": 114.475,
+"y": 123.905,
+"bbox": [
+113.5,
+123.605,
+115.45,
+124.205
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "Q1",
+"num": "6",
+"net": "VSYS",
+"layers": [
+"F"
+],
+"x": 114.475,
+"y": 122.635,
+"bbox": [
+113.5,
+122.335,
+115.45,
+122.935
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "Q1",
+"num": "7",
+"net": "/Power and Protection/VBAT_F",
+"layers": [
+"F"
+],
+"x": 114.475,
+"y": 121.365,
+"bbox": [
+113.5,
+121.065,
+115.45,
+121.665
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "Q1",
+"num": "8",
+"net": "/Power and Protection/VBAT_F",
+"layers": [
+"F"
+],
+"x": 114.475,
+"y": 120.095,
+"bbox": [
+113.5,
+119.795,
+115.45,
+120.395
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U8",
+"num": "",
+"net": "",
+"layers": [],
+"x": 149.0,
+"y": 108.615,
+"bbox": [
+148.07,
+108.12,
+149.93,
+109.11
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U8",
+"num": "",
+"net": "",
+"layers": [],
+"x": 149.0,
+"y": 108.0,
+"bbox": [
+147.845,
+106.77,
+150.155,
+109.23
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U8",
+"num": "",
+"net": "",
+"layers": [],
+"x": 149.0,
+"y": 107.385,
+"bbox": [
+148.07,
+106.89,
+149.93,
+107.88
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U8",
+"num": "1",
+"net": "MOT_nSLEEP",
+"layers": [
+"F"
+],
+"x": 146.725,
+"y": 110.8625,
+"bbox": [
+146.525,
+110.075,
+146.925,
+111.65
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U8",
+"num": "2",
+"net": "/Motor Drivers/M1_A",
+"layers": [
+"F"
+],
+"x": 147.375,
+"y": 110.8625,
+"bbox": [
+147.175,
+110.075,
+147.575,
+111.65
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U8",
+"num": "3",
+"net": "/Motor Drivers/AISEN1",
+"layers": [
+"F"
+],
+"x": 148.025,
+"y": 110.8625,
+"bbox": [
+147.825,
+110.075,
+148.225,
+111.65
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U8",
+"num": "4",
+"net": "/Motor Drivers/M1_B",
+"layers": [
+"F"
+],
+"x": 148.675,
+"y": 110.8625,
+"bbox": [
+148.475,
+110.075,
+148.875,
+111.65
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U8",
+"num": "5",
+"net": "/Motor Drivers/M2_B",
+"layers": [
+"F"
+],
+"x": 149.325,
+"y": 110.8625,
+"bbox": [
+149.125,
+110.075,
+149.525,
+111.65
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U8",
+"num": "6",
+"net": "/Motor Drivers/BISEN1",
+"layers": [
+"F"
+],
+"x": 149.975,
+"y": 110.8625,
+"bbox": [
+149.775,
+110.075,
+150.175,
+111.65
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U8",
+"num": "7",
+"net": "/Motor Drivers/M2_A",
+"layers": [
+"F"
+],
+"x": 150.625,
+"y": 110.8625,
+"bbox": [
+150.425,
+110.075,
+150.825,
+111.65
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U8",
+"num": "8",
+"net": "MOT_nFAULT",
+"layers": [
+"F"
+],
+"x": 151.275,
+"y": 110.8625,
+"bbox": [
+151.075,
+110.075,
+151.475,
+111.65
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U8",
+"num": "9",
+"net": "M2_IN1",
+"layers": [
+"F"
+],
+"x": 151.275,
+"y": 105.1375,
+"bbox": [
+151.075,
+104.35,
+151.475,
+105.925
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U8",
+"num": "10",
+"net": "M2_IN2",
+"layers": [
+"F"
+],
+"x": 150.625,
+"y": 105.1375,
+"bbox": [
+150.425,
+104.35,
+150.825,
+105.925
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U8",
+"num": "11",
+"net": "/Motor Drivers/VCP1",
+"layers": [
+"F"
+],
+"x": 149.975,
+"y": 105.1375,
+"bbox": [
+149.775,
+104.35,
+150.175,
+105.925
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U8",
+"num": "12",
+"net": "VSYS",
+"layers": [
+"F"
+],
+"x": 149.325,
+"y": 105.1375,
+"bbox": [
+149.125,
+104.35,
+149.525,
+105.925
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U8",
+"num": "13",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 148.675,
+"y": 105.1375,
+"bbox": [
+148.475,
+104.35,
+148.875,
+105.925
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U8",
+"num": "14",
+"net": "/Motor Drivers/VINT1",
+"layers": [
+"F"
+],
+"x": 148.025,
+"y": 105.1375,
+"bbox": [
+147.825,
+104.35,
+148.225,
+105.925
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U8",
+"num": "15",
+"net": "M1_IN2",
+"layers": [
+"F"
+],
+"x": 147.375,
+"y": 105.1375,
+"bbox": [
+147.175,
+104.35,
+147.575,
+105.925
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U8",
+"num": "16",
+"net": "M1_IN1",
+"layers": [
+"F"
+],
+"x": 146.725,
+"y": 105.1375,
+"bbox": [
+146.525,
+104.35,
+146.925,
+105.925
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U8",
+"num": "17",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 147.2,
+"y": 109.0,
+"bbox": [
+146.95,
+108.75,
+147.45,
+109.25
+],
+"circle": true,
+"drill": 0.2,
+"npth": false
+},
+{
+"ref": "U8",
+"num": "17",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 148.4,
+"y": 109.0,
+"bbox": [
+148.15,
+108.75,
+148.65,
+109.25
+],
+"circle": true,
+"drill": 0.2,
+"npth": false
+},
+{
+"ref": "U8",
+"num": "17",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 149.6,
+"y": 109.0,
+"bbox": [
+149.35,
+108.75,
+149.85,
+109.25
+],
+"circle": true,
+"drill": 0.2,
+"npth": false
+},
+{
+"ref": "U8",
+"num": "17",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 150.8,
+"y": 109.0,
+"bbox": [
+150.55,
+108.75,
+151.05,
+109.25
+],
+"circle": true,
+"drill": 0.2,
+"npth": false
+},
+{
+"ref": "U8",
+"num": "17",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 147.2,
+"y": 108.0,
+"bbox": [
+146.95,
+107.75,
+147.45,
+108.25
+],
+"circle": true,
+"drill": 0.2,
+"npth": false
+},
+{
+"ref": "U8",
+"num": "17",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 148.4,
+"y": 108.0,
+"bbox": [
+148.15,
+107.75,
+148.65,
+108.25
+],
+"circle": true,
+"drill": 0.2,
+"npth": false
+},
+{
+"ref": "U8",
+"num": "17",
+"net": "GND",
+"layers": [
+"B"
+],
+"x": 149.0,
+"y": 108.0,
+"bbox": [
+146.95,
+106.75,
+151.05,
+109.25
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U8",
+"num": "17",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 149.0,
+"y": 108.0,
+"bbox": [
+146.5,
+106.3,
+151.5,
+109.7
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U8",
+"num": "17",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 149.6,
+"y": 108.0,
+"bbox": [
+149.35,
+107.75,
+149.85,
+108.25
+],
+"circle": true,
+"drill": 0.2,
+"npth": false
+},
+{
+"ref": "U8",
+"num": "17",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 150.8,
+"y": 108.0,
+"bbox": [
+150.55,
+107.75,
+151.05,
+108.25
+],
+"circle": true,
+"drill": 0.2,
+"npth": false
+},
+{
+"ref": "U8",
+"num": "17",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 147.2,
+"y": 107.0,
+"bbox": [
+146.95,
+106.75,
+147.45,
+107.25
+],
+"circle": true,
+"drill": 0.2,
+"npth": false
+},
+{
+"ref": "U8",
+"num": "17",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 148.4,
+"y": 107.0,
+"bbox": [
+148.15,
+106.75,
+148.65,
+107.25
+],
+"circle": true,
+"drill": 0.2,
+"npth": false
+},
+{
+"ref": "U8",
+"num": "17",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 149.6,
+"y": 107.0,
+"bbox": [
+149.35,
+106.75,
+149.85,
+107.25
+],
+"circle": true,
+"drill": 0.2,
+"npth": false
+},
+{
+"ref": "U8",
+"num": "17",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 150.8,
+"y": 107.0,
+"bbox": [
+150.55,
+106.75,
+151.05,
+107.25
+],
+"circle": true,
+"drill": 0.2,
+"npth": false
+},
+{
+"ref": "R8",
+"num": "1",
+"net": "3V3",
+"layers": [
+"F"
+],
+"x": 135.5,
+"y": 123.425,
+"bbox": [
+135.025,
+123.025,
+135.975,
+123.825
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R8",
+"num": "2",
+"net": "/MCU and USB/EN",
+"layers": [
+"F"
+],
+"x": 135.5,
+"y": 121.775,
+"bbox": [
+135.025,
+121.375,
+135.975,
+122.175
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C2",
+"num": "1",
+"net": "VSYS",
+"layers": [
+"F"
+],
+"x": 120.6,
+"y": 133.975,
+"bbox": [
+119.7,
+133.4,
+121.5,
+134.55
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C2",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 120.6,
+"y": 131.025,
+"bbox": [
+119.7,
+130.45,
+121.5,
+131.6
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R18",
+"num": "1",
+"net": "5V",
+"layers": [
+"F"
+],
+"x": 145.0,
+"y": 143.425,
+"bbox": [
+144.525,
+143.025,
+145.475,
+143.825
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R18",
+"num": "2",
+"net": "/Audio and Camera/AMP_SD_MODE",
+"layers": [
+"F"
+],
+"x": 145.0,
+"y": 141.775,
+"bbox": [
+144.525,
+141.375,
+145.475,
+142.175
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J9",
+"num": "1",
+"net": "3V3",
+"layers": [
+"F",
+"B"
+],
+"x": 142.5,
+"y": 153.4,
+"bbox": [
+141.65,
+152.55,
+143.35,
+154.25
+],
+"circle": false,
+"drill": 1.0,
+"npth": false
+},
+{
+"ref": "J9",
+"num": "2",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 145.04,
+"y": 153.4,
+"bbox": [
+144.19,
+152.55,
+145.89,
+154.25
+],
+"circle": true,
+"drill": 1.0,
+"npth": false
+},
+{
+"ref": "J9",
+"num": "3",
+"net": "I2S_DIN",
+"layers": [
+"F",
+"B"
+],
+"x": 147.58,
+"y": 153.4,
+"bbox": [
+146.73,
+152.55,
+148.43,
+154.25
+],
+"circle": true,
+"drill": 1.0,
+"npth": false
+},
+{
+"ref": "J9",
+"num": "4",
+"net": "I2S_WS",
+"layers": [
+"F",
+"B"
+],
+"x": 150.12,
+"y": 153.4,
+"bbox": [
+149.27,
+152.55,
+150.97,
+154.25
+],
+"circle": true,
+"drill": 1.0,
+"npth": false
+},
+{
+"ref": "J9",
+"num": "5",
+"net": "I2S_BCLK",
+"layers": [
+"F",
+"B"
+],
+"x": 152.66,
+"y": 153.4,
+"bbox": [
+151.81,
+152.55,
+153.51,
+154.25
+],
+"circle": true,
+"drill": 1.0,
+"npth": false
+},
+{
+"ref": "J9",
+"num": "6",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 155.2,
+"y": 153.4,
+"bbox": [
+154.35,
+152.55,
+156.05,
+154.25
+],
+"circle": true,
+"drill": 1.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "",
+"net": "",
+"layers": [],
+"x": 129.1,
+"y": 107.81,
+"bbox": [
+128.65,
+107.36,
+129.55,
+108.26
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "",
+"net": "",
+"layers": [],
+"x": 129.1,
+"y": 109.21,
+"bbox": [
+128.65,
+108.76,
+129.55,
+109.66
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "",
+"net": "",
+"layers": [],
+"x": 129.1,
+"y": 110.61,
+"bbox": [
+128.65,
+110.16,
+129.55,
+111.06
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "",
+"net": "",
+"layers": [],
+"x": 130.5,
+"y": 107.81,
+"bbox": [
+130.05,
+107.36,
+130.95,
+108.26
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "",
+"net": "",
+"layers": [],
+"x": 130.5,
+"y": 109.21,
+"bbox": [
+130.05,
+108.76,
+130.95,
+109.66
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "",
+"net": "",
+"layers": [],
+"x": 130.5,
+"y": 110.61,
+"bbox": [
+130.05,
+110.16,
+130.95,
+111.06
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "",
+"net": "",
+"layers": [],
+"x": 131.9,
+"y": 107.81,
+"bbox": [
+131.45,
+107.36,
+132.35,
+108.26
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "",
+"net": "",
+"layers": [],
+"x": 131.9,
+"y": 109.21,
+"bbox": [
+131.45,
+108.76,
+132.35,
+109.66
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "",
+"net": "",
+"layers": [],
+"x": 131.9,
+"y": 110.61,
+"bbox": [
+131.45,
+110.16,
+132.35,
+111.06
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "1",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 123.25,
+"y": 101.49,
+"bbox": [
+122.5,
+101.04,
+124.0,
+101.94
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "2",
+"net": "3V3",
+"layers": [
+"F"
+],
+"x": 123.25,
+"y": 102.76,
+"bbox": [
+122.5,
+102.31,
+124.0,
+103.21
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "3",
+"net": "/MCU and USB/EN",
+"layers": [
+"F"
+],
+"x": 123.25,
+"y": 104.03,
+"bbox": [
+122.5,
+103.58,
+124.0,
+104.48
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "4",
+"net": "CAM_SIOD",
+"layers": [
+"F"
+],
+"x": 123.25,
+"y": 105.3,
+"bbox": [
+122.5,
+104.85,
+124.0,
+105.75
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "5",
+"net": "CAM_SIOC",
+"layers": [
+"F"
+],
+"x": 123.25,
+"y": 106.57,
+"bbox": [
+122.5,
+106.12,
+124.0,
+107.02
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "6",
+"net": "CAM_VSYNC",
+"layers": [
+"F"
+],
+"x": 123.25,
+"y": 107.84,
+"bbox": [
+122.5,
+107.39,
+124.0,
+108.29
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "7",
+"net": "CAM_HREF",
+"layers": [
+"F"
+],
+"x": 123.25,
+"y": 109.11,
+"bbox": [
+122.5,
+108.66,
+124.0,
+109.56
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "8",
+"net": "CAM_XCLK",
+"layers": [
+"F"
+],
+"x": 123.25,
+"y": 110.38,
+"bbox": [
+122.5,
+109.93,
+124.0,
+110.83
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "9",
+"net": "CAM_Y9",
+"layers": [
+"F"
+],
+"x": 123.25,
+"y": 111.65,
+"bbox": [
+122.5,
+111.2,
+124.0,
+112.1
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "10",
+"net": "CAM_Y8",
+"layers": [
+"F"
+],
+"x": 123.25,
+"y": 112.92,
+"bbox": [
+122.5,
+112.47,
+124.0,
+113.37
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "11",
+"net": "CAM_Y7",
+"layers": [
+"F"
+],
+"x": 123.25,
+"y": 114.19,
+"bbox": [
+122.5,
+113.74,
+124.0,
+114.64
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "12",
+"net": "CAM_Y4",
+"layers": [
+"F"
+],
+"x": 123.25,
+"y": 115.46,
+"bbox": [
+122.5,
+115.01,
+124.0,
+115.91
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "13",
+"net": "/MCU and USB/USB_DN",
+"layers": [
+"F"
+],
+"x": 123.25,
+"y": 116.73,
+"bbox": [
+122.5,
+116.28,
+124.0,
+117.18
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "14",
+"net": "/MCU and USB/USB_DP",
+"layers": [
+"F"
+],
+"x": 123.25,
+"y": 118.0,
+"bbox": [
+122.5,
+117.55,
+124.0,
+118.45
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "15",
+"net": "MOT_nFAULT",
+"layers": [
+"F"
+],
+"x": 125.015,
+"y": 119.25,
+"bbox": [
+124.565,
+118.5,
+125.465,
+120.0
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "16",
+"net": "/MCU and USB/LED_STAT",
+"layers": [
+"F"
+],
+"x": 126.285,
+"y": 119.25,
+"bbox": [
+125.835,
+118.5,
+126.735,
+120.0
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "17",
+"net": "CAM_Y3",
+"layers": [
+"F"
+],
+"x": 127.555,
+"y": 119.25,
+"bbox": [
+127.105,
+118.5,
+128.005,
+120.0
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "18",
+"net": "CAM_Y5",
+"layers": [
+"F"
+],
+"x": 128.825,
+"y": 119.25,
+"bbox": [
+128.375,
+118.5,
+129.275,
+120.0
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "19",
+"net": "CAM_Y2",
+"layers": [
+"F"
+],
+"x": 130.095,
+"y": 119.25,
+"bbox": [
+129.645,
+118.5,
+130.545,
+120.0
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "20",
+"net": "CAM_Y6",
+"layers": [
+"F"
+],
+"x": 131.365,
+"y": 119.25,
+"bbox": [
+130.915,
+118.5,
+131.815,
+120.0
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "21",
+"net": "CAM_PCLK",
+"layers": [
+"F"
+],
+"x": 132.635,
+"y": 119.25,
+"bbox": [
+132.185,
+118.5,
+133.085,
+120.0
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "22",
+"net": "M1_IN2",
+"layers": [
+"F"
+],
+"x": 133.905,
+"y": 119.25,
+"bbox": [
+133.455,
+118.5,
+134.355,
+120.0
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "23",
+"net": "M2_IN1",
+"layers": [
+"F"
+],
+"x": 135.175,
+"y": 119.25,
+"bbox": [
+134.725,
+118.5,
+135.625,
+120.0
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "24",
+"net": "M3_IN1",
+"layers": [
+"F"
+],
+"x": 136.445,
+"y": 119.25,
+"bbox": [
+135.995,
+118.5,
+136.895,
+120.0
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "25",
+"net": "M3_IN2",
+"layers": [
+"F"
+],
+"x": 137.715,
+"y": 119.25,
+"bbox": [
+137.265,
+118.5,
+138.165,
+120.0
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "26",
+"net": "MOT_nSLEEP",
+"layers": [
+"F"
+],
+"x": 138.985,
+"y": 119.25,
+"bbox": [
+138.535,
+118.5,
+139.435,
+120.0
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "27",
+"net": "/MCU and USB/BOOT",
+"layers": [
+"F"
+],
+"x": 140.75,
+"y": 118.0,
+"bbox": [
+140.0,
+117.55,
+141.5,
+118.45
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "28",
+"net": "unconnected-(U6-IO35-Pad28)",
+"layers": [
+"F"
+],
+"x": 140.75,
+"y": 116.73,
+"bbox": [
+140.0,
+116.28,
+141.5,
+117.18
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "29",
+"net": "unconnected-(U6-IO36-Pad29)",
+"layers": [
+"F"
+],
+"x": 140.75,
+"y": 115.46,
+"bbox": [
+140.0,
+115.01,
+141.5,
+115.91
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "30",
+"net": "unconnected-(U6-IO37-Pad30)",
+"layers": [
+"F"
+],
+"x": 140.75,
+"y": 114.19,
+"bbox": [
+140.0,
+113.74,
+141.5,
+114.64
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "31",
+"net": "M2_IN2",
+"layers": [
+"F"
+],
+"x": 140.75,
+"y": 112.92,
+"bbox": [
+140.0,
+112.47,
+141.5,
+113.37
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "32",
+"net": "I2S_DIN",
+"layers": [
+"F"
+],
+"x": 140.75,
+"y": 111.65,
+"bbox": [
+140.0,
+111.2,
+141.5,
+112.1
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "33",
+"net": "I2S_DOUT",
+"layers": [
+"F"
+],
+"x": 140.75,
+"y": 110.38,
+"bbox": [
+140.0,
+109.93,
+141.5,
+110.83
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "34",
+"net": "I2S_BCLK",
+"layers": [
+"F"
+],
+"x": 140.75,
+"y": 109.11,
+"bbox": [
+140.0,
+108.66,
+141.5,
+109.56
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "35",
+"net": "I2S_WS",
+"layers": [
+"F"
+],
+"x": 140.75,
+"y": 107.84,
+"bbox": [
+140.0,
+107.39,
+141.5,
+108.29
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "36",
+"net": "/MCU and USB/UART_RX",
+"layers": [
+"F"
+],
+"x": 140.75,
+"y": 106.57,
+"bbox": [
+140.0,
+106.12,
+141.5,
+107.02
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "37",
+"net": "/MCU and USB/UART_TX",
+"layers": [
+"F"
+],
+"x": 140.75,
+"y": 105.3,
+"bbox": [
+140.0,
+104.85,
+141.5,
+105.75
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "38",
+"net": "M1_IN1",
+"layers": [
+"F"
+],
+"x": 140.75,
+"y": 104.03,
+"bbox": [
+140.0,
+103.58,
+141.5,
+104.48
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "39",
+"net": "VBAT_SENSE",
+"layers": [
+"F"
+],
+"x": 140.75,
+"y": 102.76,
+"bbox": [
+140.0,
+102.31,
+141.5,
+103.21
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "40",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 140.75,
+"y": 101.49,
+"bbox": [
+140.0,
+101.04,
+141.5,
+101.94
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "41",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 129.1,
+"y": 108.51,
+"bbox": [
+128.8,
+108.21,
+129.4,
+108.81
+],
+"circle": true,
+"drill": 0.2,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "41",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 129.1,
+"y": 109.91,
+"bbox": [
+128.8,
+109.61,
+129.4,
+110.21
+],
+"circle": true,
+"drill": 0.2,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "41",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 129.8,
+"y": 107.81,
+"bbox": [
+129.5,
+107.51,
+130.1,
+108.11
+],
+"circle": true,
+"drill": 0.2,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "41",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 129.8,
+"y": 109.21,
+"bbox": [
+129.5,
+108.91,
+130.1,
+109.51
+],
+"circle": true,
+"drill": 0.2,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "41",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 129.8,
+"y": 110.61,
+"bbox": [
+129.5,
+110.31,
+130.1,
+110.91
+],
+"circle": true,
+"drill": 0.2,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "41",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 130.5,
+"y": 108.51,
+"bbox": [
+130.2,
+108.21,
+130.8,
+108.81
+],
+"circle": true,
+"drill": 0.2,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "41",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 130.5,
+"y": 109.21,
+"bbox": [
+128.55,
+107.26,
+132.45,
+111.16
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "41",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 130.5,
+"y": 109.91,
+"bbox": [
+130.2,
+109.61,
+130.8,
+110.21
+],
+"circle": true,
+"drill": 0.2,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "41",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 131.2,
+"y": 107.81,
+"bbox": [
+130.9,
+107.51,
+131.5,
+108.11
+],
+"circle": true,
+"drill": 0.2,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "41",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 131.2,
+"y": 109.21,
+"bbox": [
+130.9,
+108.91,
+131.5,
+109.51
+],
+"circle": true,
+"drill": 0.2,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "41",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 131.2,
+"y": 110.61,
+"bbox": [
+130.9,
+110.31,
+131.5,
+110.91
+],
+"circle": true,
+"drill": 0.2,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "41",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 131.9,
+"y": 108.51,
+"bbox": [
+131.6,
+108.21,
+132.2,
+108.81
+],
+"circle": true,
+"drill": 0.2,
+"npth": false
+},
+{
+"ref": "U6",
+"num": "41",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 131.9,
+"y": 109.91,
+"bbox": [
+131.6,
+109.61,
+132.2,
+110.21
+],
+"circle": true,
+"drill": 0.2,
+"npth": false
+},
+{
+"ref": "L2",
+"num": "1",
+"net": "/Power and Protection/SW_5V",
+"layers": [
+"F"
+],
+"x": 123.925,
+"y": 129.0,
+"bbox": [
+122.75,
+126.45,
+125.1,
+131.55
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "L2",
+"num": "2",
+"net": "5V",
+"layers": [
+"F"
+],
+"x": 128.075,
+"y": 129.0,
+"bbox": [
+126.9,
+126.45,
+129.25,
+131.55
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R7",
+"num": "1",
+"net": "3V3",
+"layers": [
+"F"
+],
+"x": 120.5,
+"y": 109.125,
+"bbox": [
+120.025,
+108.725,
+120.975,
+109.525
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R7",
+"num": "2",
+"net": "/Power and Protection/LED_PWR",
+"layers": [
+"F"
+],
+"x": 120.5,
+"y": 107.475,
+"bbox": [
+120.025,
+107.075,
+120.975,
+107.875
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "F1",
+"num": "1",
+"net": "/Power and Protection/VBAT_IN",
+"layers": [
+"F"
+],
+"x": 109.2125,
+"y": 110.0,
+"bbox": [
+108.25,
+107.275,
+110.175,
+112.725
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "F1",
+"num": "2",
+"net": "/Power and Protection/VBAT_F",
+"layers": [
+"F"
+],
+"x": 115.9875,
+"y": 110.0,
+"bbox": [
+115.025,
+107.275,
+116.95,
+112.725
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "L1",
+"num": "1",
+"net": "/Power and Protection/SW_3V3",
+"layers": [
+"F"
+],
+"x": 108.425,
+"y": 129.5,
+"bbox": [
+107.25,
+126.95,
+109.6,
+132.05
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "L1",
+"num": "2",
+"net": "3V3",
+"layers": [
+"F"
+],
+"x": 112.575,
+"y": 129.5,
+"bbox": [
+111.4,
+126.95,
+113.75,
+132.05
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "H2",
+"num": "",
+"net": "",
+"layers": [
+"F",
+"B"
+],
+"x": 160.5,
+"y": 103.5,
+"bbox": [
+159.15,
+102.15,
+161.85,
+104.85
+],
+"circle": true,
+"drill": 2.7,
+"npth": true
+},
+{
+"ref": "F2",
+"num": "1",
+"net": "VBUS",
+"layers": [
+"F"
+],
+"x": 117.2,
+"y": 142.9,
+"bbox": [
+116.325,
+142.275,
+118.075,
+143.525
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "F2",
+"num": "2",
+"net": "/Power and Protection/VBUS_F",
+"layers": [
+"F"
+],
+"x": 117.2,
+"y": 140.1,
+"bbox": [
+116.325,
+139.475,
+118.075,
+140.725
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C37",
+"num": "1",
+"net": "3V3",
+"layers": [
+"F"
+],
+"x": 137.225,
+"y": 141.1,
+"bbox": [
+136.775,
+140.625,
+137.675,
+141.575
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C37",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 138.775,
+"y": 141.1,
+"bbox": [
+138.325,
+140.625,
+139.225,
+141.575
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R12",
+"num": "1",
+"net": "/MCU and USB/LED_STAT",
+"layers": [
+"F"
+],
+"x": 135.775,
+"y": 132.5,
+"bbox": [
+135.375,
+132.025,
+136.175,
+132.975
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R12",
+"num": "2",
+"net": "/MCU and USB/LED_STAT_A",
+"layers": [
+"F"
+],
+"x": 137.425,
+"y": 132.5,
+"bbox": [
+137.025,
+132.025,
+137.825,
+132.975
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R3",
+"num": "1",
+"net": "/Power and Protection/UV",
+"layers": [
+"F"
+],
+"x": 118.2,
+"y": 115.725,
+"bbox": [
+117.725,
+115.325,
+118.675,
+116.125
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R3",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 118.2,
+"y": 114.075,
+"bbox": [
+117.725,
+113.675,
+118.675,
+114.475
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C3",
+"num": "1",
+"net": "VBAT_SENSE",
+"layers": [
+"F"
+],
+"x": 116.725,
+"y": 135.0,
+"bbox": [
+116.275,
+134.525,
+117.175,
+135.475
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C3",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 118.275,
+"y": 135.0,
+"bbox": [
+117.825,
+134.525,
+118.725,
+135.475
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J7",
+"num": "1",
+"net": "/Motor Drivers/M3_A",
+"layers": [
+"F",
+"B"
+],
+"x": 159.9,
+"y": 129.5,
+"bbox": [
+158.9,
+128.65,
+160.9,
+130.35
+],
+"circle": false,
+"drill": 1.0,
+"npth": false
+},
+{
+"ref": "J7",
+"num": "2",
+"net": "/Motor Drivers/M3_B",
+"layers": [
+"F",
+"B"
+],
+"x": 159.9,
+"y": 127.0,
+"bbox": [
+158.9,
+126.15,
+160.9,
+127.85
+],
+"circle": false,
+"drill": 1.0,
+"npth": false
+},
+{
+"ref": "C30",
+"num": "1",
+"net": "VSYS",
+"layers": [
+"F"
+],
+"x": 147.3,
+"y": 131.5,
+"bbox": [
+145.55,
+130.7,
+149.05,
+132.3
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C30",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 152.7,
+"y": 131.5,
+"bbox": [
+150.95,
+130.7,
+154.45,
+132.3
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U10",
+"num": "",
+"net": "",
+"layers": [],
+"x": 149.69,
+"y": 139.69,
+"bbox": [
+149.44,
+139.44,
+149.94,
+139.94
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U10",
+"num": "",
+"net": "",
+"layers": [],
+"x": 149.69,
+"y": 140.31,
+"bbox": [
+149.44,
+140.06,
+149.94,
+140.56
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U10",
+"num": "",
+"net": "",
+"layers": [],
+"x": 150.31,
+"y": 139.69,
+"bbox": [
+150.06,
+139.44,
+150.56,
+139.94
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U10",
+"num": "",
+"net": "",
+"layers": [],
+"x": 150.31,
+"y": 140.31,
+"bbox": [
+150.06,
+140.06,
+150.56,
+140.56
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U10",
+"num": "1",
+"net": "I2S_DOUT",
+"layers": [
+"F"
+],
+"x": 148.5625,
+"y": 139.25,
+"bbox": [
+148.15,
+139.125,
+148.975,
+139.375
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U10",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 148.5625,
+"y": 139.75,
+"bbox": [
+148.15,
+139.625,
+148.975,
+139.875
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U10",
+"num": "3",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 148.5625,
+"y": 140.25,
+"bbox": [
+148.15,
+140.125,
+148.975,
+140.375
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U10",
+"num": "4",
+"net": "/Audio and Camera/AMP_SD_MODE",
+"layers": [
+"F"
+],
+"x": 148.5625,
+"y": 140.75,
+"bbox": [
+148.15,
+140.625,
+148.975,
+140.875
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U10",
+"num": "5",
+"net": "unconnected-(U10-NC-Pad5)",
+"layers": [
+"F"
+],
+"x": 149.25,
+"y": 141.4375,
+"bbox": [
+149.125,
+141.025,
+149.375,
+141.85
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U10",
+"num": "6",
+"net": "unconnected-(U10-NC-Pad6)",
+"layers": [
+"F"
+],
+"x": 149.75,
+"y": 141.4375,
+"bbox": [
+149.625,
+141.025,
+149.875,
+141.85
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U10",
+"num": "7",
+"net": "5V",
+"layers": [
+"F"
+],
+"x": 150.25,
+"y": 141.4375,
+"bbox": [
+150.125,
+141.025,
+150.375,
+141.85
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U10",
+"num": "8",
+"net": "5V",
+"layers": [
+"F"
+],
+"x": 150.75,
+"y": 141.4375,
+"bbox": [
+150.625,
+141.025,
+150.875,
+141.85
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U10",
+"num": "9",
+"net": "/Audio and Camera/SPK_P",
+"layers": [
+"F"
+],
+"x": 151.4375,
+"y": 140.75,
+"bbox": [
+151.025,
+140.625,
+151.85,
+140.875
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U10",
+"num": "10",
+"net": "/Audio and Camera/SPK_N",
+"layers": [
+"F"
+],
+"x": 151.4375,
+"y": 140.25,
+"bbox": [
+151.025,
+140.125,
+151.85,
+140.375
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U10",
+"num": "11",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 151.4375,
+"y": 139.75,
+"bbox": [
+151.025,
+139.625,
+151.85,
+139.875
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U10",
+"num": "12",
+"net": "unconnected-(U10-NC-Pad12)",
+"layers": [
+"F"
+],
+"x": 151.4375,
+"y": 139.25,
+"bbox": [
+151.025,
+139.125,
+151.85,
+139.375
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U10",
+"num": "13",
+"net": "unconnected-(U10-NC-Pad13)",
+"layers": [
+"F"
+],
+"x": 150.75,
+"y": 138.5625,
+"bbox": [
+150.625,
+138.15,
+150.875,
+138.975
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U10",
+"num": "14",
+"net": "I2S_WS",
+"layers": [
+"F"
+],
+"x": 150.25,
+"y": 138.5625,
+"bbox": [
+150.125,
+138.15,
+150.375,
+138.975
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U10",
+"num": "15",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 149.75,
+"y": 138.5625,
+"bbox": [
+149.625,
+138.15,
+149.875,
+138.975
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U10",
+"num": "16",
+"net": "I2S_BCLK",
+"layers": [
+"F"
+],
+"x": 149.25,
+"y": 138.5625,
+"bbox": [
+149.125,
+138.15,
+149.375,
+138.975
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U10",
+"num": "17",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 150.0,
+"y": 140.0,
+"bbox": [
+149.385,
+139.385,
+150.615,
+140.615
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J10",
+"num": "1",
+"net": "unconnected-(J10-Pin_1-Pad1)",
+"layers": [
+"F"
+],
+"x": 125.75,
+"y": 149.25,
+"bbox": [
+125.6,
+148.6,
+125.9,
+149.9
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J10",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 126.25,
+"y": 149.25,
+"bbox": [
+126.1,
+148.6,
+126.4,
+149.9
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J10",
+"num": "3",
+"net": "CAM_SIOD",
+"layers": [
+"F"
+],
+"x": 126.75,
+"y": 149.25,
+"bbox": [
+126.6,
+148.6,
+126.9,
+149.9
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J10",
+"num": "4",
+"net": "2V8",
+"layers": [
+"F"
+],
+"x": 127.25,
+"y": 149.25,
+"bbox": [
+127.1,
+148.6,
+127.4,
+149.9
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J10",
+"num": "5",
+"net": "CAM_SIOC",
+"layers": [
+"F"
+],
+"x": 127.75,
+"y": 149.25,
+"bbox": [
+127.6,
+148.6,
+127.9,
+149.9
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J10",
+"num": "6",
+"net": "/Audio and Camera/CAM_RESET",
+"layers": [
+"F"
+],
+"x": 128.25,
+"y": 149.25,
+"bbox": [
+128.1,
+148.6,
+128.4,
+149.9
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J10",
+"num": "7",
+"net": "CAM_VSYNC",
+"layers": [
+"F"
+],
+"x": 128.75,
+"y": 149.25,
+"bbox": [
+128.6,
+148.6,
+128.9,
+149.9
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J10",
+"num": "8",
+"net": "/Audio and Camera/CAM_PWDN",
+"layers": [
+"F"
+],
+"x": 129.25,
+"y": 149.25,
+"bbox": [
+129.1,
+148.6,
+129.4,
+149.9
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J10",
+"num": "9",
+"net": "CAM_HREF",
+"layers": [
+"F"
+],
+"x": 129.75,
+"y": 149.25,
+"bbox": [
+129.6,
+148.6,
+129.9,
+149.9
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J10",
+"num": "10",
+"net": "1V2",
+"layers": [
+"F"
+],
+"x": 130.25,
+"y": 149.25,
+"bbox": [
+130.1,
+148.6,
+130.4,
+149.9
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J10",
+"num": "11",
+"net": "3V3",
+"layers": [
+"F"
+],
+"x": 130.75,
+"y": 149.25,
+"bbox": [
+130.6,
+148.6,
+130.9,
+149.9
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J10",
+"num": "12",
+"net": "CAM_Y9",
+"layers": [
+"F"
+],
+"x": 131.25,
+"y": 149.25,
+"bbox": [
+131.1,
+148.6,
+131.4,
+149.9
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J10",
+"num": "13",
+"net": "CAM_XCLK",
+"layers": [
+"F"
+],
+"x": 131.75,
+"y": 149.25,
+"bbox": [
+131.6,
+148.6,
+131.9,
+149.9
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J10",
+"num": "14",
+"net": "CAM_Y8",
+"layers": [
+"F"
+],
+"x": 132.25,
+"y": 149.25,
+"bbox": [
+132.1,
+148.6,
+132.4,
+149.9
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J10",
+"num": "15",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 132.75,
+"y": 149.25,
+"bbox": [
+132.6,
+148.6,
+132.9,
+149.9
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J10",
+"num": "16",
+"net": "CAM_Y7",
+"layers": [
+"F"
+],
+"x": 133.25,
+"y": 149.25,
+"bbox": [
+133.1,
+148.6,
+133.4,
+149.9
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J10",
+"num": "17",
+"net": "CAM_PCLK",
+"layers": [
+"F"
+],
+"x": 133.75,
+"y": 149.25,
+"bbox": [
+133.6,
+148.6,
+133.9,
+149.9
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J10",
+"num": "18",
+"net": "CAM_Y6",
+"layers": [
+"F"
+],
+"x": 134.25,
+"y": 149.25,
+"bbox": [
+134.1,
+148.6,
+134.4,
+149.9
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J10",
+"num": "19",
+"net": "CAM_Y2",
+"layers": [
+"F"
+],
+"x": 134.75,
+"y": 149.25,
+"bbox": [
+134.6,
+148.6,
+134.9,
+149.9
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J10",
+"num": "20",
+"net": "CAM_Y5",
+"layers": [
+"F"
+],
+"x": 135.25,
+"y": 149.25,
+"bbox": [
+135.1,
+148.6,
+135.4,
+149.9
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J10",
+"num": "21",
+"net": "CAM_Y3",
+"layers": [
+"F"
+],
+"x": 135.75,
+"y": 149.25,
+"bbox": [
+135.6,
+148.6,
+135.9,
+149.9
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J10",
+"num": "22",
+"net": "CAM_Y4",
+"layers": [
+"F"
+],
+"x": 136.25,
+"y": 149.25,
+"bbox": [
+136.1,
+148.6,
+136.4,
+149.9
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J10",
+"num": "23",
+"net": "unconnected-(J10-Pin_23-Pad23)",
+"layers": [
+"F"
+],
+"x": 136.75,
+"y": 149.25,
+"bbox": [
+136.6,
+148.6,
+136.9,
+149.9
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J10",
+"num": "24",
+"net": "unconnected-(J10-Pin_24-Pad24)",
+"layers": [
+"F"
+],
+"x": 137.25,
+"y": 149.25,
+"bbox": [
+137.1,
+148.6,
+137.4,
+149.9
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J10",
+"num": "MP",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 123.85,
+"y": 152.5,
+"bbox": [
+122.95,
+151.4,
+124.75,
+153.6
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J10",
+"num": "MP",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 139.15,
+"y": 152.5,
+"bbox": [
+138.25,
+151.4,
+140.05,
+153.6
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C24",
+"num": "1",
+"net": "/Motor Drivers/VCP1",
+"layers": [
+"F"
+],
+"x": 144.0,
+"y": 104.775,
+"bbox": [
+143.525,
+104.325,
+144.475,
+105.225
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C24",
+"num": "2",
+"net": "VSYS",
+"layers": [
+"F"
+],
+"x": 144.0,
+"y": 103.225,
+"bbox": [
+143.525,
+102.775,
+144.475,
+103.675
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C15",
+"num": "1",
+"net": "2V8",
+"layers": [
+"F"
+],
+"x": 123.725,
+"y": 144.3,
+"bbox": [
+123.275,
+143.825,
+124.175,
+144.775
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C15",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 125.275,
+"y": 144.3,
+"bbox": [
+124.825,
+143.825,
+125.725,
+144.775
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C29",
+"num": "1",
+"net": "/Motor Drivers/VINT2",
+"layers": [
+"F"
+],
+"x": 144.0,
+"y": 122.775,
+"bbox": [
+143.525,
+122.325,
+144.475,
+123.225
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C29",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 144.0,
+"y": 121.225,
+"bbox": [
+143.525,
+120.775,
+144.475,
+121.675
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J6",
+"num": "1",
+"net": "/Motor Drivers/M2_A",
+"layers": [
+"F",
+"B"
+],
+"x": 159.9,
+"y": 121.0,
+"bbox": [
+158.9,
+120.15,
+160.9,
+121.85
+],
+"circle": false,
+"drill": 1.0,
+"npth": false
+},
+{
+"ref": "J6",
+"num": "2",
+"net": "/Motor Drivers/M2_B",
+"layers": [
+"F",
+"B"
+],
+"x": 159.9,
+"y": 118.5,
+"bbox": [
+158.9,
+117.65,
+160.9,
+119.35
+],
+"circle": false,
+"drill": 1.0,
+"npth": false
+},
+{
+"ref": "C18",
+"num": "1",
+"net": "3V3",
+"layers": [
+"F"
+],
+"x": 120.5,
+"y": 104.95,
+"bbox": [
+119.775,
+104.45,
+121.225,
+105.45
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C18",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 120.5,
+"y": 103.05,
+"bbox": [
+119.775,
+102.55,
+121.225,
+103.55
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "D1",
+"num": "1",
+"net": "/Power and Protection/VBAT_F",
+"layers": [
+"F"
+],
+"x": 109.85,
+"y": 116.2,
+"bbox": [
+108.6,
+115.05,
+111.1,
+117.35
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "D1",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 114.15,
+"y": 116.2,
+"bbox": [
+112.9,
+115.05,
+115.4,
+117.35
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R4",
+"num": "1",
+"net": "/Power and Protection/VBAT_F",
+"layers": [
+"F"
+],
+"x": 118.2,
+"y": 119.025,
+"bbox": [
+117.725,
+118.625,
+118.675,
+119.425
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R4",
+"num": "2",
+"net": "/Power and Protection/~{SHDN}",
+"layers": [
+"F"
+],
+"x": 118.2,
+"y": 117.375,
+"bbox": [
+117.725,
+116.975,
+118.675,
+117.775
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J2",
+"num": "1",
+"net": "/Power and Protection/VBAT_IN",
+"layers": [
+"F",
+"B"
+],
+"x": 102.6,
+"y": 126.5,
+"bbox": [
+101.725,
+125.9,
+103.475,
+127.1
+],
+"circle": false,
+"drill": 0.75,
+"npth": false
+},
+{
+"ref": "J2",
+"num": "2",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 102.6,
+"y": 124.5,
+"bbox": [
+101.725,
+123.9,
+103.475,
+125.1
+],
+"circle": false,
+"drill": 0.75,
+"npth": false
+},
+{
+"ref": "U7",
+"num": "1",
+"net": "/MCU and USB/USB_DP",
+"layers": [
+"F"
+],
+"x": 102.8625,
+"y": 141.05,
+"bbox": [
+102.2,
+140.75,
+103.525,
+141.35
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U7",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 102.8625,
+"y": 142.0,
+"bbox": [
+102.2,
+141.7,
+103.525,
+142.3
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U7",
+"num": "3",
+"net": "/MCU and USB/USB_DN",
+"layers": [
+"F"
+],
+"x": 102.8625,
+"y": 142.95,
+"bbox": [
+102.2,
+142.65,
+103.525,
+143.25
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U7",
+"num": "4",
+"net": "/MCU and USB/USB_DN",
+"layers": [
+"F"
+],
+"x": 105.1375,
+"y": 142.95,
+"bbox": [
+104.475,
+142.65,
+105.8,
+143.25
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U7",
+"num": "5",
+"net": "VBUS",
+"layers": [
+"F"
+],
+"x": 105.1375,
+"y": 142.0,
+"bbox": [
+104.475,
+141.7,
+105.8,
+142.3
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U7",
+"num": "6",
+"net": "/MCU and USB/USB_DP",
+"layers": [
+"F"
+],
+"x": 105.1375,
+"y": 141.05,
+"bbox": [
+104.475,
+140.75,
+105.8,
+141.35
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R9",
+"num": "1",
+"net": "3V3",
+"layers": [
+"F"
+],
+"x": 137.5,
+"y": 123.425,
+"bbox": [
+137.025,
+123.025,
+137.975,
+123.825
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R9",
+"num": "2",
+"net": "/MCU and USB/BOOT",
+"layers": [
+"F"
+],
+"x": 137.5,
+"y": 121.775,
+"bbox": [
+137.025,
+121.375,
+137.975,
+122.175
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C31",
+"num": "1",
+"net": "5V",
+"layers": [
+"F"
+],
+"x": 149.05,
+"y": 144.5,
+"bbox": [
+148.55,
+143.775,
+149.55,
+145.225
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C31",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 150.95,
+"y": 144.5,
+"bbox": [
+150.45,
+143.775,
+151.45,
+145.225
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U9",
+"num": "",
+"net": "",
+"layers": [],
+"x": 149.0,
+"y": 122.615,
+"bbox": [
+148.07,
+122.12,
+149.93,
+123.11
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U9",
+"num": "",
+"net": "",
+"layers": [],
+"x": 149.0,
+"y": 122.0,
+"bbox": [
+147.845,
+120.77,
+150.155,
+123.23
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U9",
+"num": "",
+"net": "",
+"layers": [],
+"x": 149.0,
+"y": 121.385,
+"bbox": [
+148.07,
+120.89,
+149.93,
+121.88
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U9",
+"num": "1",
+"net": "MOT_nSLEEP",
+"layers": [
+"F"
+],
+"x": 146.725,
+"y": 124.8625,
+"bbox": [
+146.525,
+124.075,
+146.925,
+125.65
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U9",
+"num": "2",
+"net": "/Motor Drivers/M3_A",
+"layers": [
+"F"
+],
+"x": 147.375,
+"y": 124.8625,
+"bbox": [
+147.175,
+124.075,
+147.575,
+125.65
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U9",
+"num": "3",
+"net": "/Motor Drivers/AISEN2",
+"layers": [
+"F"
+],
+"x": 148.025,
+"y": 124.8625,
+"bbox": [
+147.825,
+124.075,
+148.225,
+125.65
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U9",
+"num": "4",
+"net": "/Motor Drivers/M3_B",
+"layers": [
+"F"
+],
+"x": 148.675,
+"y": 124.8625,
+"bbox": [
+148.475,
+124.075,
+148.875,
+125.65
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U9",
+"num": "5",
+"net": "unconnected-(U9-BOUT2-Pad5)",
+"layers": [
+"F"
+],
+"x": 149.325,
+"y": 124.8625,
+"bbox": [
+149.125,
+124.075,
+149.525,
+125.65
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U9",
+"num": "6",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 149.975,
+"y": 124.8625,
+"bbox": [
+149.775,
+124.075,
+150.175,
+125.65
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U9",
+"num": "7",
+"net": "unconnected-(U9-BOUT1-Pad7)",
+"layers": [
+"F"
+],
+"x": 150.625,
+"y": 124.8625,
+"bbox": [
+150.425,
+124.075,
+150.825,
+125.65
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U9",
+"num": "8",
+"net": "MOT_nFAULT",
+"layers": [
+"F"
+],
+"x": 151.275,
+"y": 124.8625,
+"bbox": [
+151.075,
+124.075,
+151.475,
+125.65
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U9",
+"num": "9",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 151.275,
+"y": 119.1375,
+"bbox": [
+151.075,
+118.35,
+151.475,
+119.925
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U9",
+"num": "10",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 150.625,
+"y": 119.1375,
+"bbox": [
+150.425,
+118.35,
+150.825,
+119.925
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U9",
+"num": "11",
+"net": "/Motor Drivers/VCP2",
+"layers": [
+"F"
+],
+"x": 149.975,
+"y": 119.1375,
+"bbox": [
+149.775,
+118.35,
+150.175,
+119.925
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U9",
+"num": "12",
+"net": "VSYS",
+"layers": [
+"F"
+],
+"x": 149.325,
+"y": 119.1375,
+"bbox": [
+149.125,
+118.35,
+149.525,
+119.925
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U9",
+"num": "13",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 148.675,
+"y": 119.1375,
+"bbox": [
+148.475,
+118.35,
+148.875,
+119.925
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U9",
+"num": "14",
+"net": "/Motor Drivers/VINT2",
+"layers": [
+"F"
+],
+"x": 148.025,
+"y": 119.1375,
+"bbox": [
+147.825,
+118.35,
+148.225,
+119.925
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U9",
+"num": "15",
+"net": "M3_IN2",
+"layers": [
+"F"
+],
+"x": 147.375,
+"y": 119.1375,
+"bbox": [
+147.175,
+118.35,
+147.575,
+119.925
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U9",
+"num": "16",
+"net": "M3_IN1",
+"layers": [
+"F"
+],
+"x": 146.725,
+"y": 119.1375,
+"bbox": [
+146.525,
+118.35,
+146.925,
+119.925
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U9",
+"num": "17",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 147.2,
+"y": 123.0,
+"bbox": [
+146.95,
+122.75,
+147.45,
+123.25
+],
+"circle": true,
+"drill": 0.2,
+"npth": false
+},
+{
+"ref": "U9",
+"num": "17",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 148.4,
+"y": 123.0,
+"bbox": [
+148.15,
+122.75,
+148.65,
+123.25
+],
+"circle": true,
+"drill": 0.2,
+"npth": false
+},
+{
+"ref": "U9",
+"num": "17",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 149.6,
+"y": 123.0,
+"bbox": [
+149.35,
+122.75,
+149.85,
+123.25
+],
+"circle": true,
+"drill": 0.2,
+"npth": false
+},
+{
+"ref": "U9",
+"num": "17",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 150.8,
+"y": 123.0,
+"bbox": [
+150.55,
+122.75,
+151.05,
+123.25
+],
+"circle": true,
+"drill": 0.2,
+"npth": false
+},
+{
+"ref": "U9",
+"num": "17",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 147.2,
+"y": 122.0,
+"bbox": [
+146.95,
+121.75,
+147.45,
+122.25
+],
+"circle": true,
+"drill": 0.2,
+"npth": false
+},
+{
+"ref": "U9",
+"num": "17",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 148.4,
+"y": 122.0,
+"bbox": [
+148.15,
+121.75,
+148.65,
+122.25
+],
+"circle": true,
+"drill": 0.2,
+"npth": false
+},
+{
+"ref": "U9",
+"num": "17",
+"net": "GND",
+"layers": [
+"B"
+],
+"x": 149.0,
+"y": 122.0,
+"bbox": [
+146.95,
+120.75,
+151.05,
+123.25
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U9",
+"num": "17",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 149.0,
+"y": 122.0,
+"bbox": [
+146.5,
+120.3,
+151.5,
+123.7
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U9",
+"num": "17",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 149.6,
+"y": 122.0,
+"bbox": [
+149.35,
+121.75,
+149.85,
+122.25
+],
+"circle": true,
+"drill": 0.2,
+"npth": false
+},
+{
+"ref": "U9",
+"num": "17",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 150.8,
+"y": 122.0,
+"bbox": [
+150.55,
+121.75,
+151.05,
+122.25
+],
+"circle": true,
+"drill": 0.2,
+"npth": false
+},
+{
+"ref": "U9",
+"num": "17",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 147.2,
+"y": 121.0,
+"bbox": [
+146.95,
+120.75,
+147.45,
+121.25
+],
+"circle": true,
+"drill": 0.2,
+"npth": false
+},
+{
+"ref": "U9",
+"num": "17",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 148.4,
+"y": 121.0,
+"bbox": [
+148.15,
+120.75,
+148.65,
+121.25
+],
+"circle": true,
+"drill": 0.2,
+"npth": false
+},
+{
+"ref": "U9",
+"num": "17",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 149.6,
+"y": 121.0,
+"bbox": [
+149.35,
+120.75,
+149.85,
+121.25
+],
+"circle": true,
+"drill": 0.2,
+"npth": false
+},
+{
+"ref": "U9",
+"num": "17",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 150.8,
+"y": 121.0,
+"bbox": [
+150.55,
+120.75,
+151.05,
+121.25
+],
+"circle": true,
+"drill": 0.2,
+"npth": false
+},
+{
+"ref": "D5",
+"num": "1",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 135.8125,
+"y": 134.3,
+"bbox": [
+135.375,
+133.825,
+136.25,
+134.775
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "D5",
+"num": "2",
+"net": "/MCU and USB/LED_STAT_A",
+"layers": [
+"F"
+],
+"x": 137.3875,
+"y": 134.3,
+"bbox": [
+136.95,
+133.825,
+137.825,
+134.775
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C4",
+"num": "1",
+"net": "VSYS",
+"layers": [
+"F"
+],
+"x": 120.6,
+"y": 129.275,
+"bbox": [
+119.7,
+128.7,
+121.5,
+129.85
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C4",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 120.6,
+"y": 126.325,
+"bbox": [
+119.7,
+125.75,
+121.5,
+126.9
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R6",
+"num": "1",
+"net": "VBAT_SENSE",
+"layers": [
+"F"
+],
+"x": 120.5,
+"y": 119.025,
+"bbox": [
+120.025,
+118.625,
+120.975,
+119.425
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R6",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 120.5,
+"y": 117.375,
+"bbox": [
+120.025,
+116.975,
+120.975,
+117.775
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R14",
+"num": "1",
+"net": "MOT_nFAULT",
+"layers": [
+"F"
+],
+"x": 144.0,
+"y": 115.325,
+"bbox": [
+143.525,
+114.925,
+144.475,
+115.725
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R14",
+"num": "2",
+"net": "3V3",
+"layers": [
+"F"
+],
+"x": 144.0,
+"y": 113.675,
+"bbox": [
+143.525,
+113.275,
+144.475,
+114.075
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R11",
+"num": "1",
+"net": "/MCU and USB/CC2",
+"layers": [
+"F"
+],
+"x": 121.0,
+"y": 148.325,
+"bbox": [
+120.525,
+147.925,
+121.475,
+148.725
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R11",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 121.0,
+"y": 146.675,
+"bbox": [
+120.525,
+146.275,
+121.475,
+147.075
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U5",
+"num": "1",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 128.8625,
+"y": 138.05,
+"bbox": [
+128.2,
+137.75,
+129.525,
+138.35
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U5",
+"num": "2",
+"net": "1V2",
+"layers": [
+"F"
+],
+"x": 128.8625,
+"y": 139.95,
+"bbox": [
+128.2,
+139.65,
+129.525,
+140.25
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U5",
+"num": "3",
+"net": "3V3",
+"layers": [
+"F"
+],
+"x": 131.1375,
+"y": 139.0,
+"bbox": [
+130.475,
+138.7,
+131.8,
+139.3
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C28",
+"num": "1",
+"net": "/Motor Drivers/VCP2",
+"layers": [
+"F"
+],
+"x": 144.0,
+"y": 119.275,
+"bbox": [
+143.525,
+118.825,
+144.475,
+119.725
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C28",
+"num": "2",
+"net": "VSYS",
+"layers": [
+"F"
+],
+"x": 144.0,
+"y": 117.725,
+"bbox": [
+143.525,
+117.275,
+144.475,
+118.175
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C25",
+"num": "1",
+"net": "/Motor Drivers/VINT1",
+"layers": [
+"F"
+],
+"x": 144.0,
+"y": 108.275,
+"bbox": [
+143.525,
+107.825,
+144.475,
+108.725
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C25",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 144.0,
+"y": 106.725,
+"bbox": [
+143.525,
+106.275,
+144.475,
+107.175
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "D3",
+"num": "1",
+"net": "VSYS",
+"layers": [
+"F"
+],
+"x": 120.3,
+"y": 142.0,
+"bbox": [
+119.4,
+140.75,
+121.2,
+143.25
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "D3",
+"num": "2",
+"net": "/Power and Protection/VBUS_F",
+"layers": [
+"F"
+],
+"x": 120.3,
+"y": 138.0,
+"bbox": [
+119.4,
+136.75,
+121.2,
+139.25
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C19",
+"num": "1",
+"net": "3V3",
+"layers": [
+"F"
+],
+"x": 118.2,
+"y": 105.075,
+"bbox": [
+117.725,
+104.625,
+118.675,
+105.525
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C19",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 118.2,
+"y": 103.525,
+"bbox": [
+117.725,
+103.075,
+118.675,
+103.975
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C12",
+"num": "1",
+"net": "5V",
+"layers": [
+"F"
+],
+"x": 124.05,
+"y": 134.5,
+"bbox": [
+123.55,
+133.775,
+124.55,
+135.225
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C12",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 125.95,
+"y": 134.5,
+"bbox": [
+125.45,
+133.775,
+126.45,
+135.225
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C17",
+"num": "1",
+"net": "1V2",
+"layers": [
+"F"
+],
+"x": 128.725,
+"y": 144.3,
+"bbox": [
+128.275,
+143.825,
+129.175,
+144.775
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C17",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 130.275,
+"y": 144.3,
+"bbox": [
+129.825,
+143.825,
+130.725,
+144.775
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R15",
+"num": "1",
+"net": "/Motor Drivers/AISEN1",
+"layers": [
+"F"
+],
+"x": 152.9375,
+"y": 104.5,
+"bbox": [
+152.375,
+103.625,
+153.5,
+105.375
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R15",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 155.8625,
+"y": 104.5,
+"bbox": [
+155.3,
+103.625,
+156.425,
+105.375
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C20",
+"num": "1",
+"net": "3V3",
+"layers": [
+"F"
+],
+"x": 141.5,
+"y": 123.375,
+"bbox": [
+141.025,
+122.925,
+141.975,
+123.825
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C20",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 141.5,
+"y": 121.825,
+"bbox": [
+141.025,
+121.375,
+141.975,
+122.275
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C10",
+"num": "1",
+"net": "VSYS",
+"layers": [
+"F"
+],
+"x": 131.725,
+"y": 131.5,
+"bbox": [
+131.275,
+131.025,
+132.175,
+131.975
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C10",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 133.275,
+"y": 131.5,
+"bbox": [
+132.825,
+131.025,
+133.725,
+131.975
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C14",
+"num": "1",
+"net": "3V3",
+"layers": [
+"F"
+],
+"x": 123.725,
+"y": 142.5,
+"bbox": [
+123.275,
+142.025,
+124.175,
+142.975
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C14",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 125.275,
+"y": 142.5,
+"bbox": [
+124.825,
+142.025,
+125.725,
+142.975
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R5",
+"num": "1",
+"net": "VSYS",
+"layers": [
+"F"
+],
+"x": 120.5,
+"y": 115.725,
+"bbox": [
+120.025,
+115.325,
+120.975,
+116.125
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R5",
+"num": "2",
+"net": "VBAT_SENSE",
+"layers": [
+"F"
+],
+"x": 120.5,
+"y": 114.075,
+"bbox": [
+120.025,
+113.675,
+120.975,
+114.475
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "H1",
+"num": "",
+"net": "",
+"layers": [
+"F",
+"B"
+],
+"x": 103.5,
+"y": 103.5,
+"bbox": [
+102.15,
+102.15,
+104.85,
+104.85
+],
+"circle": true,
+"drill": 2.7,
+"npth": true
+},
+{
+"ref": "SW3",
+"num": "1",
+"net": "/MCU and USB/BOOT",
+"layers": [
+"F"
+],
+"x": 129.224999,
+"y": 121.525,
+"bbox": [
+128.699999,
+121.2,
+129.749999,
+121.85
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "SW3",
+"num": "1",
+"net": "/MCU and USB/BOOT",
+"layers": [
+"F"
+],
+"x": 133.375,
+"y": 121.525,
+"bbox": [
+132.85,
+121.2,
+133.9,
+121.85
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "SW3",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 129.224999,
+"y": 123.675001,
+"bbox": [
+128.699999,
+123.350001,
+129.749999,
+124.000001
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "SW3",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 133.375,
+"y": 123.675001,
+"bbox": [
+132.85,
+123.350001,
+133.9,
+124.000001
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R22",
+"num": "1",
+"net": "3V3",
+"layers": [
+"F"
+],
+"x": 133.675,
+"y": 139.3,
+"bbox": [
+133.275,
+138.825,
+134.075,
+139.775
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R22",
+"num": "2",
+"net": "CAM_SIOD",
+"layers": [
+"F"
+],
+"x": 135.325,
+"y": 139.3,
+"bbox": [
+134.925,
+138.825,
+135.725,
+139.775
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C36",
+"num": "1",
+"net": "/Audio and Camera/CAM_RESET",
+"layers": [
+"F"
+],
+"x": 133.725,
+"y": 141.1,
+"bbox": [
+133.275,
+140.625,
+134.175,
+141.575
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C36",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 135.275,
+"y": 141.1,
+"bbox": [
+134.825,
+140.625,
+135.725,
+141.575
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C21",
+"num": "1",
+"net": "/MCU and USB/EN",
+"layers": [
+"F"
+],
+"x": 139.5,
+"y": 123.375,
+"bbox": [
+139.025,
+122.925,
+139.975,
+123.825
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C21",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 139.5,
+"y": 121.825,
+"bbox": [
+139.025,
+121.375,
+139.975,
+122.275
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C8",
+"num": "1",
+"net": "3V3",
+"layers": [
+"F"
+],
+"x": 102.25,
+"y": 134.4,
+"bbox": [
+101.75,
+133.675,
+102.75,
+135.125
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C8",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 104.15,
+"y": 134.4,
+"bbox": [
+103.65,
+133.675,
+104.65,
+135.125
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R13",
+"num": "1",
+"net": "MOT_nSLEEP",
+"layers": [
+"F"
+],
+"x": 144.0,
+"y": 111.825,
+"bbox": [
+143.525,
+111.425,
+144.475,
+112.225
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R13",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 144.0,
+"y": 110.175,
+"bbox": [
+143.525,
+109.775,
+144.475,
+110.575
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C9",
+"num": "1",
+"net": "VSYS",
+"layers": [
+"F"
+],
+"x": 136.6,
+"y": 129.674999,
+"bbox": [
+135.7,
+129.099999,
+137.5,
+130.249999
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C9",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 136.6,
+"y": 126.724999,
+"bbox": [
+135.7,
+126.149999,
+137.5,
+127.299999
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "D4",
+"num": "1",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 120.5,
+"y": 112.3875,
+"bbox": [
+120.025,
+111.95,
+120.975,
+112.825
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "D4",
+"num": "2",
+"net": "/Power and Protection/LED_PWR",
+"layers": [
+"F"
+],
+"x": 120.5,
+"y": 110.8125,
+"bbox": [
+120.025,
+110.375,
+120.975,
+111.25
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C33",
+"num": "1",
+"net": "3V3",
+"layers": [
+"F"
+],
+"x": 153.725,
+"y": 146.0,
+"bbox": [
+153.275,
+145.525,
+154.175,
+146.475
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C33",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 155.275,
+"y": 146.0,
+"bbox": [
+154.825,
+145.525,
+155.725,
+146.475
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R1",
+"num": "1",
+"net": "/Power and Protection/VBAT_F",
+"layers": [
+"F"
+],
+"x": 118.2,
+"y": 109.125,
+"bbox": [
+117.725,
+108.725,
+118.675,
+109.525
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R1",
+"num": "2",
+"net": "/Power and Protection/OV",
+"layers": [
+"F"
+],
+"x": 118.2,
+"y": 107.475,
+"bbox": [
+117.725,
+107.075,
+118.675,
+107.875
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "H4",
+"num": "",
+"net": "",
+"layers": [
+"F",
+"B"
+],
+"x": 160.5,
+"y": 152.5,
+"bbox": [
+159.15,
+151.15,
+161.85,
+153.85
+],
+"circle": true,
+"drill": 2.7,
+"npth": true
+},
+{
+"ref": "C6",
+"num": "1",
+"net": "/Power and Protection/BST_3V3",
+"layers": [
+"F"
+],
+"x": 116.225,
+"y": 132.8,
+"bbox": [
+115.775,
+132.325,
+116.675,
+133.275
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C6",
+"num": "2",
+"net": "/Power and Protection/SW_3V3",
+"layers": [
+"F"
+],
+"x": 117.775,
+"y": 132.8,
+"bbox": [
+117.325,
+132.325,
+118.225,
+133.275
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C22",
+"num": "1",
+"net": "VSYS",
+"layers": [
+"F"
+],
+"x": 152.925,
+"y": 110.7,
+"bbox": [
+152.35,
+109.8,
+153.5,
+111.6
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C22",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 155.875,
+"y": 110.7,
+"bbox": [
+155.3,
+109.8,
+156.45,
+111.6
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J8",
+"num": "1",
+"net": "/Audio and Camera/SPK_P",
+"layers": [
+"F",
+"B"
+],
+"x": 160.4,
+"y": 140.5,
+"bbox": [
+159.525,
+139.9,
+161.275,
+141.1
+],
+"circle": false,
+"drill": 0.75,
+"npth": false
+},
+{
+"ref": "J8",
+"num": "2",
+"net": "/Audio and Camera/SPK_N",
+"layers": [
+"F",
+"B"
+],
+"x": 160.4,
+"y": 138.5,
+"bbox": [
+159.525,
+137.9,
+161.275,
+139.1
+],
+"circle": false,
+"drill": 0.75,
+"npth": false
+},
+{
+"ref": "C26",
+"num": "1",
+"net": "VSYS",
+"layers": [
+"F"
+],
+"x": 152.925,
+"y": 121.6,
+"bbox": [
+152.35,
+120.7,
+153.5,
+122.5
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C26",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 155.875,
+"y": 121.6,
+"bbox": [
+155.3,
+120.7,
+156.45,
+122.5
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C23",
+"num": "1",
+"net": "VSYS",
+"layers": [
+"F"
+],
+"x": 153.625,
+"y": 113.2,
+"bbox": [
+153.175,
+112.725,
+154.075,
+113.675
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C23",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 155.175,
+"y": 113.2,
+"bbox": [
+154.725,
+112.725,
+155.625,
+113.675
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U3",
+"num": "1",
+"net": "5V",
+"layers": [
+"F"
+],
+"x": 131.3625,
+"y": 127.05,
+"bbox": [
+130.7,
+126.75,
+132.025,
+127.35
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U3",
+"num": "2",
+"net": "VSYS",
+"layers": [
+"F"
+],
+"x": 131.3625,
+"y": 128.0,
+"bbox": [
+130.7,
+127.7,
+132.025,
+128.3
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U3",
+"num": "3",
+"net": "VSYS",
+"layers": [
+"F"
+],
+"x": 131.3625,
+"y": 128.95,
+"bbox": [
+130.7,
+128.65,
+132.025,
+129.25
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U3",
+"num": "4",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 133.6375,
+"y": 128.95,
+"bbox": [
+132.975,
+128.65,
+134.3,
+129.25
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U3",
+"num": "5",
+"net": "/Power and Protection/SW_5V",
+"layers": [
+"F"
+],
+"x": 133.6375,
+"y": 128.0,
+"bbox": [
+132.975,
+127.7,
+134.3,
+128.3
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U3",
+"num": "6",
+"net": "/Power and Protection/BST_5V",
+"layers": [
+"F"
+],
+"x": 133.6375,
+"y": 127.05,
+"bbox": [
+132.975,
+126.75,
+134.3,
+127.35
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J4",
+"num": "1",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 140.2,
+"y": 126.6,
+"bbox": [
+139.35,
+125.75,
+141.05,
+127.45
+],
+"circle": false,
+"drill": 1.0,
+"npth": false
+},
+{
+"ref": "J4",
+"num": "2",
+"net": "/MCU and USB/UART_TX",
+"layers": [
+"F",
+"B"
+],
+"x": 140.2,
+"y": 129.14,
+"bbox": [
+139.35,
+128.29,
+141.05,
+129.99
+],
+"circle": true,
+"drill": 1.0,
+"npth": false
+},
+{
+"ref": "J4",
+"num": "3",
+"net": "/MCU and USB/UART_RX",
+"layers": [
+"F",
+"B"
+],
+"x": 140.2,
+"y": 131.68,
+"bbox": [
+139.35,
+130.83,
+141.05,
+132.53
+],
+"circle": true,
+"drill": 1.0,
+"npth": false
+},
+{
+"ref": "J4",
+"num": "4",
+"net": "3V3",
+"layers": [
+"F",
+"B"
+],
+"x": 140.2,
+"y": 134.22,
+"bbox": [
+139.35,
+133.37,
+141.05,
+135.07
+],
+"circle": true,
+"drill": 1.0,
+"npth": false
+},
+{
+"ref": "C5",
+"num": "1",
+"net": "VSYS",
+"layers": [
+"F"
+],
+"x": 116.225,
+"y": 131.0,
+"bbox": [
+115.775,
+130.525,
+116.675,
+131.475
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C5",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 117.775,
+"y": 131.0,
+"bbox": [
+117.325,
+130.525,
+118.225,
+131.475
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C11",
+"num": "1",
+"net": "/Power and Protection/BST_5V",
+"layers": [
+"F"
+],
+"x": 131.725,
+"y": 133.3,
+"bbox": [
+131.275,
+132.825,
+132.175,
+133.775
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C11",
+"num": "2",
+"net": "/Power and Protection/SW_5V",
+"layers": [
+"F"
+],
+"x": 133.275,
+"y": 133.3,
+"bbox": [
+132.825,
+132.825,
+133.725,
+133.775
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C35",
+"num": "1",
+"net": "1V2",
+"layers": [
+"F"
+],
+"x": 140.725,
+"y": 139.3,
+"bbox": [
+140.275,
+138.825,
+141.175,
+139.775
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C35",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 142.275,
+"y": 139.3,
+"bbox": [
+141.825,
+138.825,
+142.725,
+139.775
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R20",
+"num": "1",
+"net": "/Audio and Camera/CAM_PWDN",
+"layers": [
+"F"
+],
+"x": 137.175,
+"y": 137.5,
+"bbox": [
+136.775,
+137.025,
+137.575,
+137.975
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R20",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 138.825,
+"y": 137.5,
+"bbox": [
+138.425,
+137.025,
+139.225,
+137.975
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R19",
+"num": "1",
+"net": "3V3",
+"layers": [
+"F"
+],
+"x": 133.675,
+"y": 137.5,
+"bbox": [
+133.275,
+137.025,
+134.075,
+137.975
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R19",
+"num": "2",
+"net": "/Audio and Camera/CAM_RESET",
+"layers": [
+"F"
+],
+"x": 135.325,
+"y": 137.5,
+"bbox": [
+134.925,
+137.025,
+135.725,
+137.975
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C16",
+"num": "1",
+"net": "3V3",
+"layers": [
+"F"
+],
+"x": 128.725,
+"y": 142.5,
+"bbox": [
+128.275,
+142.025,
+129.175,
+142.975
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C16",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 130.275,
+"y": 142.5,
+"bbox": [
+129.825,
+142.025,
+130.725,
+142.975
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J3",
+"num": "",
+"net": "",
+"layers": [
+"F",
+"B"
+],
+"x": 109.11,
+"y": 149.194999,
+"bbox": [
+108.785,
+148.869999,
+109.435,
+149.519999
+],
+"circle": true,
+"drill": 0.65,
+"npth": true
+},
+{
+"ref": "J3",
+"num": "",
+"net": "",
+"layers": [
+"F",
+"B"
+],
+"x": 114.89,
+"y": 149.194999,
+"bbox": [
+114.565,
+148.869999,
+115.215,
+149.519999
+],
+"circle": true,
+"drill": 0.65,
+"npth": true
+},
+{
+"ref": "J3",
+"num": "A1",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 108.8,
+"y": 148.119999,
+"bbox": [
+108.5,
+147.544999,
+109.1,
+148.694999
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J3",
+"num": "A4",
+"net": "VBUS",
+"layers": [
+"F"
+],
+"x": 109.6,
+"y": 148.119999,
+"bbox": [
+109.3,
+147.544999,
+109.9,
+148.694999
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J3",
+"num": "A5",
+"net": "/MCU and USB/CC1",
+"layers": [
+"F"
+],
+"x": 110.75,
+"y": 148.119999,
+"bbox": [
+110.6,
+147.544999,
+110.9,
+148.694999
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J3",
+"num": "A6",
+"net": "/MCU and USB/USB_DP",
+"layers": [
+"F"
+],
+"x": 111.75,
+"y": 148.119999,
+"bbox": [
+111.6,
+147.544999,
+111.9,
+148.694999
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J3",
+"num": "A7",
+"net": "/MCU and USB/USB_DN",
+"layers": [
+"F"
+],
+"x": 112.25,
+"y": 148.119999,
+"bbox": [
+112.1,
+147.544999,
+112.4,
+148.694999
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J3",
+"num": "A8",
+"net": "unconnected-(J3-SBU1-PadA8)",
+"layers": [
+"F"
+],
+"x": 113.25,
+"y": 148.119999,
+"bbox": [
+113.1,
+147.544999,
+113.4,
+148.694999
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J3",
+"num": "A9",
+"net": "VBUS",
+"layers": [
+"F"
+],
+"x": 114.4,
+"y": 148.119999,
+"bbox": [
+114.1,
+147.544999,
+114.7,
+148.694999
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J3",
+"num": "A12",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 115.2,
+"y": 148.119999,
+"bbox": [
+114.9,
+147.544999,
+115.5,
+148.694999
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J3",
+"num": "B1",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 115.2,
+"y": 148.119999,
+"bbox": [
+114.9,
+147.544999,
+115.5,
+148.694999
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J3",
+"num": "B4",
+"net": "VBUS",
+"layers": [
+"F"
+],
+"x": 114.4,
+"y": 148.119999,
+"bbox": [
+114.1,
+147.544999,
+114.7,
+148.694999
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J3",
+"num": "B5",
+"net": "/MCU and USB/CC2",
+"layers": [
+"F"
+],
+"x": 113.75,
+"y": 148.119999,
+"bbox": [
+113.6,
+147.544999,
+113.9,
+148.694999
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J3",
+"num": "B6",
+"net": "/MCU and USB/USB_DP",
+"layers": [
+"F"
+],
+"x": 112.75,
+"y": 148.119999,
+"bbox": [
+112.6,
+147.544999,
+112.9,
+148.694999
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J3",
+"num": "B7",
+"net": "/MCU and USB/USB_DN",
+"layers": [
+"F"
+],
+"x": 111.25,
+"y": 148.119999,
+"bbox": [
+111.1,
+147.544999,
+111.4,
+148.694999
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J3",
+"num": "B8",
+"net": "unconnected-(J3-SBU2-PadB8)",
+"layers": [
+"F"
+],
+"x": 110.25,
+"y": 148.119999,
+"bbox": [
+110.1,
+147.544999,
+110.4,
+148.694999
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J3",
+"num": "B9",
+"net": "VBUS",
+"layers": [
+"F"
+],
+"x": 109.6,
+"y": 148.119999,
+"bbox": [
+109.3,
+147.544999,
+109.9,
+148.694999
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J3",
+"num": "B12",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 108.8,
+"y": 148.119999,
+"bbox": [
+108.5,
+147.544999,
+109.1,
+148.694999
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J3",
+"num": "SH",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 107.68,
+"y": 148.694999,
+"bbox": [
+107.18,
+147.644999,
+108.18,
+149.744999
+],
+"circle": false,
+"drill": 1.7,
+"npth": false
+},
+{
+"ref": "J3",
+"num": "SH",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 107.68,
+"y": 152.875,
+"bbox": [
+107.18,
+151.975,
+108.18,
+153.775
+],
+"circle": false,
+"drill": 1.4,
+"npth": false
+},
+{
+"ref": "J3",
+"num": "SH",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 116.32,
+"y": 148.694999,
+"bbox": [
+115.82,
+147.644999,
+116.82,
+149.744999
+],
+"circle": false,
+"drill": 1.7,
+"npth": false
+},
+{
+"ref": "J3",
+"num": "SH",
+"net": "GND",
+"layers": [
+"F",
+"B"
+],
+"x": 116.32,
+"y": 152.875,
+"bbox": [
+115.82,
+151.975,
+116.82,
+153.775
+],
+"circle": false,
+"drill": 1.4,
+"npth": false
+},
+{
+"ref": "U1",
+"num": "1",
+"net": "/Power and Protection/VBAT_F",
+"layers": [
+"F"
+],
+"x": 118.3625,
+"y": 121.025,
+"bbox": [
+117.7,
+120.775,
+119.025,
+121.275
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U1",
+"num": "2",
+"net": "/Power and Protection/UV",
+"layers": [
+"F"
+],
+"x": 118.3625,
+"y": 121.675,
+"bbox": [
+117.7,
+121.425,
+119.025,
+121.925
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U1",
+"num": "3",
+"net": "/Power and Protection/OV",
+"layers": [
+"F"
+],
+"x": 118.3625,
+"y": 122.325,
+"bbox": [
+117.7,
+122.075,
+119.025,
+122.575
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U1",
+"num": "4",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 118.3625,
+"y": 122.975,
+"bbox": [
+117.7,
+122.725,
+119.025,
+123.225
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U1",
+"num": "5",
+"net": "/Power and Protection/~{SHDN}",
+"layers": [
+"F"
+],
+"x": 120.6375,
+"y": 122.975,
+"bbox": [
+119.975,
+122.725,
+121.3,
+123.225
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U1",
+"num": "6",
+"net": "unconnected-(U1-~{FAULT}-Pad6)",
+"layers": [
+"F"
+],
+"x": 120.6375,
+"y": 122.325,
+"bbox": [
+119.975,
+122.075,
+121.3,
+122.575
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U1",
+"num": "7",
+"net": "VSYS",
+"layers": [
+"F"
+],
+"x": 120.6375,
+"y": 121.675,
+"bbox": [
+119.975,
+121.425,
+121.3,
+121.925
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U1",
+"num": "8",
+"net": "/Power and Protection/GATE",
+"layers": [
+"F"
+],
+"x": 120.6375,
+"y": 121.025,
+"bbox": [
+119.975,
+120.775,
+121.3,
+121.275
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C13",
+"num": "1",
+"net": "5V",
+"layers": [
+"F"
+],
+"x": 127.85,
+"y": 134.5,
+"bbox": [
+127.35,
+133.775,
+128.35,
+135.225
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C13",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 129.75,
+"y": 134.5,
+"bbox": [
+129.25,
+133.775,
+130.25,
+135.225
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "SW2",
+"num": "1",
+"net": "/MCU and USB/EN",
+"layers": [
+"F"
+],
+"x": 123.224999,
+"y": 121.525,
+"bbox": [
+122.699999,
+121.2,
+123.749999,
+121.85
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "SW2",
+"num": "1",
+"net": "/MCU and USB/EN",
+"layers": [
+"F"
+],
+"x": 127.375,
+"y": 121.525,
+"bbox": [
+126.85,
+121.2,
+127.9,
+121.85
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "SW2",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 123.224999,
+"y": 123.674999,
+"bbox": [
+122.699999,
+123.349999,
+123.749999,
+123.999999
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "SW2",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 127.375,
+"y": 123.674999,
+"bbox": [
+126.85,
+123.349999,
+127.9,
+123.999999
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "H3",
+"num": "",
+"net": "",
+"layers": [
+"F",
+"B"
+],
+"x": 103.5,
+"y": 152.5,
+"bbox": [
+102.15,
+151.15,
+104.85,
+153.85
+],
+"circle": true,
+"drill": 2.7,
+"npth": true
+},
+{
+"ref": "R10",
+"num": "1",
+"net": "/MCU and USB/CC1",
+"layers": [
+"F"
+],
+"x": 119.0,
+"y": 148.325,
+"bbox": [
+118.525,
+147.925,
+119.475,
+148.725
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R10",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 119.0,
+"y": 146.675,
+"bbox": [
+118.525,
+146.275,
+119.475,
+147.075
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R2",
+"num": "1",
+"net": "/Power and Protection/OV",
+"layers": [
+"F"
+],
+"x": 118.2,
+"y": 112.425,
+"bbox": [
+117.725,
+112.025,
+118.675,
+112.825
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R2",
+"num": "2",
+"net": "/Power and Protection/UV",
+"layers": [
+"F"
+],
+"x": 118.2,
+"y": 110.775,
+"bbox": [
+117.725,
+110.375,
+118.675,
+111.175
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U2",
+"num": "1",
+"net": "3V3",
+"layers": [
+"F"
+],
+"x": 115.8625,
+"y": 126.55,
+"bbox": [
+115.2,
+126.25,
+116.525,
+126.85
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U2",
+"num": "2",
+"net": "VSYS",
+"layers": [
+"F"
+],
+"x": 115.8625,
+"y": 127.5,
+"bbox": [
+115.2,
+127.2,
+116.525,
+127.8
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U2",
+"num": "3",
+"net": "VSYS",
+"layers": [
+"F"
+],
+"x": 115.8625,
+"y": 128.45,
+"bbox": [
+115.2,
+128.15,
+116.525,
+128.75
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U2",
+"num": "4",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 118.1375,
+"y": 128.45,
+"bbox": [
+117.475,
+128.15,
+118.8,
+128.75
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U2",
+"num": "5",
+"net": "/Power and Protection/SW_3V3",
+"layers": [
+"F"
+],
+"x": 118.1375,
+"y": 127.5,
+"bbox": [
+117.475,
+127.2,
+118.8,
+127.8
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "U2",
+"num": "6",
+"net": "/Power and Protection/BST_3V3",
+"layers": [
+"F"
+],
+"x": 118.1375,
+"y": 126.55,
+"bbox": [
+117.475,
+126.25,
+118.8,
+126.85
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "D2",
+"num": "1",
+"net": "/Power and Protection/VBUS_F",
+"layers": [
+"F"
+],
+"x": 109.0,
+"y": 143.0,
+"bbox": [
+107.75,
+142.1,
+110.25,
+143.9
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "D2",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 113.0,
+"y": 143.0,
+"bbox": [
+111.75,
+142.1,
+114.25,
+143.9
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C32",
+"num": "1",
+"net": "5V",
+"layers": [
+"F"
+],
+"x": 145.0,
+"y": 139.775,
+"bbox": [
+144.525,
+139.325,
+145.475,
+140.225
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C32",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 145.0,
+"y": 138.225,
+"bbox": [
+144.525,
+137.775,
+145.475,
+138.675
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C7",
+"num": "1",
+"net": "3V3",
+"layers": [
+"F"
+],
+"x": 102.25,
+"y": 132.0,
+"bbox": [
+101.75,
+131.275,
+102.75,
+132.725
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C7",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 104.15,
+"y": 132.0,
+"bbox": [
+103.65,
+131.275,
+104.65,
+132.725
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "J5",
+"num": "1",
+"net": "/Motor Drivers/M1_A",
+"layers": [
+"F",
+"B"
+],
+"x": 159.9,
+"y": 112.5,
+"bbox": [
+158.9,
+111.65,
+160.9,
+113.35
+],
+"circle": false,
+"drill": 1.0,
+"npth": false
+},
+{
+"ref": "J5",
+"num": "2",
+"net": "/Motor Drivers/M1_B",
+"layers": [
+"F",
+"B"
+],
+"x": 159.9,
+"y": 110.0,
+"bbox": [
+158.9,
+109.15,
+160.9,
+110.85
+],
+"circle": false,
+"drill": 1.0,
+"npth": false
+},
+{
+"ref": "C1",
+"num": "1",
+"net": "VSYS",
+"layers": [
+"F"
+],
+"x": 108.299999,
+"y": 137.2,
+"bbox": [
+106.549999,
+136.4,
+110.049999,
+138.0
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "C1",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 113.699999,
+"y": 137.2,
+"bbox": [
+111.949999,
+136.4,
+115.449999,
+138.0
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R16",
+"num": "1",
+"net": "/Motor Drivers/BISEN1",
+"layers": [
+"F"
+],
+"x": 152.9375,
+"y": 107.6,
+"bbox": [
+152.375,
+106.725,
+153.5,
+108.475
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R16",
+"num": "2",
+"net": "GND",
+"layers": [
+"F"
+],
+"x": 155.8625,
+"y": 107.6,
+"bbox": [
+155.3,
+106.725,
+156.425,
+108.475
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R21",
+"num": "1",
+"net": "3V3",
+"layers": [
+"F"
+],
+"x": 140.675,
+"y": 137.5,
+"bbox": [
+140.275,
+137.025,
+141.075,
+137.975
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+},
+{
+"ref": "R21",
+"num": "2",
+"net": "CAM_SIOC",
+"layers": [
+"F"
+],
+"x": 142.325,
+"y": 137.5,
+"bbox": [
+141.925,
+137.025,
+142.725,
+137.975
+],
+"circle": false,
+"drill": 0.0,
+"npth": false
+}
+],
+"outline": [
+99.975,
+99.975,
+164.025,
+156.025
+],
+"nets": [
+"/Audio and Camera/AMP_SD_MODE",
+"/Audio and Camera/CAM_PWDN",
+"/Audio and Camera/CAM_RESET",
+"/Audio and Camera/SPK_N",
+"/Audio and Camera/SPK_P",
+"/MCU and USB/BOOT",
+"/MCU and USB/CC1",
+"/MCU and USB/CC2",
+"/MCU and USB/EN",
+"/MCU and USB/LED_STAT",
+"/MCU and USB/LED_STAT_A",
+"/MCU and USB/UART_RX",
+"/MCU and USB/UART_TX",
+"/MCU and USB/USB_DN",
+"/MCU and USB/USB_DP",
+"/Motor Drivers/AISEN1",
+"/Motor Drivers/AISEN2",
+"/Motor Drivers/BISEN1",
+"/Motor Drivers/M1_A",
+"/Motor Drivers/M1_B",
+"/Motor Drivers/M2_A",
+"/Motor Drivers/M2_B",
+"/Motor Drivers/M3_A",
+"/Motor Drivers/M3_B",
+"/Motor Drivers/VCP1",
+"/Motor Drivers/VCP2",
+"/Motor Drivers/VINT1",
+"/Motor Drivers/VINT2",
+"/Power and Protection/BST_3V3",
+"/Power and Protection/BST_5V",
+"/Power and Protection/GATE",
+"/Power and Protection/LED_PWR",
+"/Power and Protection/OV",
+"/Power and Protection/Q_SRC",
+"/Power and Protection/SW_3V3",
+"/Power and Protection/SW_5V",
+"/Power and Protection/UV",
+"/Power and Protection/VBAT_F",
+"/Power and Protection/VBAT_IN",
+"/Power and Protection/VBUS_F",
+"/Power and Protection/~{SHDN}",
+"1V2",
+"2V8",
+"3V3",
+"5V",
+"CAM_HREF",
+"CAM_PCLK",
+"CAM_SIOC",
+"CAM_SIOD",
+"CAM_VSYNC",
+"CAM_XCLK",
+"CAM_Y2",
+"CAM_Y3",
+"CAM_Y4",
+"CAM_Y5",
+"CAM_Y6",
+"CAM_Y7",
+"CAM_Y8",
+"CAM_Y9",
+"GND",
+"I2S_BCLK",
+"I2S_DIN",
+"I2S_DOUT",
+"I2S_WS",
+"M1_IN1",
+"M1_IN2",
+"M2_IN1",
+"M2_IN2",
+"M3_IN1",
+"M3_IN2",
+"MOT_nFAULT",
+"MOT_nSLEEP",
+"VBAT_SENSE",
+"VBUS",
+"VSYS",
+"unconnected-(J10-Pin_1-Pad1)",
+"unconnected-(J10-Pin_23-Pad23)",
+"unconnected-(J10-Pin_24-Pad24)",
+"unconnected-(J3-SBU1-PadA8)",
+"unconnected-(J3-SBU2-PadB8)",
+"unconnected-(SW1-C-Pad3)",
+"unconnected-(U1-~{FAULT}-Pad6)",
+"unconnected-(U10-NC-Pad12)",
+"unconnected-(U10-NC-Pad13)",
+"unconnected-(U10-NC-Pad5)",
+"unconnected-(U10-NC-Pad6)",
+"unconnected-(U6-IO35-Pad28)",
+"unconnected-(U6-IO36-Pad29)",
+"unconnected-(U6-IO37-Pad30)",
+"unconnected-(U9-BOUT1-Pad7)",
+"unconnected-(U9-BOUT2-Pad5)"
+]
+}

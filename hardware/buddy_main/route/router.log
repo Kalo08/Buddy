@@ -1,0 +1,15 @@
+  rip-up for /Motor Drivers/M1_B: ['/Motor Drivers/AISEN1']
+  rip-up for /Motor Drivers/M3_B: ['/Motor Drivers/AISEN2']
+  rip-up for /Motor Drivers/M2_A: ['/Motor Drivers/BISEN1']
+  20/166 routed, queue 146, 24s
+  40/166 routed, queue 126, 29s
+  60/166 routed, queue 106, 39s
+  80/166 routed, queue 86, 48s
+  rip-up for /Motor Drivers/VINT1: ['VSYS']
+  rip-up for M3_IN2: ['/Motor Drivers/VCP2', '/Motor Drivers/VINT2']
+  rip-up for /Audio and Camera/CAM_RESET: ['5V']
+  rip-up for M1_IN2: ['/Motor Drivers/VCP1', '/Motor Drivers/VINT1']
+  rip-up for /Power and Protection/~{SHDN}: ['/Power and Protection/OV', '3V3']
+  60/166 routed, queue 106, 67s
+  rip-up for CAM_Y8: []
+  rip-up for CAM_Y9: []
