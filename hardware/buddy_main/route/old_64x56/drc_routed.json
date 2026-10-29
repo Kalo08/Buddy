@@ -1,0 +1,2360 @@
+{
+    "$schema": "https://schemas.kicad.org/drc.v1.json",
+    "coordinate_units": "mm",
+    "date": "2026-10-29T16:28:52",
+    "ignored_checks": [
+        {
+            "description": "Footprint has no courtyard defined",
+            "key": "missing_courtyard"
+        },
+        {
+            "description": "Track endpoint not centered on via",
+            "key": "track_not_centered_on_via"
+        },
+        {
+            "description": "Tuning profile track geometries",
+            "key": "tuning_profile_track_geometries"
+        },
+        {
+            "description": "Footprint doesn't match symbol's footprint filters",
+            "key": "footprint_filters_mismatch"
+        },
+        {
+            "description": "Footprint component type doesn't match footprint pads",
+            "key": "footprint_type_mismatch"
+        }
+    ],
+    "included_severities": [
+        "error"
+    ],
+    "kicad_version": "10.0.3",
+    "schematic_parity": [],
+    "source": "routed.kicad_pcb",
+    "unconnected_items": [
+        {
+            "description": "Missing connection between items",
+            "items": [
+                {
+                    "description": "Track [2V8] on F.Cu, length 1.5013 mm",
+                    "pos": {
+                        "x": 123.8625,
+                        "y": 139.95
+                    },
+                    "uuid": "8bab8883-ec29-4f79-8dd8-334f274301d1"
+                },
+                {
+                    "description": "Track [2V8] on F.Cu, length 1.2552 mm",
+                    "pos": {
+                        "x": 123.725,
+                        "y": 144.3
+                    },
+                    "uuid": "d10215a0-cdbf-4676-a79a-a2ba415c70e0"
+                }
+            ],
+            "severity": "error",
+            "type": "unconnected_items"
+        },
+        {
+            "description": "Missing connection between items",
+            "items": [
+                {
+                    "description": "Track [VSYS] on F.Cu, length 1.4142 mm",
+                    "pos": {
+                        "x": 120.8,
+                        "y": 124.4
+                    },
+                    "uuid": "e8b3e9fb-ae2e-47bb-8992-6a9cca9c3aaa"
+                },
+                {
+                    "description": "Track [VSYS] on F.Cu, length 4.1000 mm",
+                    "pos": {
+                        "x": 130.4,
+                        "y": 126.2
+                    },
+                    "uuid": "84f426f1-1427-4a49-9bb1-cdce2008f883"
+                }
+            ],
+            "severity": "error",
+            "type": "unconnected_items"
+        },
+        {
+            "description": "Missing connection between items",
+            "items": [
+                {
+                    "description": "Pad 12 [VSYS] of U8 on F.Cu",
+                    "pos": {
+                        "x": 149.325,
+                        "y": 105.1375
+                    },
+                    "uuid": "6c863e91-1231-4f67-9c7c-1aaf525b5d87"
+                },
+                {
+                    "description": "Pad 2 [VSYS] of C24 on F.Cu",
+                    "pos": {
+                        "x": 144.0,
+                        "y": 103.225
+                    },
+                    "uuid": "2399d417-a6d7-4a2c-b247-cab84c048a76"
+                }
+            ],
+            "severity": "error",
+            "type": "unconnected_items"
+        },
+        {
+            "description": "Missing connection between items",
+            "items": [
+                {
+                    "description": "Pad 1 [VSYS] of C22 on F.Cu",
+                    "pos": {
+                        "x": 152.925,
+                        "y": 110.7
+                    },
+                    "uuid": "9054c17a-97ee-4b00-ad15-9a4e71526ef6"
+                },
+                {
+                    "description": "Pad 12 [VSYS] of U8 on F.Cu",
+                    "pos": {
+                        "x": 149.325,
+                        "y": 105.1375
+                    },
+                    "uuid": "6c863e91-1231-4f67-9c7c-1aaf525b5d87"
+                }
+            ],
+            "severity": "error",
+            "type": "unconnected_items"
+        },
+        {
+            "description": "Missing connection between items",
+            "items": [
+                {
+                    "description": "Pad 1 [VSYS] of C23 on F.Cu",
+                    "pos": {
+                        "x": 153.625,
+                        "y": 113.2
+                    },
+                    "uuid": "af9aefcb-102a-4d96-92a8-7e4305546655"
+                },
+                {
+                    "description": "Pad 1 [VSYS] of C22 on F.Cu",
+                    "pos": {
+                        "x": 152.925,
+                        "y": 110.7
+                    },
+                    "uuid": "9054c17a-97ee-4b00-ad15-9a4e71526ef6"
+                }
+            ],
+            "severity": "error",
+            "type": "unconnected_items"
+        },
+        {
+            "description": "Missing connection between items",
+            "items": [
+                {
+                    "description": "Pad 1 [VSYS] of C23 on F.Cu",
+                    "pos": {
+                        "x": 153.625,
+                        "y": 113.2
+                    },
+                    "uuid": "af9aefcb-102a-4d96-92a8-7e4305546655"
+                },
+                {
+                    "description": "Track [VSYS] on F.Cu, length 5.8000 mm",
+                    "pos": {
+                        "x": 150.7,
+                        "y": 116.9
+                    },
+                    "uuid": "50a99bdd-0d0c-4197-b90b-381c3b3a4c07"
+                }
+            ],
+            "severity": "error",
+            "type": "unconnected_items"
+        },
+        {
+            "description": "Missing connection between items",
+            "items": [
+                {
+                    "description": "Track [/Power and Protection/GATE] on F.Cu, length 2.4000 mm",
+                    "pos": {
+                        "x": 110.9,
+                        "y": 122.1
+                    },
+                    "uuid": "36bb3756-018e-4d45-a31b-59d69a06a86d"
+                },
+                {
+                    "description": "Pad 2 [/Power and Protection/GATE] of Q1 on F.Cu",
+                    "pos": {
+                        "x": 109.525,
+                        "y": 121.365
+                    },
+                    "uuid": "91434377-1225-452a-82fc-d7002f0ae329"
+                }
+            ],
+            "severity": "error",
+            "type": "unconnected_items"
+        },
+        {
+            "description": "Missing connection between items",
+            "items": [
+                {
+                    "description": "Track [/Power and Protection/VBAT_F] on F.Cu, length 6.0466 mm",
+                    "pos": {
+                        "x": 114.475,
+                        "y": 120.095
+                    },
+                    "uuid": "de17cc49-3f2e-4e23-9ec5-860fa6a04182"
+                },
+                {
+                    "description": "Pad 1 [/Power and Protection/VBAT_F] of R4 on F.Cu",
+                    "pos": {
+                        "x": 118.2,
+                        "y": 119.025
+                    },
+                    "uuid": "ee0c438a-7a25-4062-9bad-5b9b10c4eda4"
+                }
+            ],
+            "severity": "error",
+            "type": "unconnected_items"
+        },
+        {
+            "description": "Missing connection between items",
+            "items": [
+                {
+                    "description": "Track [MOT_nSLEEP] on B.Cu, length 0.7517 mm",
+                    "pos": {
+                        "x": 140.15,
+                        "y": 117.75
+                    },
+                    "uuid": "88844c6c-4bab-4415-9c83-4c2e041aec28"
+                },
+                {
+                    "description": "Pad 1 [MOT_nSLEEP] of R13 on F.Cu",
+                    "pos": {
+                        "x": 144.0,
+                        "y": 111.825
+                    },
+                    "uuid": "e730d50c-3b4b-451b-950e-16ea9f088d66"
+                }
+            ],
+            "severity": "error",
+            "type": "unconnected_items"
+        },
+        {
+            "description": "Missing connection between items",
+            "items": [
+                {
+                    "description": "Pad 3 [/Motor Drivers/AISEN1] of U8 on F.Cu",
+                    "pos": {
+                        "x": 148.025,
+                        "y": 110.8625
+                    },
+                    "uuid": "54d1c09b-5053-400e-81ed-2ac5fedd2cc2"
+                },
+                {
+                    "description": "Pad 1 [/Motor Drivers/AISEN1] of R15 on F.Cu",
+                    "pos": {
+                        "x": 152.9375,
+                        "y": 104.5
+                    },
+                    "uuid": "d7beba8a-0558-4684-b807-024fd3c04635"
+                }
+            ],
+            "severity": "error",
+            "type": "unconnected_items"
+        },
+        {
+            "description": "Missing connection between items",
+            "items": [
+                {
+                    "description": "Pad 7 [/Motor Drivers/M2_A] of U8 on F.Cu",
+                    "pos": {
+                        "x": 150.625,
+                        "y": 110.8625
+                    },
+                    "uuid": "5cc44763-aa79-4b80-bd10-e4aaf1f87b14"
+                },
+                {
+                    "description": "PTH pad 1 [/Motor Drivers/M2_A] of J6",
+                    "pos": {
+                        "x": 159.9,
+                        "y": 121.0
+                    },
+                    "uuid": "f27afa4d-5303-4610-b6d6-23087587f6b2"
+                }
+            ],
+            "severity": "error",
+            "type": "unconnected_items"
+        },
+        {
+            "description": "Missing connection between items",
+            "items": [
+                {
+                    "description": "Track [/MCU and USB/EN] on F.Cu, length 1.5000 mm",
+                    "pos": {
+                        "x": 129.8,
+                        "y": 122.2
+                    },
+                    "uuid": "63eac173-9167-4da3-8dde-8a4d7eacb559"
+                },
+                {
+                    "description": "Pad 1 [/MCU and USB/EN] of SW2 on F.Cu",
+                    "pos": {
+                        "x": 127.375,
+                        "y": 121.525
+                    },
+                    "uuid": "6188758e-3cdc-4bc6-8f67-a4b0d1a0e5ae"
+                }
+            ],
+            "severity": "error",
+            "type": "unconnected_items"
+        },
+        {
+            "description": "Missing connection between items",
+            "items": [
+                {
+                    "description": "Track [5V] on F.Cu, length 1.7357 mm",
+                    "pos": {
+                        "x": 127.85,
+                        "y": 134.5
+                    },
+                    "uuid": "e1189d6d-9052-4b01-9a44-0af2bf53ef69"
+                },
+                {
+                    "description": "Track [5V] on F.Cu, length 1.6000 mm",
+                    "pos": {
+                        "x": 144.0,
+                        "y": 140.7
+                    },
+                    "uuid": "caf7c42b-5093-467f-be05-70450a658798"
+                }
+            ],
+            "severity": "error",
+            "type": "unconnected_items"
+        },
+        {
+            "description": "Missing connection between items",
+            "items": [
+                {
+                    "description": "Track [5V] on F.Cu, length 3.8223 mm",
+                    "pos": {
+                        "x": 128.074999,
+                        "y": 129.0
+                    },
+                    "uuid": "b3e4dc4d-77e8-402e-81bd-231e9a8572e7"
+                },
+                {
+                    "description": "Track [5V] on F.Cu, length 1.7357 mm",
+                    "pos": {
+                        "x": 127.85,
+                        "y": 134.5
+                    },
+                    "uuid": "e1189d6d-9052-4b01-9a44-0af2bf53ef69"
+                }
+            ],
+            "severity": "error",
+            "type": "unconnected_items"
+        },
+        {
+            "description": "Missing connection between items",
+            "items": [
+                {
+                    "description": "Track [5V] on F.Cu, length 4.1902 mm",
+                    "pos": {
+                        "x": 145.0,
+                        "y": 143.425
+                    },
+                    "uuid": "d32bc3e1-aad8-49a3-a342-a99fbd7efb14"
+                },
+                {
+                    "description": "Track [5V] on F.Cu, length 0.5000 mm",
+                    "pos": {
+                        "x": 150.25,
+                        "y": 141.4375
+                    },
+                    "uuid": "12706ee3-c163-4461-8b5e-b4a17662ff95"
+                }
+            ],
+            "severity": "error",
+            "type": "unconnected_items"
+        },
+        {
+            "description": "Missing connection between items",
+            "items": [
+                {
+                    "description": "Track [I2S_WS] on B.Cu, length 11.1036 mm",
+                    "pos": {
+                        "x": 150.8,
+                        "y": 137.6
+                    },
+                    "uuid": "4cdb2484-11e9-4a4d-a8d0-0e5c9d2e3617"
+                },
+                {
+                    "description": "Pad 14 [I2S_WS] of U10 on F.Cu",
+                    "pos": {
+                        "x": 150.25,
+                        "y": 138.5625
+                    },
+                    "uuid": "841595e3-4607-4bba-9716-dbabf86d6753"
+                }
+            ],
+            "severity": "error",
+            "type": "unconnected_items"
+        },
+        {
+            "description": "Missing connection between items",
+            "items": [
+                {
+                    "description": "Pad 2 [CAM_SIOD] of R22 on F.Cu",
+                    "pos": {
+                        "x": 135.325,
+                        "y": 139.3
+                    },
+                    "uuid": "5956c841-f74b-4d9b-bb9c-3c381399a4e7"
+                },
+                {
+                    "description": "Track [CAM_SIOD] on B.Cu, length 1.5620 mm",
+                    "pos": {
+                        "x": 134.3,
+                        "y": 138.7
+                    },
+                    "uuid": "b6763151-03ba-44d9-8b4a-b3e8ecce5f5c"
+                }
+            ],
+            "severity": "error",
+            "type": "unconnected_items"
+        },
+        {
+            "description": "Missing connection between items",
+            "items": [
+                {
+                    "description": "Pad 8 [CAM_XCLK] of U6 on F.Cu",
+                    "pos": {
+                        "x": 123.25,
+                        "y": 110.38
+                    },
+                    "uuid": "b14f7d01-3827-4168-bf2d-28ca26d17990"
+                },
+                {
+                    "description": "Pad 13 [CAM_XCLK] of J10 on F.Cu",
+                    "pos": {
+                        "x": 131.75,
+                        "y": 149.25
+                    },
+                    "uuid": "78cf69e7-22eb-4ae3-b69d-bbd24d931af5"
+                }
+            ],
+            "severity": "error",
+            "type": "unconnected_items"
+        },
+        {
+            "description": "Missing connection between items",
+            "items": [
+                {
+                    "description": "Pad 11 [CAM_Y7] of U6 on F.Cu",
+                    "pos": {
+                        "x": 123.25,
+                        "y": 114.19
+                    },
+                    "uuid": "c2d5a69a-8d55-4d98-95b5-cc474ce70900"
+                },
+                {
+                    "description": "Pad 16 [CAM_Y7] of J10 on F.Cu",
+                    "pos": {
+                        "x": 133.25,
+                        "y": 149.25
+                    },
+                    "uuid": "b132a6ac-130c-4f0a-97e0-56fdba0f81b9"
+                }
+            ],
+            "severity": "error",
+            "type": "unconnected_items"
+        },
+        {
+            "description": "Missing connection between items",
+            "items": [
+                {
+                    "description": "Pad 1 [/MCU and USB/USB_DP] of U7 on F.Cu",
+                    "pos": {
+                        "x": 102.8625,
+                        "y": 141.05
+                    },
+                    "uuid": "e613dfd4-b8b0-46e3-9621-749e0442ff31"
+                },
+                {
+                    "description": "Pad 6 [/MCU and USB/USB_DP] of U7 on F.Cu",
+                    "pos": {
+                        "x": 105.1375,
+                        "y": 141.05
+                    },
+                    "uuid": "6d4d3b29-1495-4379-983d-25e7398a80e2"
+                }
+            ],
+            "severity": "error",
+            "type": "unconnected_items"
+        },
+        {
+            "description": "Missing connection between items",
+            "items": [
+                {
+                    "description": "Pad 16 [/MCU and USB/LED_STAT] of U6 on F.Cu",
+                    "pos": {
+                        "x": 126.285,
+                        "y": 119.25
+                    },
+                    "uuid": "37374153-358b-4b67-861f-d8e864905813"
+                },
+                {
+                    "description": "Pad 1 [/MCU and USB/LED_STAT] of R12 on F.Cu",
+                    "pos": {
+                        "x": 135.775,
+                        "y": 132.5
+                    },
+                    "uuid": "69f9a67c-953b-440c-8682-72534272dce9"
+                }
+            ],
+            "severity": "error",
+            "type": "unconnected_items"
+        },
+        {
+            "description": "Missing connection between items",
+            "items": [
+                {
+                    "description": "Pad 20 [CAM_Y6] of U6 on F.Cu",
+                    "pos": {
+                        "x": 131.365,
+                        "y": 119.25
+                    },
+                    "uuid": "c5ed148b-51f9-4696-8c15-50ac0b694d00"
+                },
+                {
+                    "description": "Pad 18 [CAM_Y6] of J10 on F.Cu",
+                    "pos": {
+                        "x": 134.25,
+                        "y": 149.25
+                    },
+                    "uuid": "32018fd0-d04b-4d11-865e-075bc239c522"
+                }
+            ],
+            "severity": "error",
+            "type": "unconnected_items"
+        },
+        {
+            "description": "Missing connection between items",
+            "items": [
+                {
+                    "description": "Track [/MCU and USB/BOOT] on F.Cu, length 2.2000 mm",
+                    "pos": {
+                        "x": 136.5,
+                        "y": 120.9
+                    },
+                    "uuid": "e45fc7dd-d606-49f2-ad23-e225e6419db3"
+                },
+                {
+                    "description": "Pad 1 [/MCU and USB/BOOT] of SW3 on F.Cu",
+                    "pos": {
+                        "x": 133.375,
+                        "y": 121.525
+                    },
+                    "uuid": "11d4b07f-5e83-4647-9c37-3650a93f0c08"
+                }
+            ],
+            "severity": "error",
+            "type": "unconnected_items"
+        },
+        {
+            "description": "Missing connection between items",
+            "items": [
+                {
+                    "description": "Track [VBAT_SENSE] on B.Cu, length 4.3841 mm",
+                    "pos": {
+                        "x": 122.0,
+                        "y": 103.8
+                    },
+                    "uuid": "f7a1e130-7a62-4189-8f22-3461b747a8e2"
+                },
+                {
+                    "description": "Track [VBAT_SENSE] on F.Cu, length 1.4320 mm",
+                    "pos": {
+                        "x": 119.5,
+                        "y": 115.1
+                    },
+                    "uuid": "a4269bbd-2fd4-424e-a59f-4ccac340131f"
+                }
+            ],
+            "severity": "error",
+            "type": "unconnected_items"
+        },
+        {
+            "description": "Missing connection between items",
+            "items": [
+                {
+                    "description": "Track [VBUS] on B.Cu, length 3.6770 mm",
+                    "pos": {
+                        "x": 109.6,
+                        "y": 146.1
+                    },
+                    "uuid": "ca9ad8a2-7412-4194-93dc-d0fade0de6bb"
+                },
+                {
+                    "description": "Track [VBUS] on F.Cu, length 4.1012 mm",
+                    "pos": {
+                        "x": 114.3,
+                        "y": 145.8
+                    },
+                    "uuid": "d5839a82-b479-4190-8fae-8e7428a5cc5b"
+                }
+            ],
+            "severity": "error",
+            "type": "unconnected_items"
+        }
+    ],
+    "violations": [
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.0226 mm)",
+            "items": [
+                {
+                    "description": "Pad 36 [/MCU and USB/UART_RX] of U6 on F.Cu",
+                    "pos": {
+                        "x": 140.75,
+                        "y": 106.57
+                    },
+                    "uuid": "3b2eabc5-4bda-466b-8244-da11e807108c"
+                },
+                {
+                    "description": "Track [/MCU and USB/UART_TX] on F.Cu, length 8.0432 mm",
+                    "pos": {
+                        "x": 134.7,
+                        "y": 110.6
+                    },
+                    "uuid": "75274e0d-8411-4e22-b827-e15f3064ebe8"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.1000 mm)",
+            "items": [
+                {
+                    "description": "Via [VSYS] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 153.1,
+                        "y": 120.0
+                    },
+                    "uuid": "b18e2d45-393d-41e0-b6ee-66782172bbc1"
+                },
+                {
+                    "description": "Via [/Motor Drivers/AISEN2] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 152.2,
+                        "y": 120.0
+                    },
+                    "uuid": "fd7be146-a9f2-422b-a092-e3fa5250aa4e"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.1000 mm)",
+            "items": [
+                {
+                    "description": "Via [VSYS] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 153.1,
+                        "y": 120.0
+                    },
+                    "uuid": "b18e2d45-393d-41e0-b6ee-66782172bbc1"
+                },
+                {
+                    "description": "Via [/Motor Drivers/AISEN2] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 152.2,
+                        "y": 120.0
+                    },
+                    "uuid": "fd7be146-a9f2-422b-a092-e3fa5250aa4e"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Tracks crossing",
+            "items": [
+                {
+                    "description": "Track [/MCU and USB/EN] on F.Cu, length 5.1197 mm",
+                    "pos": {
+                        "x": 128.3,
+                        "y": 122.2
+                    },
+                    "uuid": "5b2291a5-09b9-4e37-a795-56c8ce129a4a"
+                },
+                {
+                    "description": "Track [CAM_HREF] on F.Cu, length 3.6000 mm",
+                    "pos": {
+                        "x": 124.4,
+                        "y": 123.9
+                    },
+                    "uuid": "6ef0d0d2-c3cc-4ca3-9789-aabe3fb2bfb7"
+                }
+            ],
+            "severity": "error",
+            "type": "tracks_crossing"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.1000 mm)",
+            "items": [
+                {
+                    "description": "Via [VSYS] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 153.1,
+                        "y": 120.0
+                    },
+                    "uuid": "b18e2d45-393d-41e0-b6ee-66782172bbc1"
+                },
+                {
+                    "description": "Via [/Motor Drivers/AISEN2] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 152.2,
+                        "y": 120.0
+                    },
+                    "uuid": "fd7be146-a9f2-422b-a092-e3fa5250aa4e"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.0243 mm)",
+            "items": [
+                {
+                    "description": "Via [CAM_PCLK] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 135.5,
+                        "y": 145.2
+                    },
+                    "uuid": "5e86da1e-edac-426a-bbba-52edf0dd6615"
+                },
+                {
+                    "description": "Track [CAM_Y4] on F.Cu, length 6.9296 mm",
+                    "pos": {
+                        "x": 131.4,
+                        "y": 141.7
+                    },
+                    "uuid": "a60e76eb-cf13-46fb-89aa-38de1de6c085"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Hole clearance violation (board setup constraints hole clearance 0.2500 mm; actual 0.1743 mm)",
+            "items": [
+                {
+                    "description": "Track [CAM_Y4] on F.Cu, length 6.9296 mm",
+                    "pos": {
+                        "x": 131.4,
+                        "y": 141.7
+                    },
+                    "uuid": "a60e76eb-cf13-46fb-89aa-38de1de6c085"
+                },
+                {
+                    "description": "Via [CAM_PCLK] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 135.5,
+                        "y": 145.2
+                    },
+                    "uuid": "5e86da1e-edac-426a-bbba-52edf0dd6615"
+                }
+            ],
+            "severity": "error",
+            "type": "hole_clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.1000 mm)",
+            "items": [
+                {
+                    "description": "Via [VSYS] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 153.1,
+                        "y": 120.0
+                    },
+                    "uuid": "b18e2d45-393d-41e0-b6ee-66782172bbc1"
+                },
+                {
+                    "description": "Via [/Motor Drivers/AISEN2] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 152.2,
+                        "y": 120.0
+                    },
+                    "uuid": "fd7be146-a9f2-422b-a092-e3fa5250aa4e"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.0185 mm)",
+            "items": [
+                {
+                    "description": "Pad 11 [CAM_Y7] of U6 on F.Cu",
+                    "pos": {
+                        "x": 123.25,
+                        "y": 114.19
+                    },
+                    "uuid": "c2d5a69a-8d55-4d98-95b5-cc474ce70900"
+                },
+                {
+                    "description": "Track [CAM_Y8] on F.Cu, length 4.2013 mm",
+                    "pos": {
+                        "x": 126.4,
+                        "y": 115.7
+                    },
+                    "uuid": "e99e4b79-8b9b-47c7-a991-74c78ec6f171"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.1000 mm)",
+            "items": [
+                {
+                    "description": "Via [CAM_Y8] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 136.8,
+                        "y": 128.5
+                    },
+                    "uuid": "35b59acd-3189-43e7-9a7a-1b2c4eb73861"
+                },
+                {
+                    "description": "Track [CAM_Y2] on B.Cu, length 6.1000 mm",
+                    "pos": {
+                        "x": 137.3,
+                        "y": 133.199999
+                    },
+                    "uuid": "38025cd0-54dd-438d-8198-61cd5fbca668"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.0950 mm)",
+            "items": [
+                {
+                    "description": "Track [M2_IN1] on B.Cu, length 2.5456 mm",
+                    "pos": {
+                        "x": 133.6,
+                        "y": 147.7
+                    },
+                    "uuid": "04e1d796-9020-4fe9-bfee-2546b46c6734"
+                },
+                {
+                    "description": "Via [CAM_PCLK] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 133.9,
+                        "y": 147.3
+                    },
+                    "uuid": "ce238026-04d0-4030-b655-7684aa207627"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.1283 mm)",
+            "items": [
+                {
+                    "description": "Pad 4 [CAM_SIOD] of U6 on F.Cu",
+                    "pos": {
+                        "x": 123.25,
+                        "y": 105.3
+                    },
+                    "uuid": "00151765-4ba5-4768-8a40-2e4a973486cd"
+                },
+                {
+                    "description": "Track [/MCU and USB/EN] on F.Cu, length 1.6623 mm",
+                    "pos": {
+                        "x": 121.9,
+                        "y": 105.0
+                    },
+                    "uuid": "a78367b4-a7c3-4341-9e2f-45ab1e754475"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Hole clearance violation (board setup constraints hole clearance 0.2500 mm; actual 0.2450 mm)",
+            "items": [
+                {
+                    "description": "Track [M2_IN1] on B.Cu, length 2.5456 mm",
+                    "pos": {
+                        "x": 133.6,
+                        "y": 147.7
+                    },
+                    "uuid": "04e1d796-9020-4fe9-bfee-2546b46c6734"
+                },
+                {
+                    "description": "Via [CAM_PCLK] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 133.9,
+                        "y": 147.3
+                    },
+                    "uuid": "ce238026-04d0-4030-b655-7684aa207627"
+                }
+            ],
+            "severity": "error",
+            "type": "hole_clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.1000 mm)",
+            "items": [
+                {
+                    "description": "Via [CAM_PCLK] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 133.9,
+                        "y": 147.3
+                    },
+                    "uuid": "ce238026-04d0-4030-b655-7684aa207627"
+                },
+                {
+                    "description": "Track [M2_IN1] on B.Cu, length 0.5000 mm",
+                    "pos": {
+                        "x": 133.6,
+                        "y": 148.2
+                    },
+                    "uuid": "d2f3d8d4-0e7c-4f41-83fc-6ff7553e0a8a"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.0537 mm)",
+            "items": [
+                {
+                    "description": "Track [/MCU and USB/BOOT] on F.Cu, length 5.1133 mm",
+                    "pos": {
+                        "x": 134.3,
+                        "y": 120.9
+                    },
+                    "uuid": "8baf947c-7f8e-4af9-9230-51e86bf9b42b"
+                },
+                {
+                    "description": "Via [CAM_PCLK] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 131.4,
+                        "y": 120.8
+                    },
+                    "uuid": "d46d59b2-2a31-46a2-882d-21343a9b991b"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Items shorting two nets (nets /MCU and USB/BOOT and /MCU and USB/EN)",
+            "items": [
+                {
+                    "description": "Pad 1 [/MCU and USB/BOOT] of SW3 on F.Cu",
+                    "pos": {
+                        "x": 133.375,
+                        "y": 121.525
+                    },
+                    "uuid": "11d4b07f-5e83-4647-9c37-3650a93f0c08"
+                },
+                {
+                    "description": "Track [/MCU and USB/EN] on F.Cu, length 4.4205 mm",
+                    "pos": {
+                        "x": 135.5,
+                        "y": 121.775
+                    },
+                    "uuid": "f7f489ca-3348-40fb-bde1-9cd6755fdde2"
+                }
+            ],
+            "severity": "error",
+            "type": "shorting_items"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.0243 mm)",
+            "items": [
+                {
+                    "description": "Track [M2_IN1] on B.Cu, length 7.9196 mm",
+                    "pos": {
+                        "x": 140.6,
+                        "y": 143.0
+                    },
+                    "uuid": "7ed95fd0-8f41-48e8-b51f-cab25d971961"
+                },
+                {
+                    "description": "Via [CAM_Y8] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 138.4,
+                        "y": 145.8
+                    },
+                    "uuid": "a5ce18da-d9f0-4ccb-805e-1f29de1eec31"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Hole clearance violation (board setup constraints hole clearance 0.2500 mm; actual 0.1743 mm)",
+            "items": [
+                {
+                    "description": "Track [M2_IN1] on B.Cu, length 7.9196 mm",
+                    "pos": {
+                        "x": 140.6,
+                        "y": 143.0
+                    },
+                    "uuid": "7ed95fd0-8f41-48e8-b51f-cab25d971961"
+                },
+                {
+                    "description": "Via [CAM_Y8] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 138.4,
+                        "y": 145.8
+                    },
+                    "uuid": "a5ce18da-d9f0-4ccb-805e-1f29de1eec31"
+                }
+            ],
+            "severity": "error",
+            "type": "hole_clearance"
+        },
+        {
+            "description": "Hole clearance violation (board setup constraints hole clearance 0.2500 mm; actual 0.2037 mm)",
+            "items": [
+                {
+                    "description": "Track [/MCU and USB/BOOT] on F.Cu, length 5.1133 mm",
+                    "pos": {
+                        "x": 134.3,
+                        "y": 120.9
+                    },
+                    "uuid": "8baf947c-7f8e-4af9-9230-51e86bf9b42b"
+                },
+                {
+                    "description": "Via [CAM_PCLK] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 131.4,
+                        "y": 120.8
+                    },
+                    "uuid": "d46d59b2-2a31-46a2-882d-21343a9b991b"
+                }
+            ],
+            "severity": "error",
+            "type": "hole_clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.1000 mm)",
+            "items": [
+                {
+                    "description": "Track [CAM_SIOD] on B.Cu, length 5.0000 mm",
+                    "pos": {
+                        "x": 131.9,
+                        "y": 125.7
+                    },
+                    "uuid": "43a2884f-14e4-4621-beea-5a22643ce685"
+                },
+                {
+                    "description": "Via [CAM_PCLK] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 131.4,
+                        "y": 120.8
+                    },
+                    "uuid": "d46d59b2-2a31-46a2-882d-21343a9b991b"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.1000 mm)",
+            "items": [
+                {
+                    "description": "Track [M2_IN1] on F.Cu, length 4.6000 mm",
+                    "pos": {
+                        "x": 128.8,
+                        "y": 116.2
+                    },
+                    "uuid": "08f64edc-b08c-4948-b548-c1a4b1035215"
+                },
+                {
+                    "description": "Via [CAM_Y8] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 129.4,
+                        "y": 115.7
+                    },
+                    "uuid": "e895e119-7ca3-4435-a8e6-3a5d54194b88"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.0243 mm)",
+            "items": [
+                {
+                    "description": "Track [CAM_SIOD] on B.Cu, length 3.1113 mm",
+                    "pos": {
+                        "x": 131.9,
+                        "y": 120.7
+                    },
+                    "uuid": "42982d00-0623-4b0a-9fed-55d4b7589a6d"
+                },
+                {
+                    "description": "Via [CAM_PCLK] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 131.4,
+                        "y": 120.8
+                    },
+                    "uuid": "d46d59b2-2a31-46a2-882d-21343a9b991b"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Hole clearance violation (board setup constraints hole clearance 0.2500 mm; actual 0.1743 mm)",
+            "items": [
+                {
+                    "description": "Track [CAM_SIOD] on B.Cu, length 3.1113 mm",
+                    "pos": {
+                        "x": 131.9,
+                        "y": 120.7
+                    },
+                    "uuid": "42982d00-0623-4b0a-9fed-55d4b7589a6d"
+                },
+                {
+                    "description": "Via [CAM_PCLK] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 131.4,
+                        "y": 120.8
+                    },
+                    "uuid": "d46d59b2-2a31-46a2-882d-21343a9b991b"
+                }
+            ],
+            "severity": "error",
+            "type": "hole_clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.0403 mm)",
+            "items": [
+                {
+                    "description": "Via [CAM_VSYNC] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 125.0,
+                        "y": 149.7
+                    },
+                    "uuid": "034074b2-e800-4523-a5f3-ce9f8b0b1040"
+                },
+                {
+                    "description": "Via [CAM_SIOD] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 124.5,
+                        "y": 150.1
+                    },
+                    "uuid": "c2f19107-414d-4b3b-a9ba-019b12665677"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Hole clearance violation (board setup constraints hole clearance 0.2500 mm; actual 0.1903 mm)",
+            "items": [
+                {
+                    "description": "Via [CAM_VSYNC] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 125.0,
+                        "y": 149.7
+                    },
+                    "uuid": "034074b2-e800-4523-a5f3-ce9f8b0b1040"
+                },
+                {
+                    "description": "Via [CAM_SIOD] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 124.5,
+                        "y": 150.1
+                    },
+                    "uuid": "c2f19107-414d-4b3b-a9ba-019b12665677"
+                }
+            ],
+            "severity": "error",
+            "type": "hole_clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.0403 mm)",
+            "items": [
+                {
+                    "description": "Via [CAM_VSYNC] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 125.0,
+                        "y": 149.7
+                    },
+                    "uuid": "034074b2-e800-4523-a5f3-ce9f8b0b1040"
+                },
+                {
+                    "description": "Via [CAM_SIOD] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 124.5,
+                        "y": 150.1
+                    },
+                    "uuid": "c2f19107-414d-4b3b-a9ba-019b12665677"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Hole clearance violation (board setup constraints hole clearance 0.2500 mm; actual 0.1903 mm)",
+            "items": [
+                {
+                    "description": "Via [CAM_VSYNC] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 125.0,
+                        "y": 149.7
+                    },
+                    "uuid": "034074b2-e800-4523-a5f3-ce9f8b0b1040"
+                },
+                {
+                    "description": "Via [CAM_SIOD] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 124.5,
+                        "y": 150.1
+                    },
+                    "uuid": "c2f19107-414d-4b3b-a9ba-019b12665677"
+                }
+            ],
+            "severity": "error",
+            "type": "hole_clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.0403 mm)",
+            "items": [
+                {
+                    "description": "Via [CAM_VSYNC] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 125.0,
+                        "y": 149.7
+                    },
+                    "uuid": "034074b2-e800-4523-a5f3-ce9f8b0b1040"
+                },
+                {
+                    "description": "Via [CAM_SIOD] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 124.5,
+                        "y": 150.1
+                    },
+                    "uuid": "c2f19107-414d-4b3b-a9ba-019b12665677"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Hole clearance violation (board setup constraints hole clearance 0.2500 mm; actual 0.1903 mm)",
+            "items": [
+                {
+                    "description": "Via [CAM_VSYNC] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 125.0,
+                        "y": 149.7
+                    },
+                    "uuid": "034074b2-e800-4523-a5f3-ce9f8b0b1040"
+                },
+                {
+                    "description": "Via [CAM_SIOD] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 124.5,
+                        "y": 150.1
+                    },
+                    "uuid": "c2f19107-414d-4b3b-a9ba-019b12665677"
+                }
+            ],
+            "severity": "error",
+            "type": "hole_clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.0403 mm)",
+            "items": [
+                {
+                    "description": "Via [CAM_VSYNC] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 125.0,
+                        "y": 149.7
+                    },
+                    "uuid": "034074b2-e800-4523-a5f3-ce9f8b0b1040"
+                },
+                {
+                    "description": "Via [CAM_SIOD] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 124.5,
+                        "y": 150.1
+                    },
+                    "uuid": "c2f19107-414d-4b3b-a9ba-019b12665677"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Hole clearance violation (board setup constraints hole clearance 0.2500 mm; actual 0.1903 mm)",
+            "items": [
+                {
+                    "description": "Via [CAM_VSYNC] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 125.0,
+                        "y": 149.7
+                    },
+                    "uuid": "034074b2-e800-4523-a5f3-ce9f8b0b1040"
+                },
+                {
+                    "description": "Via [CAM_SIOD] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 124.5,
+                        "y": 150.1
+                    },
+                    "uuid": "c2f19107-414d-4b3b-a9ba-019b12665677"
+                }
+            ],
+            "severity": "error",
+            "type": "hole_clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.1062 mm)",
+            "items": [
+                {
+                    "description": "Via [/Power and Protection/GATE] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 120.2,
+                        "y": 120.2
+                    },
+                    "uuid": "7afed012-0949-4cec-9fd5-5edc47285edd"
+                },
+                {
+                    "description": "Via [VSYS] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 121.0,
+                        "y": 120.1
+                    },
+                    "uuid": "d13547a7-cd0d-44db-b6e5-a3680ff75d60"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.1000 mm)",
+            "items": [
+                {
+                    "description": "Track [2V8] on F.Cu, length 1.7000 mm",
+                    "pos": {
+                        "x": 132.9,
+                        "y": 138.1
+                    },
+                    "uuid": "422a419c-17cf-4383-80ac-31c601d6ee8b"
+                },
+                {
+                    "description": "Via [CAM_SIOD] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 132.4,
+                        "y": 138.3
+                    },
+                    "uuid": "c07bd7be-4636-465b-930d-c552b6716f9d"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.1062 mm)",
+            "items": [
+                {
+                    "description": "Via [/Power and Protection/GATE] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 120.2,
+                        "y": 120.2
+                    },
+                    "uuid": "7afed012-0949-4cec-9fd5-5edc47285edd"
+                },
+                {
+                    "description": "Via [VSYS] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 121.0,
+                        "y": 120.1
+                    },
+                    "uuid": "d13547a7-cd0d-44db-b6e5-a3680ff75d60"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.1000 mm)",
+            "items": [
+                {
+                    "description": "Via [CAM_VSYNC] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 121.2,
+                        "y": 135.1
+                    },
+                    "uuid": "44b8eda7-d342-4916-8365-6f184125c400"
+                },
+                {
+                    "description": "Track [CAM_Y4] on B.Cu, length 18.1000 mm",
+                    "pos": {
+                        "x": 121.7,
+                        "y": 119.3
+                    },
+                    "uuid": "f8051ca3-1fcd-4158-8b38-483714fd81d1"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.1062 mm)",
+            "items": [
+                {
+                    "description": "Via [/Power and Protection/GATE] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 120.2,
+                        "y": 120.2
+                    },
+                    "uuid": "7afed012-0949-4cec-9fd5-5edc47285edd"
+                },
+                {
+                    "description": "Via [VSYS] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 121.0,
+                        "y": 120.1
+                    },
+                    "uuid": "d13547a7-cd0d-44db-b6e5-a3680ff75d60"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.1062 mm)",
+            "items": [
+                {
+                    "description": "Via [/Power and Protection/GATE] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 120.2,
+                        "y": 120.2
+                    },
+                    "uuid": "7afed012-0949-4cec-9fd5-5edc47285edd"
+                },
+                {
+                    "description": "Via [VSYS] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 121.0,
+                        "y": 120.1
+                    },
+                    "uuid": "d13547a7-cd0d-44db-b6e5-a3680ff75d60"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.0165 mm)",
+            "items": [
+                {
+                    "description": "Track [VSYS] on F.Cu, length 0.7823 mm",
+                    "pos": {
+                        "x": 120.6375,
+                        "y": 121.675
+                    },
+                    "uuid": "430c7087-004a-4598-8f22-26c441a025e5"
+                },
+                {
+                    "description": "Pad 8 [/Power and Protection/GATE] of U1 on F.Cu",
+                    "pos": {
+                        "x": 120.6375,
+                        "y": 121.025
+                    },
+                    "uuid": "7eaff576-f91e-425f-a786-95457e11b0fc"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Items shorting two nets (nets CAM_Y4 and CAM_HREF)",
+            "items": [
+                {
+                    "description": "Track [CAM_Y4] on F.Cu, length 1.3000 mm",
+                    "pos": {
+                        "x": 124.9,
+                        "y": 140.6
+                    },
+                    "uuid": "24011318-4f98-444a-9e0d-0c3200659a48"
+                },
+                {
+                    "description": "Via [CAM_HREF] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 125.5,
+                        "y": 141.0
+                    },
+                    "uuid": "3fe1907e-3e04-45d9-8977-7b807ecfb78e"
+                }
+            ],
+            "severity": "error",
+            "type": "shorting_items"
+        },
+        {
+            "description": "Hole clearance violation (board setup constraints hole clearance 0.2500 mm; actual 0.1500 mm)",
+            "items": [
+                {
+                    "description": "Track [CAM_Y4] on F.Cu, length 1.3000 mm",
+                    "pos": {
+                        "x": 124.9,
+                        "y": 140.6
+                    },
+                    "uuid": "24011318-4f98-444a-9e0d-0c3200659a48"
+                },
+                {
+                    "description": "Via [CAM_HREF] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 125.5,
+                        "y": 141.0
+                    },
+                    "uuid": "3fe1907e-3e04-45d9-8977-7b807ecfb78e"
+                }
+            ],
+            "severity": "error",
+            "type": "hole_clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.1400 mm)",
+            "items": [
+                {
+                    "description": "Track [/Motor Drivers/BISEN1] on F.Cu, length 1.1830 mm",
+                    "pos": {
+                        "x": 150.3,
+                        "y": 112.0
+                    },
+                    "uuid": "0bdfe6ba-7728-4da1-9ae5-27bf880634d9"
+                },
+                {
+                    "description": "Pad 7 [/Motor Drivers/M2_A] of U8 on F.Cu",
+                    "pos": {
+                        "x": 150.625,
+                        "y": 110.8625
+                    },
+                    "uuid": "5cc44763-aa79-4b80-bd10-e4aaf1f87b14"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.0950 mm)",
+            "items": [
+                {
+                    "description": "Track [2V8] on F.Cu, length 1.9799 mm",
+                    "pos": {
+                        "x": 131.5,
+                        "y": 136.7
+                    },
+                    "uuid": "b01ba7d2-03a9-4e60-a854-ccc6bb0bf604"
+                },
+                {
+                    "description": "Via [CAM_SIOD] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 132.4,
+                        "y": 138.3
+                    },
+                    "uuid": "c07bd7be-4636-465b-930d-c552b6716f9d"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Hole clearance violation (board setup constraints hole clearance 0.2500 mm; actual 0.2450 mm)",
+            "items": [
+                {
+                    "description": "Track [2V8] on F.Cu, length 1.9799 mm",
+                    "pos": {
+                        "x": 131.5,
+                        "y": 136.7
+                    },
+                    "uuid": "b01ba7d2-03a9-4e60-a854-ccc6bb0bf604"
+                },
+                {
+                    "description": "Via [CAM_SIOD] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 132.4,
+                        "y": 138.3
+                    },
+                    "uuid": "c07bd7be-4636-465b-930d-c552b6716f9d"
+                }
+            ],
+            "severity": "error",
+            "type": "hole_clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.1000 mm)",
+            "items": [
+                {
+                    "description": "Track [/Motor Drivers/VINT2] on F.Cu, length 1.3000 mm",
+                    "pos": {
+                        "x": 146.0,
+                        "y": 120.9
+                    },
+                    "uuid": "9ab8c0f0-aa6a-43df-8e59-f7b0007bedd2"
+                },
+                {
+                    "description": "Via [/Motor Drivers/VCP2] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 145.5,
+                        "y": 120.2
+                    },
+                    "uuid": "e50aed0f-a12e-43fa-b779-82c46e077bc3"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Items shorting two nets (nets CAM_Y4 and VSYS)",
+            "items": [
+                {
+                    "description": "Track [CAM_Y4] on F.Cu, length 0.9899 mm",
+                    "pos": {
+                        "x": 122.4,
+                        "y": 115.9
+                    },
+                    "uuid": "a2fc1b5a-4959-4a04-b70d-88457fce3ec7"
+                },
+                {
+                    "description": "Via [VSYS] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 121.6,
+                        "y": 116.1
+                    },
+                    "uuid": "b152b9f8-04be-45bd-ace5-685fdae6c23d"
+                }
+            ],
+            "severity": "error",
+            "type": "shorting_items"
+        },
+        {
+            "description": "Hole clearance violation (board setup constraints hole clearance 0.2500 mm; actual 0.1243 mm)",
+            "items": [
+                {
+                    "description": "Track [CAM_Y4] on F.Cu, length 0.9899 mm",
+                    "pos": {
+                        "x": 122.4,
+                        "y": 115.9
+                    },
+                    "uuid": "a2fc1b5a-4959-4a04-b70d-88457fce3ec7"
+                },
+                {
+                    "description": "Via [VSYS] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 121.6,
+                        "y": 116.1
+                    },
+                    "uuid": "b152b9f8-04be-45bd-ace5-685fdae6c23d"
+                }
+            ],
+            "severity": "error",
+            "type": "hole_clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.1280 mm)",
+            "items": [
+                {
+                    "description": "Via [M3_IN2] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 139.2,
+                        "y": 117.1
+                    },
+                    "uuid": "3ad9a809-24f6-4a04-9b07-92af03f305e6"
+                },
+                {
+                    "description": "Via [MOT_nSLEEP] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 139.4,
+                        "y": 117.8
+                    },
+                    "uuid": "c0ec557d-67dc-451f-a790-91f57248df7b"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.1280 mm)",
+            "items": [
+                {
+                    "description": "Via [M3_IN2] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 139.2,
+                        "y": 117.1
+                    },
+                    "uuid": "3ad9a809-24f6-4a04-9b07-92af03f305e6"
+                },
+                {
+                    "description": "Via [MOT_nSLEEP] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 139.4,
+                        "y": 117.8
+                    },
+                    "uuid": "c0ec557d-67dc-451f-a790-91f57248df7b"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.1099 mm)",
+            "items": [
+                {
+                    "description": "Track [M3_IN2] on F.Cu, length 0.1414 mm",
+                    "pos": {
+                        "x": 147.3,
+                        "y": 117.9
+                    },
+                    "uuid": "a298f862-221f-4990-8514-6acac44b2735"
+                },
+                {
+                    "description": "Via [/Motor Drivers/VINT2] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 147.8,
+                        "y": 117.8
+                    },
+                    "uuid": "af5c2488-c14f-4334-ad21-5c7391326eec"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.1280 mm)",
+            "items": [
+                {
+                    "description": "Via [M3_IN2] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 139.2,
+                        "y": 117.1
+                    },
+                    "uuid": "3ad9a809-24f6-4a04-9b07-92af03f305e6"
+                },
+                {
+                    "description": "Via [MOT_nSLEEP] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 139.4,
+                        "y": 117.8
+                    },
+                    "uuid": "c0ec557d-67dc-451f-a790-91f57248df7b"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.1099 mm)",
+            "items": [
+                {
+                    "description": "Track [M3_IN2] on F.Cu, length 1.2398 mm",
+                    "pos": {
+                        "x": 147.375,
+                        "y": 119.1375
+                    },
+                    "uuid": "6b3c348d-7b6c-4596-99f7-1ae67df5516f"
+                },
+                {
+                    "description": "Via [/Motor Drivers/VINT2] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 147.8,
+                        "y": 117.8
+                    },
+                    "uuid": "af5c2488-c14f-4334-ad21-5c7391326eec"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.1280 mm)",
+            "items": [
+                {
+                    "description": "Via [M3_IN2] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 139.2,
+                        "y": 117.1
+                    },
+                    "uuid": "3ad9a809-24f6-4a04-9b07-92af03f305e6"
+                },
+                {
+                    "description": "Via [MOT_nSLEEP] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 139.4,
+                        "y": 117.8
+                    },
+                    "uuid": "c0ec557d-67dc-451f-a790-91f57248df7b"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.1177 mm)",
+            "items": [
+                {
+                    "description": "Track [CAM_HREF] on F.Cu, length 1.6741 mm",
+                    "pos": {
+                        "x": 124.6,
+                        "y": 110.1
+                    },
+                    "uuid": "37caa452-6a5e-4500-ad5e-2384874fed35"
+                },
+                {
+                    "description": "Pad 8 [CAM_XCLK] of U6 on F.Cu",
+                    "pos": {
+                        "x": 123.25,
+                        "y": 110.38
+                    },
+                    "uuid": "b14f7d01-3827-4168-bf2d-28ca26d17990"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.0299 mm)",
+            "items": [
+                {
+                    "description": "Via [/Motor Drivers/VCP2] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 149.8,
+                        "y": 117.8
+                    },
+                    "uuid": "3b586214-5ee0-4f49-8a75-91b35c5f04e7"
+                },
+                {
+                    "description": "Track [VSYS] on F.Cu, length 2.2388 mm",
+                    "pos": {
+                        "x": 149.4,
+                        "y": 116.9
+                    },
+                    "uuid": "846cd505-5f5d-46be-a975-3e522a9b4f7c"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Hole clearance violation (board setup constraints hole clearance 0.2500 mm; actual 0.1799 mm)",
+            "items": [
+                {
+                    "description": "Track [VSYS] on F.Cu, length 2.2388 mm",
+                    "pos": {
+                        "x": 149.4,
+                        "y": 116.9
+                    },
+                    "uuid": "846cd505-5f5d-46be-a975-3e522a9b4f7c"
+                },
+                {
+                    "description": "Via [/Motor Drivers/VCP2] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 149.8,
+                        "y": 117.8
+                    },
+                    "uuid": "3b586214-5ee0-4f49-8a75-91b35c5f04e7"
+                }
+            ],
+            "severity": "error",
+            "type": "hole_clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.0243 mm)",
+            "items": [
+                {
+                    "description": "Track [CAM_Y4] on F.Cu, length 1.5556 mm",
+                    "pos": {
+                        "x": 126.2,
+                        "y": 140.6
+                    },
+                    "uuid": "c5b52777-69e4-4b83-a98f-e0424246a20c"
+                },
+                {
+                    "description": "Via [CAM_SIOD] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 127.3,
+                        "y": 141.1
+                    },
+                    "uuid": "fb2b2b70-7d6a-4a28-816b-1eb0aefd199b"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Hole clearance violation (board setup constraints hole clearance 0.2500 mm; actual 0.1743 mm)",
+            "items": [
+                {
+                    "description": "Track [CAM_Y4] on F.Cu, length 1.5556 mm",
+                    "pos": {
+                        "x": 126.2,
+                        "y": 140.6
+                    },
+                    "uuid": "c5b52777-69e4-4b83-a98f-e0424246a20c"
+                },
+                {
+                    "description": "Via [CAM_SIOD] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 127.3,
+                        "y": 141.1
+                    },
+                    "uuid": "fb2b2b70-7d6a-4a28-816b-1eb0aefd199b"
+                }
+            ],
+            "severity": "error",
+            "type": "hole_clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.1211 mm)",
+            "items": [
+                {
+                    "description": "Via [CAM_Y4] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 124.9,
+                        "y": 140.6
+                    },
+                    "uuid": "2ad59715-f105-4f4f-9029-e31886a272d2"
+                },
+                {
+                    "description": "Via [CAM_HREF] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 125.5,
+                        "y": 141.0
+                    },
+                    "uuid": "3fe1907e-3e04-45d9-8977-7b807ecfb78e"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.1211 mm)",
+            "items": [
+                {
+                    "description": "Via [CAM_Y4] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 124.9,
+                        "y": 140.6
+                    },
+                    "uuid": "2ad59715-f105-4f4f-9029-e31886a272d2"
+                },
+                {
+                    "description": "Via [CAM_HREF] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 125.5,
+                        "y": 141.0
+                    },
+                    "uuid": "3fe1907e-3e04-45d9-8977-7b807ecfb78e"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.0243 mm)",
+            "items": [
+                {
+                    "description": "Via [CAM_HREF] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 125.5,
+                        "y": 141.0
+                    },
+                    "uuid": "3fe1907e-3e04-45d9-8977-7b807ecfb78e"
+                },
+                {
+                    "description": "Track [/MCU and USB/USB_DN] on B.Cu, length 2.5456 mm",
+                    "pos": {
+                        "x": 125.2,
+                        "y": 141.9
+                    },
+                    "uuid": "854871f6-e36b-4ffa-a0c4-dbef415f2c02"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Hole clearance violation (board setup constraints hole clearance 0.2500 mm; actual 0.1743 mm)",
+            "items": [
+                {
+                    "description": "Track [/MCU and USB/USB_DN] on B.Cu, length 2.5456 mm",
+                    "pos": {
+                        "x": 125.2,
+                        "y": 141.9
+                    },
+                    "uuid": "854871f6-e36b-4ffa-a0c4-dbef415f2c02"
+                },
+                {
+                    "description": "Via [CAM_HREF] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 125.5,
+                        "y": 141.0
+                    },
+                    "uuid": "3fe1907e-3e04-45d9-8977-7b807ecfb78e"
+                }
+            ],
+            "severity": "error",
+            "type": "hole_clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.1211 mm)",
+            "items": [
+                {
+                    "description": "Via [CAM_Y4] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 124.9,
+                        "y": 140.6
+                    },
+                    "uuid": "2ad59715-f105-4f4f-9029-e31886a272d2"
+                },
+                {
+                    "description": "Via [CAM_HREF] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 125.5,
+                        "y": 141.0
+                    },
+                    "uuid": "3fe1907e-3e04-45d9-8977-7b807ecfb78e"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.0099 mm)",
+            "items": [
+                {
+                    "description": "Via [VSYS] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 121.6,
+                        "y": 116.1
+                    },
+                    "uuid": "b152b9f8-04be-45bd-ace5-685fdae6c23d"
+                },
+                {
+                    "description": "Track [CAM_Y4] on F.Cu, length 2.7000 mm",
+                    "pos": {
+                        "x": 121.7,
+                        "y": 116.6
+                    },
+                    "uuid": "f8bd783f-54bb-4651-830e-4cb4e1631d47"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Hole clearance violation (board setup constraints hole clearance 0.2500 mm; actual 0.2099 mm)",
+            "items": [
+                {
+                    "description": "Track [CAM_Y4] on F.Cu, length 2.7000 mm",
+                    "pos": {
+                        "x": 121.7,
+                        "y": 116.6
+                    },
+                    "uuid": "f8bd783f-54bb-4651-830e-4cb4e1631d47"
+                },
+                {
+                    "description": "Via [VSYS] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 121.6,
+                        "y": 116.1
+                    },
+                    "uuid": "b152b9f8-04be-45bd-ace5-685fdae6c23d"
+                }
+            ],
+            "severity": "error",
+            "type": "hole_clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.1211 mm)",
+            "items": [
+                {
+                    "description": "Via [CAM_Y4] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 124.9,
+                        "y": 140.6
+                    },
+                    "uuid": "2ad59715-f105-4f4f-9029-e31886a272d2"
+                },
+                {
+                    "description": "Via [CAM_HREF] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 125.5,
+                        "y": 141.0
+                    },
+                    "uuid": "3fe1907e-3e04-45d9-8977-7b807ecfb78e"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.1000 mm)",
+            "items": [
+                {
+                    "description": "Track [/MCU and USB/USB_DN] on B.Cu, length 15.3000 mm",
+                    "pos": {
+                        "x": 124.3,
+                        "y": 136.4
+                    },
+                    "uuid": "1e4ebb24-bbe0-4675-adee-1d76cf087b0d"
+                },
+                {
+                    "description": "Via [CAM_HREF] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 123.8,
+                        "y": 125.9
+                    },
+                    "uuid": "cf33dd1b-ffb8-485b-9b6d-871cb69dba6e"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.0322 mm)",
+            "items": [
+                {
+                    "description": "Pad 6 [unconnected-(U1-~{FAULT}-Pad6)] of U1 on F.Cu",
+                    "pos": {
+                        "x": 120.6375,
+                        "y": 122.325
+                    },
+                    "uuid": "3e4aec4b-19cc-490f-aca2-36d7dffd9a27"
+                },
+                {
+                    "description": "Track [VSYS] on F.Cu, length 1.2756 mm",
+                    "pos": {
+                        "x": 121.8,
+                        "y": 122.2
+                    },
+                    "uuid": "e33993ce-558d-40bd-b664-c82a6c13e412"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.1500 mm; actual 0.1000 mm)",
+            "items": [
+                {
+                    "description": "Track [/Audio and Camera/CAM_PWDN] on F.Cu, length 6.9000 mm",
+                    "pos": {
+                        "x": 129.8,
+                        "y": 151.1
+                    },
+                    "uuid": "619a2a59-635f-4c46-8405-4726bd0cb3a6"
+                },
+                {
+                    "description": "Via [CAM_Y9] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 130.9,
+                        "y": 150.6
+                    },
+                    "uuid": "addc4c16-f7e3-45ab-8694-7384e42301d4"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Items shorting two nets (nets /MCU and USB/USB_DN and CAM_Y9)",
+            "items": [
+                {
+                    "description": "Track [/MCU and USB/USB_DN] on B.Cu, length 15.3000 mm",
+                    "pos": {
+                        "x": 124.3,
+                        "y": 136.4
+                    },
+                    "uuid": "1e4ebb24-bbe0-4675-adee-1d76cf087b0d"
+                },
+                {
+                    "description": "Via [CAM_Y9] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 124.7,
+                        "y": 132.1
+                    },
+                    "uuid": "f1b426ef-d1a4-41c1-baf9-a4a71a049a6f"
+                }
+            ],
+            "severity": "error",
+            "type": "shorting_items"
+        },
+        {
+            "description": "Hole clearance violation (board setup constraints hole clearance 0.2500 mm; actual 0.1500 mm)",
+            "items": [
+                {
+                    "description": "Track [/MCU and USB/USB_DN] on B.Cu, length 15.3000 mm",
+                    "pos": {
+                        "x": 124.3,
+                        "y": 136.4
+                    },
+                    "uuid": "1e4ebb24-bbe0-4675-adee-1d76cf087b0d"
+                },
+                {
+                    "description": "Via [CAM_Y9] on F.Cu - B.Cu",
+                    "pos": {
+                        "x": 124.7,
+                        "y": 132.1
+                    },
+                    "uuid": "f1b426ef-d1a4-41c1-baf9-a4a71a049a6f"
+                }
+            ],
+            "severity": "error",
+            "type": "hole_clearance"
+        },
+        {
+            "description": "Thermal relief connection to zone incomplete (layer B.Cu; zone min spoke count 2; actual 1)",
+            "items": [
+                {
+                    "description": "Zone 'GND_BOTTOM' [GND] on B.Cu, priority 0",
+                    "pos": {
+                        "x": 99.5,
+                        "y": 99.5
+                    },
+                    "uuid": "4a68ef7f-2812-4522-9433-118b0063d042"
+                },
+                {
+                    "description": "PTH pad 17 [GND] of U8",
+                    "pos": {
+                        "x": 150.8,
+                        "y": 109.0
+                    },
+                    "uuid": "a5088ba4-280f-43ed-b5eb-2cfcd0317a02"
+                }
+            ],
+            "severity": "error",
+            "type": "starved_thermal"
+        },
+        {
+            "description": "Front solder mask aperture bridges items with different nets",
+            "items": [
+                {
+                    "description": "Track [/MCU and USB/EN] on F.Cu, length 4.4205 mm",
+                    "pos": {
+                        "x": 135.5,
+                        "y": 121.775
+                    },
+                    "uuid": "f7f489ca-3348-40fb-bde1-9cd6755fdde2"
+                },
+                {
+                    "description": "Pad 1 [/MCU and USB/BOOT] of SW3 on F.Cu",
+                    "pos": {
+                        "x": 133.375,
+                        "y": 121.525
+                    },
+                    "uuid": "11d4b07f-5e83-4647-9c37-3650a93f0c08"
+                }
+            ],
+            "severity": "error",
+            "type": "solder_mask_bridge"
+        },
+        {
+            "description": "Front solder mask aperture bridges items with different nets",
+            "items": [
+                {
+                    "description": "Track [VSYS] on F.Cu, length 0.7823 mm",
+                    "pos": {
+                        "x": 120.6375,
+                        "y": 121.675
+                    },
+                    "uuid": "430c7087-004a-4598-8f22-26c441a025e5"
+                },
+                {
+                    "description": "Pad 8 [/Power and Protection/GATE] of U1 on F.Cu",
+                    "pos": {
+                        "x": 120.6375,
+                        "y": 121.025
+                    },
+                    "uuid": "7eaff576-f91e-425f-a786-95457e11b0fc"
+                }
+            ],
+            "severity": "error",
+            "type": "solder_mask_bridge"
+        },
+        {
+            "description": "Front solder mask aperture bridges items with different nets",
+            "items": [
+                {
+                    "description": "Track [VSYS] on F.Cu, length 1.2756 mm",
+                    "pos": {
+                        "x": 121.8,
+                        "y": 122.2
+                    },
+                    "uuid": "e33993ce-558d-40bd-b664-c82a6c13e412"
+                },
+                {
+                    "description": "Pad 6 [unconnected-(U1-~{FAULT}-Pad6)] of U1 on F.Cu",
+                    "pos": {
+                        "x": 120.6375,
+                        "y": 122.325
+                    },
+                    "uuid": "3e4aec4b-19cc-490f-aca2-36d7dffd9a27"
+                }
+            ],
+            "severity": "error",
+            "type": "solder_mask_bridge"
+        },
+        {
+            "description": "Front solder mask aperture bridges items with different nets",
+            "items": [
+                {
+                    "description": "Track [CAM_Y8] on F.Cu, length 4.2013 mm",
+                    "pos": {
+                        "x": 126.4,
+                        "y": 115.7
+                    },
+                    "uuid": "e99e4b79-8b9b-47c7-a991-74c78ec6f171"
+                },
+                {
+                    "description": "Pad 11 [CAM_Y7] of U6 on F.Cu",
+                    "pos": {
+                        "x": 123.25,
+                        "y": 114.19
+                    },
+                    "uuid": "c2d5a69a-8d55-4d98-95b5-cc474ce70900"
+                }
+            ],
+            "severity": "error",
+            "type": "solder_mask_bridge"
+        },
+        {
+            "description": "Front solder mask aperture bridges items with different nets",
+            "items": [
+                {
+                    "description": "Track [/MCU and USB/UART_TX] on F.Cu, length 8.0432 mm",
+                    "pos": {
+                        "x": 134.7,
+                        "y": 110.6
+                    },
+                    "uuid": "75274e0d-8411-4e22-b827-e15f3064ebe8"
+                },
+                {
+                    "description": "Pad 36 [/MCU and USB/UART_RX] of U6 on F.Cu",
+                    "pos": {
+                        "x": 140.75,
+                        "y": 106.57
+                    },
+                    "uuid": "3b2eabc5-4bda-466b-8244-da11e807108c"
+                }
+            ],
+            "severity": "error",
+            "type": "solder_mask_bridge"
+        }
+    ]
+}

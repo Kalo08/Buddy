@@ -16,6 +16,36 @@ tracks = routes["tracks"]
 vias = routes["vias"]
 nets = board.GetNetsByName()
 
+def split_t_junctions(tracks):
+    """KiCad joins wires only at endpoints: split a wire wherever another wire of the same net ends on it."""
+    out = [list(t) for t in tracks]
+    changed = True
+    while changed:
+        changed = False
+        ends = {}
+        for t in out:
+            ends.setdefault((t[6], t[0]), set()).update([(round(t[1], 3), round(t[2], 3)), (round(t[3], 3), round(t[4], 3))])
+        for idx, t in enumerate(out):
+            l, xa, ya, xb, yb, w, net = t
+            for (px, py) in ends[(net, l)]:
+                if (abs(px - xa) < 5e-4 and abs(py - ya) < 5e-4) or (abs(px - xb) < 5e-4 and abs(py - yb) < 5e-4):
+                    continue
+                dx, dy = xb - xa, yb - ya
+                L2 = dx * dx + dy * dy
+                if L2 < 1e-9:
+                    continue
+                u = ((px - xa) * dx + (py - ya) * dy) / L2
+                if 0 < u < 1 and abs(xa + u * dx - px) < 2e-3 and abs(ya + u * dy - py) < 2e-3:
+                    out[idx] = [l, xa, ya, px, py, w, net]
+                    out.append([l, px, py, xb, yb, w, net])
+                    changed = True
+                    break
+            if changed:
+                break
+    return out
+
+
+tracks = split_t_junctions(tracks)
 for l, xa, ya, xb, yb, w, net in tracks:
     t = pcbnew.PCB_TRACK(board)
     t.SetStart(pcbnew.VECTOR2I(FM(xa), FM(ya)))
@@ -43,7 +73,7 @@ for layer, net, name, prio in ((pcbnew.In1_Cu, "GND", "GND_PLANE", 0), (pcbnew.I
     z.SetAssignedPriority(prio)
     ol = z.Outline()
     ol.NewOutline()
-    for x, y in ((99.5, 99.5), (164.5, 99.5), (164.5, 156.5), (99.5, 156.5)):
+    for x, y in ((99.5, 99.5), (172.5, 99.5), (172.5, 162.5), (99.5, 162.5)):
         ol.Append(FM(x), FM(y))
     z.SetMinThickness(FM(0.2))
     z.SetLocalClearance(FM(0.2))

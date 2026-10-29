@@ -94,10 +94,10 @@ struct __attribute__((packed)) BuddyConfig {
 // 480×480 box → the square OV5647 streams 448×448 (was 288×288 at q50).
 // Bigger/sharper = more data per frame: if video lags on a weak connection
 // (phone hotspot), drop CAM_FPS to ~10 or go back to 320 / q50.
-#define CAM_MAX_W      480
-#define CAM_MAX_H      480
-#define CAM_FPS         15
-#define CAM_QUALITY     70     // JPEG 1-100
+#define CAM_MAX_W      320
+#define CAM_MAX_H      320
+#define CAM_FPS         12     // upper limit — the sketch slows itself down if the link can't keep up
+#define CAM_QUALITY     55     // JPEG 1-100
 #define CAM_MIRROR   false
 #define CAM_FLIP     false
 #define CAM_SWAP     false     // set true if colors look wrong (red/blue noise)
@@ -127,6 +127,7 @@ struct __attribute__((packed)) BuddyConfig {
 // hear its own voice come back. false = half duplex: the mic is muted while
 // the speaker plays (and MIC_ECHO_GUARD_MS after) — the old behavior.
 #define MIC_FULL_DUPLEX  true
+#define AEC_LOW_COST     false // true = lighter echo canceller (less CPU, a bit more echo)
 #define AEC_SWAP_SLOTS   false // set true if the mic sounds like the speaker only
 #define MIC_ECHO_GUARD_MS 300  // half-duplex mode only
 
@@ -142,7 +143,12 @@ i2c_master_bus_handle_t i2cBus;
 
 struct Frame { uint8_t* buf; size_t len; };
 QueueHandle_t txQueue;
-#define TX_QUEUE_DEPTH 2   // keep small to minimise frame lag
+#define TX_QUEUE_DEPTH 1   // one frame in flight: a backed-up link must never pile up old video
+
+// Video, mic, speaker and drive commands all share ONE websocket, so a video
+// frame that's slow to send delays the audio behind it. Minimum time between
+// video frames; loop() raises it when sends are slow and relaxes it when not.
+volatile int64_t camGapUs = 1000000 / CAM_FPS;
 QueueHandle_t micQueue;    // mic chunks waiting for loop() to send
 #define MIC_QUEUE_DEPTH 10 // ~1 s of audio — rides out a slow video send
 
@@ -519,7 +525,7 @@ void micTask(void*) {
   // half-duplex echo guard.
   aec_handle_t* aec = NULL;
   if (MIC_FULL_DUPLEX) {
-    aec = aec_create(SPK_RATE, 4, 1, AEC_MODE_FD_HIGH_PERF);
+    aec = aec_create(SPK_RATE, 4, 1, AEC_LOW_COST ? AEC_MODE_FD_LOW_COST : AEC_MODE_FD_HIGH_PERF);
     if (!aec) aec = aec_create(SPK_RATE, 4, 1, AEC_MODE_VOIP_HIGH_PERF);
     if (aec) Serial.printf("[mic] echo canceller on — full duplex (%d-sample frames)\n",
                            aec_get_chunksize(aec));
@@ -789,7 +795,6 @@ static size_t encodeFrame(const uint8_t* frame) {
 }
 
 void cameraTask(void*) {
-  const int64_t periodUs = 1000000 / CAM_FPS;
   int64_t nextUs = 0;
   for (;;) {
     struct v4l2_buffer buf = {};
@@ -799,8 +804,10 @@ void cameraTask(void*) {
 
     size_t len = 0;
     int64_t now = esp_timer_get_time();
-    if (peerOnline && now >= nextUs) {
-      nextUs = now + periodUs;
+    // Skip the frame (don't even encode it) while the last one is still waiting
+    // to be sent — a stale frame is worse than a dropped one.
+    if (peerOnline && now >= nextUs && uxQueueMessagesWaiting(txQueue) == 0) {
+      nextUs = now + camGapUs;
       len = encodeFrame(camBufs[buf.index]);
     }
     ioctl(camFd, VIDIOC_QBUF, &buf);  // hand the buffer straight back to the sensor
@@ -854,8 +861,8 @@ static void uvcStreamEvent(const uvc_host_stream_event_data_t* e, void*) {
 // Runs in the UVC driver task: copy the frame out and hand the buffer back.
 static bool uvcFrame(const uvc_host_frame_t* f, void*) {
   int64_t now = esp_timer_get_time();
-  if (peerOnline && f->data_len > 0 && now >= uvcNextUs) {
-    uvcNextUs = now + 1000000 / CAM_FPS;
+  if (peerOnline && f->data_len > 0 && now >= uvcNextUs && uxQueueMessagesWaiting(txQueue) == 0) {
+    uvcNextUs = now + camGapUs;
     uint8_t* out = (uint8_t*)ps_malloc(1 + f->data_len);
     if (out) {
       out[0] = TYPE_VIDEO;
@@ -1118,6 +1125,10 @@ void setup() {
   Serial.println("[buddy] running");
 }
 
+static unsigned long netFrames = 0;
+static int64_t       netSendUs = 0;
+static size_t        netBytes  = 0;
+
 void loop() {
   Frame f;
   // Mic audio first — it's small and late audio is worse than a late frame.
@@ -1126,11 +1137,34 @@ void loop() {
     free(f.buf);
   }
   while (xQueueReceive(txQueue, &f, 0) == pdTRUE) {
-    if (wsLive && peerOnline) ws.sendBIN(f.buf, f.len);
+    if (wsLive && peerOnline) {
+      int64_t t0 = esp_timer_get_time();
+      ws.sendBIN(f.buf, f.len);
+      int64_t dt = esp_timer_get_time() - t0;
+      // Throttle: if a frame took dt to push out, wait ~3x that before the
+      // next one so audio and drive commands get the link in between.
+      int64_t base   = 1000000 / CAM_FPS;
+      int64_t target = constrain(dt * 3, base, (int64_t)1500000);
+      camGapUs = (camGapUs * 3 + target) / 4;
+      netFrames++; netSendUs += dt; netBytes += f.len;
+    }
     free(f.buf);
   }
 
   ws.loop();
+
+  // Every 3 s: what the link is doing. Paste this line if video still lags.
+  static unsigned long lastNet = 0;
+  if (millis() - lastNet > 3000) {
+    unsigned long span = millis() - lastNet;
+    lastNet = millis();
+    if (netFrames && wsLive && peerOnline)
+      Serial.printf("[net] video %.1f fps, %u KB/s, send %lu ms/frame, gap %lld ms, wifi %d dBm, free heap %u KB\n",
+                    netFrames * 1000.0f / span, (unsigned)(netBytes / 1024 * 1000 / span),
+                    (unsigned long)(netSendUs / 1000 / netFrames), camGapUs / 1000,
+                    WiFi.RSSI(), (unsigned)(ESP.getFreeHeap() / 1024));
+    netFrames = 0; netSendUs = 0; netBytes = 0;
+  }
 
   static unsigned long lastCheck = 0;
   if (millis() - lastCheck > 5000) {

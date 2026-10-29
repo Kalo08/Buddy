@@ -22,12 +22,13 @@ import numpy as np
 RES = 0.1
 X0, Y0 = 99.9, 99.9
 CLR = 0.15            # board clearance rule
-MARGIN = 0.07         # raster safety margin (half a cell diagonal)
+MARGIN = 0.10         # raster safety margin (half a cell diagonal)
 EDGE_CLR = 0.5        # copper to board edge
 HOLE_CLR = 0.25       # copper to NPTH hole
 B_COST = 1.1          # slight preference for F.Cu
 PLANES = {"GND": "In1.Cu", "3V3": "In2.Cu"}   # these nets drop to inner planes
-VIA_COST = 14.0
+VIA_COST = 45.0
+BEND_COST = 2.5
 NARROW = 0.2
 POWER = {"VSYS": 0.5, "/Power and Protection/VBAT_IN": 0.5, "/Power and Protection/VBAT_F": 0.5,
          "/Power and Protection/Q_SRC": 0.5, "VBUS": 0.5, "/Power and Protection/VBUS_F": 0.5,
@@ -81,6 +82,7 @@ for p in geom["pads"]:
 
 # static copper: pads
 pad_owner = np.zeros((2, H, W), np.int32)
+fan_owner = np.zeros((2, H, W), np.int32)   # plane fan-out stubs/vias (never waived)
 pad_any = np.zeros((2, H, W), bool)
 hard = np.zeros((H, W), bool)          # edge + NPTH (both layers)
 for p in geom["pads"]:
@@ -195,7 +197,8 @@ def pin_cells(key, layer_mask):
     out = []
     for p in pins[key]["pads"]:
         l, t, r, b = p["bbox"]
-        j0, i0 = cell(l, t); j1, i1 = cell(r, b)
+        inset = max(0.0, min(0.1, min(r - l, b - t) / 2 - 0.06))
+        j0, i0 = cell(l + inset, t + inset); j1, i1 = cell(r - inset, b - inset)
         for li, ln in enumerate("FB"):
             if ln not in p["layers"]:
                 continue
@@ -214,7 +217,7 @@ MOVES = [(1, 0, 1.0), (-1, 0, 1.0), (0, 1, 1.0), (0, -1, 1.0),
          (1, 1, SQ2), (1, -1, SQ2), (-1, 1, SQ2), (-1, -1, SQ2)]
 
 
-def astar(sources, targets, tx, ty, free, soft, viafree, window, pen):
+def astar(sources, targets, tx, ty, free, soft, viafree, window, pen, cap=300000):
     """free/soft/viafree are bytes per layer; soft==1 means passable only with penalty."""
     ci0, ci1, cj0, cj1 = window
     tset = set(targets)
@@ -238,10 +241,17 @@ def astar(sources, targets, tx, ty, free, soft, viafree, window, pen):
                 path.append(s); s = parent[s]
             return path[::-1], expanded
         expanded += 1
-        if expanded > 900000:
+        if expanded > cap:
             return None, expanded
         l, rem = divmod(s, N); j, i = divmod(rem, W)
         lc = B_COST if l else 1.0
+        pdir = None
+        ps = parent[s]
+        if ps != -1:
+            pl, prem = divmod(ps, N)
+            if pl == l:
+                pj, pi = divmod(prem, W)
+                pdir = (i - pi, j - pj)
         for di, dj, c in MOVES:
             ni, nj = i + di, j + dj
             if ni < ci0 or ni > ci1 or nj < cj0 or nj > cj1:
@@ -249,7 +259,8 @@ def astar(sources, targets, tx, ty, free, soft, viafree, window, pen):
             ns = l * N + nj * W + ni
             if not free[ns] and ns not in tset:
                 continue
-            ng = gc + c * lc + (pen * (1.0 + hist_flat[ns]) if soft[ns] else 0.0) + hist_flat[ns] * 0.3
+            ng = gc + c * lc + (BEND_COST if pdir is not None and (di, dj) != pdir else 0.0) \
+                + (pen * (1.0 + hist_flat[ns]) if soft[ns] else 0.0) + hist_flat[ns] * 0.3
             if ng < g.get(ns, 1e18):
                 g[ns] = ng; parent[ns] = s
                 h = max(abs(ni - tx), abs(nj - ty)) + (SQ2 - 1) * min(abs(ni - tx), abs(nj - ty))
@@ -296,14 +307,24 @@ def masks_for(net, width):
     copper = np.where(pad_owner != 0, pad_owner, track_owner)
     static_foreign = ((pad_owner != 0) & (pad_owner != nid))
     track_foreign = ((track_owner != 0) & (track_owner != nid) & (pad_owner == 0))
+    frozen = np.isin(track_owner, list(FROZEN - {nid})) if FROZEN else np.zeros_like(track_foreign)
+    static_foreign = static_foreign | frozen
+    track_foreign = track_foreign & ~frozen
     r_n = NARROW / 2 + CLR + MARGIN
     r_w = width / 2 + CLR + MARGIN
     vd, _ = VIA[width]
     r_v = vd / 2 + CLR + MARGIN
-    hard_n = np.stack([dilate(static_foreign[l] | hard, r_n) for l in (0, 1)])
+    fan_f = ((fan_owner != 0) | frozen) & (fan_owner != nid)
+    pad_f = static_foreign & ~(fan_owner != 0)
+    acc = access_mask(net)
+    # pad-to-pad squeeze on fine-pitch pins is waived (acc) but vias, stubs
+    # and foreign tracks are never waived
+    def hard_for(r):
+        return np.stack([dilate(pad_f[l], r) & ~acc[l] | dilate(fan_f[l] | hard, r) for l in (0, 1)])
+    hard_n = hard_for(r_n)
     soft_n = np.stack([dilate(track_foreign[l], r_n) for l in (0, 1)])
     if width > NARROW:
-        hard_w = np.stack([dilate(static_foreign[l] | hard, r_w) for l in (0, 1)])
+        hard_w = hard_for(r_w)
         soft_w = np.stack([dilate(track_foreign[l], r_w) for l in (0, 1)])
         near = np.zeros((H, W), bool)
         for k, v in pins.items():
@@ -315,10 +336,6 @@ def masks_for(net, width):
         soft_c = np.where(near, soft_n, soft_w)
     else:
         hard_w, soft_w, hard_c, soft_c = hard_n, soft_n, hard_n, soft_n
-    acc = access_mask(net)
-    hard_c = hard_c & ~acc
-    soft_c = soft_c & ~acc
-    hard_n = hard_n & ~acc
     # vias: keep off every pad (any net) and off foreign tracks
     via_block = dilate(pad_any[0] | pad_any[1] | hard, r_v) | \
         dilate((static_foreign[0] | static_foreign[1]), r_v)
@@ -376,9 +393,7 @@ def build_geometry(path, net, width, target_key, m):
         l, rem = divmod(s, N); j, i = divmod(rem, W)
         pts.append((l, xs[i], ys[j]))
     sx, sy = snap_start(path[0], net, m)
-    pts[0] = (pts[0][0], sx, sy)
     tx, ty = pin_center(target_key)
-    pts[-1] = (pts[-1][0], tx, ty)
     blocked_c = m["hard_c"] | m["soft_c"]
     blocked_w = m["hard_w"] | m["soft_w"]
     nid, copper = m["nid"], m["copper"]
@@ -401,23 +416,17 @@ def build_geometry(path, net, width, target_key, m):
         l = run[0][0]
         i = 0
         while i < len(run) - 1:
-            # gallop then binary search for the farthest visible point
-            step, last_ok = 1, i + 1
-            while i + step < len(run) and seg_ok(l, run[i][1], run[i][2], run[i + step][1], run[i + step][2], blocked_c, nid, copper):
-                last_ok = i + step; step *= 2
-            lo, hi = last_ok, min(len(run) - 1, i + step)
-            while hi - lo > 1:
-                mid = (lo + hi) // 2
-                if seg_ok(l, run[i][1], run[i][2], run[mid][1], run[mid][2], blocked_c, nid, copper):
-                    lo = mid
-                else:
-                    hi = mid
-            j = lo
+            d0 = (round((run[i + 1][1] - run[i][1]) / RES), round((run[i + 1][2] - run[i][2]) / RES))
+            j = i + 1
+            while j + 1 < len(run) and (round((run[j + 1][1] - run[j][1]) / RES),
+                                        round((run[j + 1][2] - run[j][2]) / RES)) == d0:
+                j += 1
             xa, ya, xb, yb = run[i][1], run[i][2], run[j][1], run[j][2]
             if math.hypot(xb - xa, yb - ya) > 1e-6:
                 w = width if (width > NARROW and seg_ok(l, xa, ya, xb, yb, blocked_w, nid, copper)) else NARROW
-                tracks.append((l, round(xa, 4), round(ya, 4), round(xb, 4), round(yb, 4), w))
+                tracks.append([l, xa, ya, xb, yb, w])
             i = j
+    tracks = [(l, round(a, 4), round(b2, 4), round(c, 4), round(d, 4), w) for l, a, b2, c, d, w in tracks]
     return tracks, [(round(x, 4), round(y, 4), d, dr) for x, y, d, dr in vias]
 
 
@@ -435,8 +444,21 @@ def route_conn(net, key, allow_soft, full_board=False):
     vblock = m["via_block"] | (False if allow_soft else m["via_soft"])
     viafree = (~vblock).ravel().astype(np.uint8).tobytes()
     # sources: only copper already joined to this net's tree
-    tree = np.argwhere(track_owner == nid)
-    sources = [int(l * N + j * W + i) for l, j, i in tree if free_l[l][j, i]]
+    sources = []
+    for (n2, k2), rt in routes.items():
+        if n2 != net:
+            continue
+        for tl, xa, ya, xb, yb, w in rt["tracks"]:
+            steps = max(1, int(round(max(abs(xb - xa), abs(yb - ya)) / RES)))
+            for q in range(steps + 1):
+                j, i = cell(xa + (xb - xa) * q / steps, ya + (yb - ya) * q / steps)
+                if free_l[tl][j, i]:
+                    sources.append(tl * N + j * W + i)
+        for vx, vy, vd, vdr in rt["vias"]:
+            j, i = cell(vx, vy)
+            for li in (0, 1):
+                if free_l[li][j, i]:
+                    sources.append(li * N + j * W + i)
     for k in connected[net]:
         sources += pin_cells(k, free_l)
     targets = pin_cells(key, free_l)
@@ -453,7 +475,8 @@ def route_conn(net, key, allow_soft, full_board=False):
                   max(0, min(near[0], ty) - mg), min(H - 1, max(near[0], ty) + mg))
     global hist_flat
     hist_flat = history.ravel().tolist()
-    path, _ = astar(sources, targets, tx, ty, free, soft, viafree, window, pen=25.0)
+    path, _ = astar(sources, targets, tx, ty, free, soft, viafree, window, pen=25.0,
+                    cap=1500000 if full_board else 300000)
     if path is None:
         return None
     tracks, vias = build_geometry(path, net, width, key, m)
@@ -462,6 +485,7 @@ def route_conn(net, key, allow_soft, full_board=False):
 
 
 hist_flat = None
+FROZEN = set()
 connected = {net: {k} for net, k in seeds.items()}
 
 
@@ -507,10 +531,11 @@ def plane_fanout():
         tw = 0.3 if min(p["bbox"][2] - p["bbox"][0], p["bbox"][3] - p["bbox"][1]) >= 0.5 else NARROW
         blk = dilate(foreign[l] | hard, tw / 2 + CLR + MARGIN) & ~acc[l]
         r_v = VD / 2 + CLR + MARGIN
-        via_bad = dilate(pad_any[0] | pad_any[1] | hard | foreign[0] | foreign[1], r_v)
+        own_pads = (pad_owner[0] == nid) | (pad_owner[1] == nid)
+        via_bad = dilate(foreign[0] | foreign[1] | hard, r_v) | dilate(own_pads, 0.38)
         best = None
-        for rr in np.arange(0.5, 3.01, 0.1):
-            for a in range(0, 360, 10):
+        for rr in np.arange(0.5, 2.51, 0.1):
+            for a in range(0, 360, 45):
                 vx = px + rr * math.cos(math.radians(a)); vy = py + rr * math.sin(math.radians(a))
                 j, i = cell(vx, vy)
                 if not (0 <= j < H and 0 <= i < W) or via_bad[j, i]:
@@ -518,7 +543,8 @@ def plane_fanout():
                 if any(math.hypot(vx - qx, vy - qy) < VD + 0.35 for qx, qy in placed):
                     continue
                 if seg_ok(l, px, py, vx, vy, np.stack([blk, blk]), nid, copper):
-                    best = (round(vx, 3), round(vy, 3))
+                    best = (round(px + round(rr * math.cos(math.radians(a)), 3), 4),
+                            round(py + round(rr * math.sin(math.radians(a)), 3), 4))
                     break
             if best:
                 break
@@ -529,14 +555,18 @@ def plane_fanout():
             fanout["skipped"].append([net, list(key)])
             continue
         vx, vy = best
+        if best == (px, py):
+            pass
         placed.append(best)
         fanout["tracks"].append([l, px, py, vx, vy, tw, net])
         fanout["vias"].append([vx, vy, VD, VDR, net])
         (j0, j1, i0, i1), m = raster_segment(px, py, vx, vy, tw / 2)
         pad_owner[l, j0:j1, i0:i1][m] = nid
+        fan_owner[l, j0:j1, i0:i1][m] = nid
         (j0, j1, i0, i1), m = raster_segment(vx, vy, vx, vy, VD / 2)
         for li in (0, 1):
             pad_owner[li, j0:j1, i0:i1][m] = nid
+            fan_owner[li, j0:j1, i0:i1][m] = nid
             pad_any[li, j0:j1, i0:i1] |= m
     print(f"plane fan-out: {len(fanout['vias'])} vias, skipped {fanout['skipped']}", flush=True)
 
@@ -549,9 +579,13 @@ def main():
     attempts = {}
     failed = set()
     steps = 0
-    while queue and steps < 4 * len(conns):
+    n_power = sum(1 for c in conns if c[0] in POWER)
+    while queue and steps < 3 * len(conns):
         steps += 1
         ci = queue.pop(0)
+        if not FROZEN and ci >= n_power:
+            FROZEN.update(net_id[n] for n in POWER if n in net_id and any(k[0] == n for k in routes))
+            print(f"  power stage done: froze {len(FROZEN)} nets", flush=True)
         net, key = key_of[ci]
         attempts[ci] = attempts.get(ci, 0) + 1
         res = route_conn(net, key, allow_soft=False)
@@ -592,6 +626,8 @@ def main():
         out["tracks"] += [[l, a, b, c, d, w, net] for l, a, b, c, d, w in r["tracks"]]
         out["vias"] += [[x, y, d, dr, net] for x, y, d, dr in r["vias"]]
     out["failed"] = [[key_of[c][0], list(key_of[c][1])] for c in failed if key_of[c] not in routes]
+    out["conns"] = [{"net": net, "key": list(key), "tracks": [list(t) for t in r["tracks"]],
+                     "vias": [list(v) for v in r["vias"]]} for (net, key), r in routes.items()]
     json.dump(out, open("routes.json", "w"))
     print(f"done: {len(routes)}/{len(conns)} connections, {len(out['tracks'])} tracks, "
           f"{len(out['vias'])} vias, {len(out['failed'])} failed, {time.time() - t0:.0f}s")

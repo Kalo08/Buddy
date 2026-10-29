@@ -488,7 +488,7 @@
     "pinned_symbol_libs": []
   },
   "meta": {
-    "filename": "buddy_main.kicad_pro",
+    "filename": "routed.kicad_pro",
     "version": 3
   },
   "net_settings": {
@@ -515,8 +515,11 @@
       {
         "clearance": 0.15,
         "name": "Power",
+        "pcb_color": "rgba(0, 0, 0, 0.000)",
         "priority": -1,
+        "schematic_color": "rgba(0, 0, 0, 0.000)",
         "track_width": 0.5,
+        "tuning_profile": "",
         "via_diameter": 0.8,
         "via_drill": 0.4
       }

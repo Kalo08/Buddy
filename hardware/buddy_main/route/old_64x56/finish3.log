@@ -1,0 +1,33 @@
+plane fan-out: 96 vias, skipped []
+baseline: 1 violations, 35 open items, 21 unrouted
+  undo /Motor Drivers/BISEN1 -> ('U8', '6')
+  undo /Motor Drivers/M1_B -> ('U8', '4')
+  undo /Motor Drivers/M3_B -> ('U9', '4')
+  undo /Motor Drivers/M2_B -> ('U8', '5')
+  undo VSYS -> ('U1', '7')
+  undo VSYS -> ('C23', '1')
+  undo VSYS -> ('C22', '1')
+  undo VSYS -> ('U8', '12')
+  undo VSYS -> ('C24', '2')
+  undo /Motor Drivers/VCP2 -> ('C28', '1')
+  undo M1_IN1 -> ('U6', '38')
+  undo /Audio and Camera/SPK_N -> ('J8', '2')
+  undo M3_IN2 -> ('U6', '25')
+  undo /Power and Protection/GATE -> ('U1', '8')
+  undo /Power and Protection/OV -> ('U1', '3')
+  undo M1_IN2 -> ('U8', '15')
+  undo /MCU and USB/UART_TX -> ('U6', '37')
+  undo CAM_Y2 -> ('U6', '19')
+  undo CAM_Y7 -> ('J10', '16')
+  undo CAM_Y8 -> ('U6', '10')
+  undo CAM_SIOC -> ('U6', '5')
+Traceback (most recent call last):
+  File "C:\Users\Gavin\Downloads\Hack Jam\Buddy\hardware\buddy_main\route\finish3.py", line 123, in <module>
+    v, u = drc_count()
+           ^^^^^^^^^^^
+  File "C:\Users\Gavin\Downloads\Hack Jam\Buddy\hardware\buddy_main\route\finish3.py", line 51, in drc_count
+    save()
+  File "C:\Users\Gavin\Downloads\Hack Jam\Buddy\hardware\buddy_main\route\finish3.py", line 47, in save
+    json.dump(out, open("routes.json", "w"))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^
+OSError: [Errno 22] Invalid argument: 'routes.json'

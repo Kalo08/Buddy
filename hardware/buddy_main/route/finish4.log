@@ -1,0 +1,17 @@
+plane fan-out: 96 vias, skipped []
+baseline: 2 violations, 33 open items, 13 unrouted
+  skip /Motor Drivers/M2_B -> ('U8', '5'): no path
+  undo /Motor Drivers/M2_A -> ('J6', '1')
+  undo VSYS -> ('U1', '7')
+  skip /Motor Drivers/VCP2 -> ('C28', '1'): no path
+  skip /Motor Drivers/VCP1 -> ('C24', '1'): no path
+  undo /Audio and Camera/SPK_N -> ('J8', '2')
+  undo M1_IN1 -> ('U6', '38')
+  undo /Power and Protection/UV -> ('U1', '2')
+  undo M3_IN2 -> ('U6', '25')
+  undo M1_IN2 -> ('U8', '15')
+  undo CAM_Y8 -> ('U6', '10')
+  undo CAM_Y9 -> ('J10', '12')
+  undo CAM_XCLK -> ('J10', '13')
+final: 2 violations, 33 open items; kept 0, left open 13
+open: [('/Motor Drivers/M2_B', ('U8', '5')), ('/Motor Drivers/M2_A', ('J6', '1')), ('VSYS', ('U1', '7')), ('/Motor Drivers/VCP2', ('C28', '1')), ('/Motor Drivers/VCP1', ('C24', '1')), ('/Audio and Camera/SPK_N', ('J8', '2')), ('M1_IN1', ('U6', '38')), ('/Power and Protection/UV', ('U1', '2')), ('M3_IN2', ('U6', '25')), ('M1_IN2', ('U8', '15')), ('CAM_Y8', ('U6', '10')), ('CAM_Y9', ('J10', '12')), ('CAM_XCLK', ('J10', '13'))]

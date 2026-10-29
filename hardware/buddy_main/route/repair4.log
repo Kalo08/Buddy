@@ -1,0 +1,10 @@
+plane fan-out: 96 vias, skipped []
+round 1: 79 violations, 44 connections to redo, 7 unrouted
+round 2: 26 violations, 14 connections to redo, 23 unrouted
+round 3: 14 violations, 9 connections to redo, 31 unrouted
+round 4: 9 violations, 6 connections to redo, 28 unrouted
+round 5: 5 violations, 3 connections to redo, 46 unrouted
+round 6: 3 violations, 2 connections to redo, 50 unrouted
+round 7: 2 violations, 2 connections to redo, 50 unrouted
+round 8: 4 violations, 2 connections to redo, 50 unrouted
+final: 1 violations, 50 unrouted: [('/Motor Drivers/BISEN1', ('U8', '6')), ('/Motor Drivers/M2_B', ('U8', '5')), ('/Motor Drivers/M2_A', ('J6', '1')), ('5V', ('C13', '1')), ('5V', ('C12', '1')), ('5V', ('L2', '2')), ('5V', ('U3', '1')), ('VSYS', ('C10', '1')), ('VSYS', ('C9', '1')), ('VSYS', ('C28', '2')), ('VSYS', ('U9', '12')), ('VSYS', ('C26', '1')), ('VSYS', ('C27', '1')), ('VSYS', ('C23', '1')), ('VSYS', ('C22', '1')), ('VSYS', ('U8', '12')), ('VSYS', ('C24', '2')), ('VSYS', ('C30', '1')), ('VSYS', ('C4', '1')), ('VSYS', ('C2', '1')), ('VSYS', ('C5', '1')), ('VSYS', ('U2', '3')), ('VSYS', ('U2', '2')), ('VSYS', ('Q1', '5')), ('VSYS', ('Q1', '6')), ('VSYS', ('U1', '7')), ('VSYS', ('R5', '1')), ('VSYS', ('D3', '1')), ('VSYS', ('C1', '1')), ('/Motor Drivers/VINT1', ('U8', '14')), ('/Motor Drivers/VINT2', ('U9', '14')), ('/Motor Drivers/VCP2', ('C28', '1')), ('/Motor Drivers/VCP1', ('C24', '1')), ('/Audio and Camera/SPK_N', ('J8', '2')), ('M1_IN1', ('U6', '38')), ('/Power and Protection/UV', ('U1', '2')), ('/Power and Protection/OV', ('U1', '3')), ('M2_IN2', ('U6', '31')), ('M1_IN2', ('U8', '15')), ('1V2', ('J10', '10')), ('MOT_nSLEEP', ('U8', '1')), ('CAM_Y8', ('U6', '10')), ('CAM_Y9', ('J10', '12')), ('CAM_XCLK', ('J10', '13')), ('MOT_nFAULT', ('U9', '8')), ('/MCU and USB/USB_DN', ('J3', 'B7')), ('/MCU and USB/USB_DN', ('J3', 'A7')), ('CAM_SIOD', ('J10', '3')), ('I2S_WS', ('J9', '4')), ('I2S_WS', ('U6', '35'))]

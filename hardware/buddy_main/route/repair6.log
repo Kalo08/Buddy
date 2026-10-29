@@ -1,0 +1,10 @@
+plane fan-out: 96 vias, skipped []
+round 1: 46 violations, 20 connections to redo, 9 unrouted
+round 2: 3 violations, 3 connections to redo, 11 unrouted
+round 3: 3 violations, 3 connections to redo, 15 unrouted
+round 4: 2 violations, 2 connections to redo, 14 unrouted
+round 5: 2 violations, 1 connections to redo, 13 unrouted
+round 6: 1 violations, 1 connections to redo, 13 unrouted
+round 7: 1 violations, 1 connections to redo, 13 unrouted
+round 8: 1 violations, 1 connections to redo, 13 unrouted
+final: 0 violations, 13 unrouted: [('/Motor Drivers/BISEN1', ('U8', '6')), ('/Motor Drivers/AISEN2', ('R17', '1')), ('/Motor Drivers/M2_B', ('U8', '5')), ('5V', ('C13', '1')), ('5V', ('C12', '1')), ('5V', ('L2', '2')), ('5V', ('U3', '1')), ('/Motor Drivers/VCP2', ('C28', '1')), ('/Motor Drivers/VCP1', ('C24', '1')), ('M1_IN2', ('U8', '15')), ('CAM_Y2', ('U6', '19')), ('CAM_SIOD', ('J10', '3')), ('CAM_SIOC', ('J10', '5'))]

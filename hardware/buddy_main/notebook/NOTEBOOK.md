@@ -304,3 +304,61 @@ also appear in the STEP export.
    Java 17/24 already is.
 2. Add GND pours on both layers and stitch them with vias.
 3. Clean up silkscreen, then final DRC and fab outputs.
+
+---
+
+## Entry 4 · 2026-10-29 · Four layers, routing (in progress)
+
+### Why four layers
+The first routing attempts on two layers failed on the same nets: **VSYS**
+and **3V3** reach almost every part, and with a 0.5 mm supply track they
+couldn't be threaded between the 8 camera data lines, the USB pair and the
+motor-driver pins. Freerouting stalled at about 30 unrouted connections, and
+my own router managed 122 of 166 with both supply nets mostly missing.
+
+**D12. Stackup: F.Cu signal / In1.Cu GND plane / In2.Cu 3V3 plane / B.Cu signal.**
+- Every GND and 3V3 pad drops through a short 45° stub and a 0.6/0.3 mm via
+  to its plane (96 vias). That removes about 70 connections from routing.
+- A solid GND plane under the ESP32, the camera bus and the motor drivers
+  also helps WiFi, camera signal quality and motor noise.
+- Cost: a 4-layer JLCPCB order is a few dollars more for 5 boards.
+- Board size and placement are unchanged.
+
+### How it was routed
+Freerouting 2.5 needs Java 25 (this PC has 24), and 2.1.0 ignored its pass
+limit and ran for an hour. So I wrote a small router (`route/router.py`):
+a grid A* on a 0.1 mm grid with rip-up and re-route, 45°/90° traces only, a
+cost for every bend and a high cost for every via. A repair loop
+(`route/repair.py`) then used **KiCad's own DRC as the judge**: it ripped up
+every trace or via KiCad flagged and re-routed it with more room, until DRC
+was clean. Both tools work on a *copy* of the board, because the PCB Editor
+must not be edited behind its back.
+
+| Stage | Violations | Unrouted connections |
+|---|---|---|
+| First grid route (any-angle traces) | 101 clearance errors | 44 |
+| 45° router + via/bend costs | 41 | 28 |
+| After DRC-driven repair | **0** | 20 |
+| One-at-a-time finisher (keeps a result only if DRC stays clean) | **0** (one harmless thermal-relief note) | 21 |
+
+![Routed board, top](img/09_pcb_routed_top_3d.png)
+
+![Routed board, isometric](img/10_pcb_routed_iso_3d.png)
+
+![Routed board, bottom](img/11_pcb_routed_bottom_3d.png)
+
+### Status
+Everything routed is **DRC-clean**. A final DRC lists **35 open ratsnest
+items** that still need finishing: they sit at the tightest spots (the two
+DRV8833 motor drivers, the ESP32's lower-left pins, the camera connector and
+the VSYS/5V supply branches). The autorouter's cost was to leave these alone
+rather than create violations. They are finished by hand in the PCB Editor.
+
+Backups before this step are in `backup/` (2-layer, and 4-layer unrouted).
+
+### Next
+1. Hand-route the remaining open items, then fill zones (B).
+2. Final DRC, silkscreen cleanup, fab outputs (Gerbers, drill, BOM, position
+   file for JLCPCB).
+3. New ESP32-S3 firmware for this board (OV2640 camera, I2S speaker and mic,
+   DC motors). `buddy_p4.ino` is for the P4 and won't run on it.

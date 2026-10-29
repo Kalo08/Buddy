@@ -74,11 +74,20 @@ If something goes wrong:
 
 - **Camera:** the ribbon camera is detected automatically. The OV5647
   captures a square 800×800 raw image. The P4's ISP converts it to color, the
-  PPA scales it to 448×448, and the hardware JPEG encoder compresses it at
-  quality 70 and 15 fps. If video lags on a weak connection, lower
-  `CAM_FPS` or go back to `CAM_MAX_W/H 320` and `CAM_QUALITY 50`. An OV5640 captures 1280×720 instead and streams
+  PPA scales it to 320×320, and the hardware JPEG encoder compresses it at
+  quality 55, up to 12 fps. An OV5640 captures 1280×720 instead and streams
   320×176. Change these with the `CAM_*` defines. If colors look wrong, set
   `CAM_SWAP true`.
+- **Lag protection:** video, mic, speaker and drive commands share one
+  websocket, so a slow video frame delays everything behind it. The sketch
+  keeps only one video frame in flight, skips (doesn't even encode) frames
+  while the last is still being sent, and slows the frame rate by itself when
+  sends take long. Every 3 s the Serial Monitor prints
+  `[net] video 8.4 fps, 190 KB/s, send 22 ms/frame, gap 120 ms, wifi -58 dBm`.
+  Healthy: send under ~60 ms and gap close to 1000/`CAM_FPS` ms. If the gap
+  climbs past 500 ms the link can't carry video: move closer to the router or
+  hotspot, or lower `CAM_MAX_W/H` and `CAM_QUALITY`. A wifi level below about
+  -75 dBm is too weak. If you suspect the CPU, set `AEC_LOW_COST true`.
 - **Speaker:** the P4 can't decode the browser's opus audio. When a browser
   pairs, the sketch sends `{"type":"hello","audio":"pcm16"}`, and `client.js`
   then sends raw 16 kHz PCM, which is played through the ES8311. Change the
