@@ -56,6 +56,7 @@
 #include "esp_timer.h"
 #include "freertos/stream_buffer.h"
 #include "esp_intr_alloc.h"
+#include "esp_aec.h"
 #include "usb/usb_host.h"
 #include "usb/uvc_host.h"
 
@@ -90,11 +91,13 @@ struct __attribute__((packed)) BuddyConfig {
 // camera is auto-detected (OV5647 or OV5640). The OV5647 captures a square
 // 800×800 (the OV5640 1280×720); the P4's ISP + PPA turn that into RGB565 and
 // scale it down, and the hardware JPEG encoder compresses it.
-// 320×320 box → the square OV5647 streams 288×288.
-#define CAM_MAX_W      320
-#define CAM_MAX_H      320
+// 480×480 box → the square OV5647 streams 448×448 (was 288×288 at q50).
+// Bigger/sharper = more data per frame: if video lags on a weak connection
+// (phone hotspot), drop CAM_FPS to ~10 or go back to 320 / q50.
+#define CAM_MAX_W      480
+#define CAM_MAX_H      480
 #define CAM_FPS         15
-#define CAM_QUALITY     50     // JPEG 1-100
+#define CAM_QUALITY     70     // JPEG 1-100
 #define CAM_MIRROR   false
 #define CAM_FLIP     false
 #define CAM_SWAP     false     // set true if colors look wrong (red/blue noise)
@@ -105,17 +108,27 @@ struct __attribute__((packed)) BuddyConfig {
 
 // ─── Speaker settings ─────────────────────────────────────────────────────────
 #define SPK_RATE     16000
-#define SPK_VOLUME      90     // 0-100 (100 = 0 dB, each step below = -1 dB)
+#define SPK_VOLUME     106     // 0-132, 1 dB per step: 100 = 0 dB, 106 = +6 dB.
+                               // The browser already levels the voice (limiter),
+                               // so big boosts here just clip — keep it ≤ ~110.
 
 // ─── Microphone settings ──────────────────────────────────────────────────────
 // Onboard mic → ES8311 → browser, as PCM16 mono 16 kHz (same as the Pi).
 #define MIC_ENABLED   true
-#define MIC_GAIN         6     // 0-7, each step = +6 dB (6 = 36 dB). Analog, in the codec.
-#define MIC_BOOST      4.0f    // extra digital gain on top (clipped). Lower if it distorts.
+#define MIC_GAIN         5     // 0-7, each step = +6 dB (5 = 30 dB). Analog, in the codec.
+                               // Kept moderate so the speaker's sound doesn't clip the
+                               // mic — the echo canceller can't undo clipping.
+#define MIC_BOOST      6.0f    // extra digital gain after echo cancelling (clipped).
 #define MIC_CHUNK_MS   100     // audio per packet: bigger = fewer packets = fewer drops
-// Half duplex: while the speaker is playing (and briefly after), the mic is
-// muted, so the browser doesn't hear its own voice echoed back.
-#define MIC_ECHO_GUARD_MS 300
+
+// Full duplex: talk and listen at the same time. The ES8311 loops what it
+// plays back into the mic stream (right slot), and Espressif's echo canceller
+// (esp-sr AEC) subtracts it from the mic (left slot), so the browser doesn't
+// hear its own voice come back. false = half duplex: the mic is muted while
+// the speaker plays (and MIC_ECHO_GUARD_MS after) — the old behavior.
+#define MIC_FULL_DUPLEX  true
+#define AEC_SWAP_SLOTS   false // set true if the mic sounds like the speaker only
+#define MIC_ECHO_GUARD_MS 300  // half-duplex mode only
 
 // ─── Frame type bytes ─────────────────────────────────────────────────────────
 #define TYPE_VIDEO  0x01
@@ -386,9 +399,13 @@ static bool initES8311() {
   ok &= esWrite(0x15, 0x40);
   ok &= esWrite(0x37, 0x08);
   ok &= esWrite(0x45, 0x00);
-  // Volume (0xBF = 0 dB, 0.5 dB steps) + unmute
-  int vol = 0xBF - (100 - constrain(SPK_VOLUME, 0, 100)) * 2;
-  ok &= esWrite(0x32, (uint8_t)max(vol, 0));
+  // Echo-cancel reference: put the DAC's output on the right slot of the
+  // ADC stream (left = mic, right = what's being played) — same setting
+  // Espressif's esp_codec_dev uses for ES8311 AEC.
+  if (MIC_FULL_DUPLEX) ok &= esWrite(0x44, 0x58);
+  // Volume: DAC register, 0.5 dB steps, 0xBF = 0 dB, 0xFF = +32 dB max.
+  int vol = 0xBF + (constrain(SPK_VOLUME, 0, 132) - 100) * 2;
+  ok &= esWrite(0x32, (uint8_t)constrain(vol, 0, 0xFF));
   ok &= esWrite(0x31, 0x00);
   return ok;
 }
@@ -449,6 +466,7 @@ void initSpeaker() {
   std.clk_cfg  = I2S_STD_CLK_DEFAULT_CONFIG(SPK_RATE);
   std.clk_cfg.mclk_multiple = I2S_MCLK_MULTIPLE_256;
   std.slot_cfg = I2S_STD_PHILIPS_SLOT_DEFAULT_CONFIG(I2S_DATA_BIT_WIDTH_16BIT, I2S_SLOT_MODE_MONO);
+  std.slot_cfg.slot_mask = I2S_STD_SLOT_BOTH;  // same audio on both slots, whichever the DAC uses
   std.gpio_cfg.mclk = (gpio_num_t)I2S_MCLK;
   std.gpio_cfg.bclk = (gpio_num_t)I2S_BCLK;
   std.gpio_cfg.ws   = (gpio_num_t)I2S_WS;
@@ -457,8 +475,13 @@ void initSpeaker() {
   if (i2s_channel_init_std_mode(i2sTx, &std) != ESP_OK || i2s_channel_enable(i2sTx) != ESP_OK) {
     Serial.println("[spk] init FAILED — I2S config"); return;
   }
+  // Mic input is read as explicit STEREO (L,R interleaved) and reduced to mono
+  // in micTask — "mono" RX mode can hand back both slots, which played as
+  // mono sounds half-speed and smeared.
+  i2s_std_config_t stdRx = std;
+  stdRx.slot_cfg = I2S_STD_PHILIPS_SLOT_DEFAULT_CONFIG(I2S_DATA_BIT_WIDTH_16BIT, I2S_SLOT_MODE_STEREO);
   if (MIC_ENABLED &&
-      (i2s_channel_init_std_mode(i2sRx, &std) != ESP_OK || i2s_channel_enable(i2sRx) != ESP_OK)) {
+      (i2s_channel_init_std_mode(i2sRx, &stdRx) != ESP_OK || i2s_channel_enable(i2sRx) != ESP_OK)) {
     Serial.println("[mic] I2S input init FAILED — mic disabled");
     i2sRx = NULL;
   }
@@ -476,7 +499,7 @@ void initSpeaker() {
   speakerBeep();
 
   if (MIC_ENABLED && i2sRx) {
-    xTaskCreate(micTask, "mic", 4096, NULL, 6, NULL);
+    xTaskCreatePinnedToCore(micTask, "mic", 12288, NULL, 6, NULL, 0);  // AEC needs stack
     Serial.printf("[mic] ready — gain %d (+%d dB), streams while a browser is paired\n",
                   MIC_GAIN, MIC_GAIN * 6);
   }
@@ -485,20 +508,89 @@ void initSpeaker() {
 // Mic → browser: MIC_CHUNK_MS chunks of PCM16 mono 16 kHz as 0x02 frames, which
 // client.js already plays (playPCM16). Handed to loop() via micQueue because
 // the WebSockets library isn't thread-safe.
+static int16_t* micAlloc(size_t samples) {
+  // esp-sr wants 16-byte-aligned buffers
+  return (int16_t*)heap_caps_aligned_alloc(16, samples * sizeof(int16_t),
+                                           MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT);
+}
+
 void micTask(void*) {
-  static int16_t buf[SPK_RATE * MIC_CHUNK_MS / 1000];   // 1600 samples at 100 ms
+  // Echo canceller for full duplex. If it can't start, fall back to the
+  // half-duplex echo guard.
+  aec_handle_t* aec = NULL;
+  if (MIC_FULL_DUPLEX) {
+    aec = aec_create(SPK_RATE, 4, 1, AEC_MODE_FD_HIGH_PERF);
+    if (!aec) aec = aec_create(SPK_RATE, 4, 1, AEC_MODE_VOIP_HIGH_PERF);
+    if (aec) Serial.printf("[mic] echo canceller on — full duplex (%d-sample frames)\n",
+                           aec_get_chunksize(aec));
+    else     Serial.println("[mic] echo canceller FAILED to start — using half duplex");
+  }
+
+  const size_t FRAME = aec ? aec_get_chunksize(aec) : 256;      // samples per step
+  const size_t PKT   = SPK_RATE * MIC_CHUNK_MS / 1000;           // samples per packet
+  int16_t* stereo = micAlloc(FRAME * 2);   // L,R pairs from the codec
+  int16_t* mic    = micAlloc(FRAME);
+  int16_t* ref    = micAlloc(FRAME);
+  int16_t* clean  = micAlloc(FRAME);
+  int16_t* pkt    = micAlloc(PKT);
+  if (!stereo || !mic || !ref || !clean || !pkt) {
+    Serial.println("[mic] out of memory — mic disabled");
+    vTaskDelete(NULL);
+  }
+  // Which slot is the mic: left normally. In full-duplex mode the right slot
+  // carries the speaker reference.
+  const int micSide = AEC_SWAP_SLOTS ? 1 : 0;
+
+  size_t pktFill = 0;
   int peak = 0, sent = 0, muted = 0, dropped = 0;
   int64_t lastReport = esp_timer_get_time();
   for (;;) {
     size_t got = 0;
-    if (i2s_channel_read(i2sRx, buf, sizeof(buf), &got, portMAX_DELAY) != ESP_OK || got == 0) continue;
+    if (i2s_channel_read(i2sRx, stereo, FRAME * 4, &got, portMAX_DELAY) != ESP_OK ||
+        got < FRAME * 4) continue;
 
-    // Digital boost (clipped), then track the level that actually gets sent.
-    for (size_t i = 0; i < got / 2; i++) {
-      int v = (int)(buf[i] * MIC_BOOST);
-      v = constrain(v, -32767, 32767);
-      buf[i] = (int16_t)v;
+    if (aec) {
+      for (size_t i = 0; i < FRAME; i++) {
+        mic[i] = stereo[2 * i + micSide];
+        ref[i] = stereo[2 * i + 1 - micSide];
+      }
+      aec_process(aec, mic, ref, clean);   // mic minus what the speaker played
+    } else {
+      // Half duplex. Without the loopback, keep whichever slot is louder
+      // (the codec's ADC fills one side; the other is silence or a copy).
+      int side = micSide;
+      if (!MIC_FULL_DUPLEX) {
+        int64_t eL = 0, eR = 0;
+        for (size_t i = 0; i < FRAME; i++) {
+          eL += abs((int)stereo[2 * i]);
+          eR += abs((int)stereo[2 * i + 1]);
+        }
+        side = (eR > eL) ? 1 : 0;
+      }
+      for (size_t i = 0; i < FRAME; i++) clean[i] = stereo[2 * i + side];
+    }
+
+    // Digital boost (clipped) into the outgoing packet.
+    for (size_t i = 0; i < FRAME; i++) {
+      int v = constrain((int)(clean[i] * MIC_BOOST), -32767, 32767);
       peak = max(peak, abs(v));
+      pkt[pktFill++] = (int16_t)v;
+      if (pktFill < PKT) continue;
+      pktFill = 0;
+
+      // A full packet: send it (or say why not).
+      if (!peerOnline || !wsLive) continue;
+      if (!aec && esp_timer_get_time() - spkLastPlayUs < MIC_ECHO_GUARD_MS * 1000LL) {
+        muted++;   // half-duplex echo guard
+        continue;
+      }
+      uint8_t* out = (uint8_t*)malloc(1 + PKT * 2);
+      if (!out) continue;
+      out[0] = TYPE_AUDIO;
+      memcpy(out + 1, pkt, PKT * 2);
+      Frame f = { out, 1 + PKT * 2 };
+      if (xQueueSend(micQueue, &f, 0) == pdTRUE) sent++;
+      else { free(out); dropped++; }   // network behind
     }
 
     // Once a second: how loud the mic is and what happened to the audio.
@@ -506,23 +598,12 @@ void micTask(void*) {
     // much gain (distortion). Speech should land roughly 3000–20000.
     int64_t now = esp_timer_get_time();
     if (now - lastReport >= 1000000) {
-      Serial.printf("[mic] peak %5d / 32767   sent %2d   muted %2d   dropped %2d   (%s)\n",
-                    peak, sent, muted, dropped,
+      Serial.printf("[mic] peak %5d / 32767   sent %2d   muted %2d   dropped %2d   %s  (%s)\n",
+                    peak, sent, muted, dropped, aec ? "full duplex" : "half duplex",
                     !wsLive ? "no server" : !peerOnline ? "no browser" : "streaming");
       peak = sent = muted = dropped = 0;
       lastReport = now;
     }
-
-    if (!peerOnline || !wsLive) continue;
-    if (now - spkLastPlayUs < MIC_ECHO_GUARD_MS * 1000LL) { muted++; continue; }  // echo guard
-    sent++;
-
-    uint8_t* out = (uint8_t*)malloc(1 + got);
-    if (!out) continue;
-    out[0] = TYPE_AUDIO;
-    memcpy(out + 1, buf, got);
-    Frame f = { out, 1 + got };
-    if (xQueueSend(micQueue, &f, 0) != pdTRUE) { free(out); dropped++; }  // network behind
   }
 }
 
@@ -642,9 +723,13 @@ static bool initScalerAndEncoder() {
   uint32_t blkW = min(camW, (uint32_t)(outW / s));
   uint32_t blkH = min(camH, (uint32_t)(outH / s));
 
-  jpeg_encode_memory_alloc_cfg_t inMem  = { .buffer_direction = JPEG_ENC_ALLOC_INPUT_BUFFER };
+  // The scaled frame is the PPA's output AND the JPEG encoder's input. The PPA
+  // needs address + size aligned to the PSRAM's L2 cache line (128 B), which
+  // jpeg_alloc_encoder_mem doesn't guarantee — align to 256 B ourselves.
+  const size_t ALIGN = 256;
+  scaledCap = (outW * outH * 2 + ALIGN - 1) & ~(ALIGN - 1);
+  scaledBuf = (uint8_t*)heap_caps_aligned_calloc(ALIGN, 1, scaledCap, MALLOC_CAP_SPIRAM | MALLOC_CAP_DMA);
   jpeg_encode_memory_alloc_cfg_t outMem = { .buffer_direction = JPEG_ENC_ALLOC_OUTPUT_BUFFER };
-  scaledBuf = (uint8_t*)jpeg_alloc_encoder_mem(outW * outH * 2, &inMem, &scaledCap);
   jpegBuf   = (uint8_t*)jpeg_alloc_encoder_mem(outW * outH, &outMem, &jpegCap);
   if (!scaledBuf || !jpegBuf) { Serial.println("[cam] out of memory — is PSRAM enabled?"); return false; }
 

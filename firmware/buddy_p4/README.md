@@ -74,14 +74,16 @@ If something goes wrong:
 
 - **Camera:** the ribbon camera is detected automatically. The OV5647
   captures a square 800×800 raw image. The P4's ISP converts it to color, the
-  PPA scales it to 288×288, and the hardware JPEG encoder compresses it at
-  quality 50 and 15 fps. An OV5640 captures 1280×720 instead and streams
+  PPA scales it to 448×448, and the hardware JPEG encoder compresses it at
+  quality 70 and 15 fps. If video lags on a weak connection, lower
+  `CAM_FPS` or go back to `CAM_MAX_W/H 320` and `CAM_QUALITY 50`. An OV5640 captures 1280×720 instead and streams
   320×176. Change these with the `CAM_*` defines. If colors look wrong, set
   `CAM_SWAP true`.
 - **Speaker:** the P4 can't decode the browser's opus audio. When a browser
   pairs, the sketch sends `{"type":"hello","audio":"pcm16"}`, and `client.js`
   then sends raw 16 kHz PCM, which is played through the ES8311. Change the
-  volume with `SPK_VOLUME`.
+  volume with `SPK_VOLUME`: 1 dB per step, where 100 = 0 dB. Above 100 is
+  extra boost, up to 132; the default is 118. Lower it if it distorts.
 - **Wheels:** the drive logic is ported from `pi/buddy_pi.py`: same wheel
   geometry, steering softening, back-wheel correction and stall-protection
   rest cycling. Servos still get no signal at idle. Pulses come from LEDC
@@ -94,7 +96,7 @@ If something goes wrong:
 [srv] LEDC servos ready (GPIO 20/21/22) — outputs off until driven
 [spk] ES8311 ready — PCM16 mono 16000 Hz
 [cam] sensor: OV5647
-[cam] ready — capture 800x800 → stream 288x288 @ 15 fps, q50
+[cam] ready — capture 800x800 → stream 448x448 @ 15 fps, q70
 [wifi] 192.168.x.x
 [ws]  connected — id: BDY-00001
 ```
@@ -119,11 +121,21 @@ The onboard mic streams to the browser while a browser is paired, the same
 way the Pi's mic did. Sound comes out of the page when the **SPEAKER** toggle
 is on.
 
-- **Echo:** while the robot's speaker is playing, plus 300 ms after, the mic
-  is muted, so you don't hear your own voice echoed back. Set the time with
-  `MIC_ECHO_GUARD_MS`.
+- **Full duplex (talk and listen at once):** `MIC_FULL_DUPLEX true`, the
+  default. The ES8311 copies what the speaker plays into the mic stream as
+  a reference, and Espressif's echo canceller (esp-sr AEC) subtracts it from
+  the mic, so you don't hear your own voice come back. The boot log shows
+  `[mic] echo canceller on`.
+  - **Mic sounds like the speaker and not the room:** set
+    `AEC_SWAP_SLOTS true`.
+  - **Still some echo:** lower `SPK_VOLUME` or `MIC_GAIN`. Loud playback
+    that clips the mic can't be cancelled. Keeping the speaker and mic apart
+    on the robot also helps.
+  - **Fallback:** `MIC_FULL_DUPLEX false` goes back to half duplex. The mic
+    is then muted while the speaker plays, plus `MIC_ECHO_GUARD_MS` after.
 - **Level:** `MIC_GAIN` is the codec's analog gain (0–7, 6 dB per step;
-  default 6). `MIC_BOOST` is extra digital gain on top (default 4×). The
+  default 5). `MIC_BOOST` is extra digital gain applied after echo
+  cancelling (default 6×). The
   Serial Monitor prints a `[mic] peak` line every second. Speech should
   land around 3000–20000. If it's always near 32767, it's distorting:
   lower `MIC_BOOST`.

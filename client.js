@@ -321,7 +321,12 @@ async function startSpeaking() {
   sentBytes = 0;
 
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+    // Echo cancellation keeps the robot's voice (playing from this page)
+    // from being picked up by this mic and sent straight back while you talk.
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
+      video: false,
+    });
 
     // Button released (or pressed again) while the permission prompt was up —
     // don't start a recorder nobody will ever stop.
@@ -404,6 +409,18 @@ async function startPcmCapture(stream, session) {
   if (session !== speakSession || !el.speakBtn.classList.contains('speaking')) return;
 
   const src  = ctx.createMediaStreamSource(stream);
+
+  // Level the voice before it leaves: boost it, then a hard limiter so the
+  // peaks never clip. Small robot speakers need loud-but-clean audio; boosting
+  // on the device instead just distorts the loud parts.
+  const boost = ctx.createGain();
+  boost.gain.value = 4;                 // ~+12 dB
+  const limiter = ctx.createDynamicsCompressor();
+  limiter.threshold.value = -12;        // dB — start squashing peaks here
+  limiter.knee.value      = 6;
+  limiter.ratio.value     = 20;         // ~brick wall
+  limiter.attack.value    = 0.003;
+  limiter.release.value   = 0.15;
   const tap  = new AudioWorkletNode(ctx, 'buddy-tap');
   const mute = ctx.createGain();  // the graph must pull the tap, but we don't want to hear ourselves
   mute.gain.value = 0;
@@ -424,13 +441,15 @@ async function startPcmCapture(stream, session) {
     }
   };
 
-  src.connect(tap);
+  src.connect(boost).connect(limiter).connect(tap);
   tap.connect(mute).connect(ctx.destination);
   pcmCapture = {
     stop() {
       tap.port.onmessage = null;
       if (fill) sendPcm(out.subarray(0, fill));
       src.disconnect();
+      boost.disconnect();
+      limiter.disconnect();
       tap.disconnect();
       mute.disconnect();
     },
