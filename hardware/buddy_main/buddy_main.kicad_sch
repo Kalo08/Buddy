@@ -1,0 +1,148 @@
+(kicad_sch
+	(version 20250610)
+	(generator "konnect")
+	(generator_version "10.0")
+	(uuid "6cf5447b-9521-4347-9ef0-9a9c7adf2ec7")
+	(paper "A4")
+	(lib_symbols
+	)
+  (sheet
+		(at 30 40)
+		(size 70 40)
+		(fields_autoplaced)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0.0)
+		)
+		(uuid "c02d4064-a270-4cd1-a6ec-4a608002cd53")
+		(property "Sheetname" "Power and Protection"
+			(at 30 39.365 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "power.kicad_sch"
+			(at 30 80.635 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "buddy_main"
+				(path "/6cf5447b-9521-4347-9ef0-9a9c7adf2ec7"
+					(page "2")
+				)
+			)
+		)
+	)
+  (sheet
+    (at 120 40)
+    (size 70 40)
+    (exclude_from_sim no)
+    (in_bom yes)
+    (on_board yes)
+    (dnp no)
+    (fields_autoplaced yes)
+    (stroke (width 0.1524) (type solid))
+    (fill (color 0 0 0 0.0))
+    (uuid "3b9789c3-170a-4c77-accc-3c53ca0fea9d")
+    (property "Sheetname" "MCU and USB"
+      (at 120 39.365 0)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects (font (size 1.27 1.27)) (justify left bottom))
+    )
+    (property "Sheetfile" "mcu.kicad_sch"
+      (at 120 80.635 0)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects (font (size 1.27 1.27)) (justify left top))
+    )
+    (instances
+      (project "buddy_main"
+        (path "/6cf5447b-9521-4347-9ef0-9a9c7adf2ec7" (page "3"))
+      )
+    )
+  )
+  (sheet
+    (at 30 100)
+    (size 70 40)
+    (exclude_from_sim no)
+    (in_bom yes)
+    (on_board yes)
+    (dnp no)
+    (fields_autoplaced yes)
+    (stroke (width 0.1524) (type solid))
+    (fill (color 0 0 0 0.0))
+    (uuid "3661508f-e2ac-4cbd-b790-32f2d7153c44")
+    (property "Sheetname" "Motor Drivers"
+      (at 30 99.365 0)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects (font (size 1.27 1.27)) (justify left bottom))
+    )
+    (property "Sheetfile" "motors.kicad_sch"
+      (at 30 140.635 0)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects (font (size 1.27 1.27)) (justify left top))
+    )
+    (instances
+      (project "buddy_main"
+        (path "/6cf5447b-9521-4347-9ef0-9a9c7adf2ec7" (page "4"))
+      )
+    )
+  )
+  (sheet
+    (at 120 100)
+    (size 70 40)
+    (exclude_from_sim no)
+    (in_bom yes)
+    (on_board yes)
+    (dnp no)
+    (fields_autoplaced yes)
+    (stroke (width 0.1524) (type solid))
+    (fill (color 0 0 0 0.0))
+    (uuid "ae026020-763d-4d3d-8d65-c5f39a17cdcf")
+    (property "Sheetname" "Audio and Camera"
+      (at 120 99.365 0)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects (font (size 1.27 1.27)) (justify left bottom))
+    )
+    (property "Sheetfile" "audio_camera.kicad_sch"
+      (at 120 140.635 0)
+      (show_name no)
+      (do_not_autoplace no)
+      (effects (font (size 1.27 1.27)) (justify left top))
+    )
+    (instances
+      (project "buddy_main"
+        (path "/6cf5447b-9521-4347-9ef0-9a9c7adf2ec7" (page "5"))
+      )
+    )
+  )
+  (sheet_instances
+    (path "/"
+      (page "1")
+    )
+  )
+  (embedded_fonts no)
+)

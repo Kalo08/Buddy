@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 600" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#444"/>
+    </marker>
+    <style>
+      .box{fill:#fff;stroke:#333;stroke-width:1.5;rx:6}
+      .pwr{fill:#fff4e5;stroke:#c77700}
+      .prot{fill:#ffe9e9;stroke:#c62828}
+      .mcu{fill:#e8f1ff;stroke:#1f5fbf}
+      .io{fill:#ecf8ee;stroke:#2e7d32}
+      .ext{fill:#f4f4f4;stroke:#888;stroke-dasharray:5 3}
+      .t{font-weight:600}
+      .s{font-size:11px;fill:#555}
+      .ln{stroke:#444;stroke-width:1.6;fill:none;marker-end:url(#a)}
+      .bus{stroke:#1f5fbf;stroke-width:1.6;fill:none;marker-end:url(#a)}
+    </style>
+  </defs>
+  <rect width="980" height="600" fill="#fafafa"/>
+  <text x="20" y="30" font-size="18" class="t">Buddy main board — block diagram</text>
+  <text x="20" y="50" class="s">ESP32-S3 robot computer · 2S LiPo or USB-C · 3 DC motors · I2S speaker + mic · 24-pin DVP camera</text>
+
+  <!-- inputs -->
+  <rect x="20" y="90" width="150" height="62" class="box ext"/>
+  <text x="32" y="113" class="t">Battery</text>
+  <text x="32" y="131" class="s">XT30 or JST-PH 2-pin</text>
+  <text x="32" y="145" class="s">2S LiPo / 6×AA (6.1–9.7 V)</text>
+
+  <rect x="20" y="300" width="150" height="62" class="box ext"/>
+  <text x="32" y="323" class="t">USB-C</text>
+  <text x="32" y="341" class="s">5 V power + native USB</text>
+  <text x="32" y="355" class="s">(program / serial)</text>
+
+  <!-- protection -->
+  <rect x="210" y="80" width="220" height="92" class="box prot"/>
+  <text x="222" y="103" class="t">Battery protection</text>
+  <text x="222" y="121" class="s">PTC fuse 3 A · TVS ±24 V</text>
+  <text x="222" y="137" class="s">LTC4365 + back-to-back NMOS:</text>
+  <text x="222" y="152" class="s">reverse · OV 9.7 V · UV 6.1 V</text>
+  <text x="222" y="166" class="s">power switch on ~SHDN</text>
+
+  <rect x="210" y="295" width="220" height="72" class="box prot"/>
+  <text x="222" y="318" class="t">USB protection</text>
+  <text x="222" y="336" class="s">PTC 1.1 A · TVS 5 V · Schottky</text>
+  <text x="222" y="352" class="s">USBLC6 ESD on D+/D−</text>
+
+  <!-- VSYS -->
+  <rect x="470" y="190" width="120" height="56" class="box pwr"/>
+  <text x="482" y="213" class="t">VSYS</text>
+  <text x="482" y="231" class="s">4.6–9.7 V rail</text>
+
+  <!-- regulators -->
+  <rect x="640" y="80" width="150" height="54" class="box pwr"/>
+  <text x="652" y="103" class="t">3V3 buck</text>
+  <text x="652" y="121" class="s">AP63203 · 2 A</text>
+  <rect x="640" y="150" width="150" height="54" class="box pwr"/>
+  <text x="652" y="173" class="t">5V buck</text>
+  <text x="652" y="191" class="s">AP63205 · 2 A</text>
+  <rect x="820" y="80" width="140" height="54" class="box pwr"/>
+  <text x="832" y="103" class="t">Camera LDOs</text>
+  <text x="832" y="121" class="s">XC6206 2V8 + 1V2</text>
+
+  <!-- MCU -->
+  <rect x="470" y="300" width="200" height="120" class="box mcu"/>
+  <text x="482" y="325" class="t">ESP32-S3-WROOM-1</text>
+  <text x="482" y="343" class="s">N16R8 · WiFi · 8 MB PSRAM</text>
+  <text x="482" y="361" class="s">BOOT / RESET buttons</text>
+  <text x="482" y="379" class="s">status LED · battery ADC</text>
+  <text x="482" y="397" class="s">native USB on GPIO19/20</text>
+
+  <!-- peripherals -->
+  <rect x="740" y="250" width="220" height="70" class="box io"/>
+  <text x="752" y="273" class="t">Motor drivers</text>
+  <text x="752" y="291" class="s">2× DRV8833 (3 of 4 bridges used)</text>
+  <text x="752" y="307" class="s">2 A current limit each · JST-XH ×3</text>
+
+  <rect x="740" y="340" width="220" height="56" class="box io"/>
+  <text x="752" y="363" class="t">Speaker amp</text>
+  <text x="752" y="381" class="s">MAX98357A I2S · 5 V · JST-PH</text>
+
+  <rect x="740" y="410" width="220" height="56" class="box io"/>
+  <text x="752" y="433" class="t">Mic header</text>
+  <text x="752" y="451" class="s">I2S MEMS (INMP441 module)</text>
+
+  <rect x="740" y="480" width="220" height="56" class="box io"/>
+  <text x="752" y="503" class="t">Camera FPC</text>
+  <text x="752" y="521" class="s">24-pin 0.5 mm DVP (OV2640)</text>
+
+  <!-- power arrows -->
+  <path d="M170 121 H208" class="ln"/>
+  <path d="M170 331 H208" class="ln"/>
+  <path d="M430 126 H450 V205 H468" class="ln"/>
+  <path d="M430 331 H450 V232 H468" class="ln"/>
+  <path d="M590 205 H615 V107 H638" class="ln"/>
+  <path d="M590 212 H615 V177 H638" class="ln"/>
+  <path d="M590 225 H700 V248" class="ln"/>
+  <text x="604" y="242" class="s">VM</text>
+  <path d="M790 107 H818" class="ln"/>
+  <path d="M715 134 V298" class="ln" stroke-dasharray="4 3"/>
+  <text x="720" y="285" class="s">3V3</text>
+  <path d="M790 177 H850 V338" class="ln" stroke-dasharray="4 3"/>
+  <text x="855" y="215" class="s">5V</text>
+  <path d="M890 134 V160 H940 V478" class="ln" stroke-dasharray="4 3"/>
+  <text x="944" y="300" class="s">2V8/1V2</text>
+
+  <!-- signals -->
+  <path d="M430 352 H468" class="bus"/>
+  <text x="434" y="346" class="s">D+/D−</text>
+  <path d="M670 320 H738" class="bus"/>
+  <text x="678" y="314" class="s">6× PWM</text>
+  <path d="M670 360 H738" class="bus"/>
+  <text x="678" y="354" class="s">I2S out</text>
+  <path d="M670 395 V430 H738" class="bus"/>
+  <text x="678" y="425" class="s">I2S in</text>
+  <path d="M640 420 V508 H738" class="bus"/>
+  <text x="590" y="470" class="s">DVP 8-bit + SCCB</text>
+  <path d="M520 246 V298" class="bus" stroke-dasharray="4 3"/>
+  <text x="525" y="275" class="s">VBAT sense</text>
+
+  <text x="20" y="585" class="s">Orange = power · Red = protection · Blue = processor · Green = I/O · Dashed boxes = off-board</text>
+</svg>
