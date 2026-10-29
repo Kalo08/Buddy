@@ -415,7 +415,7 @@ class Speaker:
             # output device or decode a stream, that must land in the journal.
             self.proc = subprocess.Popen(
                 cmd,
-                stdin=subprocess.PIPE,
+                stdin=subprocess.PIPE, 
                 stdout=subprocess.DEVNULL,
             )
             log.info("[spk] ffplay started (pid %d, %s)", self.proc.pid, fmt)

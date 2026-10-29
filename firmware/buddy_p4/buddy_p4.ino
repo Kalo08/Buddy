@@ -3,7 +3,7 @@
  * ─────────────────────────────────────────────────────────────────────────────
  * Target board : Waveshare ESP32-P4-Nano / ESP32-P4-WIFI6 (also the Espressif
  *                ESP32-P4-Function-EV-Board — same audio + I2C pins)
- *   Camera  OV5640 on the MIPI-CSI ribbon connector
+ *   Camera  OV5647 (or OV5640) on the MIPI-CSI ribbon connector, or a USB webcam
  *   Speaker onboard ES8311 codec + amp (speaker on the SPK header)
  *   WiFi    onboard ESP32-C6 (handled by the core — plain WiFi.begin())
  *
@@ -86,20 +86,22 @@ struct __attribute__((packed)) BuddyConfig {
 #define SERVO_PIN_B   22
 
 // ─── Camera settings ──────────────────────────────────────────────────────────
-// Low on purpose, same as the Pi: small frames = low latency. The OV5640
-// captures 1280×720; the P4's PPA scales it down and the hardware JPEG
-// encoder compresses it — the CPU never touches a pixel.
+// Low on purpose, same as the Pi: small frames = low latency. The ribbon
+// camera is auto-detected (OV5647 or OV5640). The OV5647 captures a square
+// 800×800 (the OV5640 1280×720); the P4's ISP + PPA turn that into RGB565 and
+// scale it down, and the hardware JPEG encoder compresses it.
+// 320×320 box → the square OV5647 streams 288×288.
 #define CAM_MAX_W      320
-#define CAM_MAX_H      240
+#define CAM_MAX_H      320
 #define CAM_FPS         15
 #define CAM_QUALITY     50     // JPEG 1-100
 #define CAM_MIRROR   false
 #define CAM_FLIP     false
 #define CAM_SWAP     false     // set true if colors look wrong (red/blue noise)
 
-// Camera source: true = USB webcam on the USB OTG port, false = OV5640 on the
-// MIPI-CSI ribbon. CAM_MAX_W/H and CAM_FPS apply to both.
-#define USE_USB_WEBCAM true
+// Camera source: true = USB webcam on the USB OTG port, false = ribbon camera
+// (OV5647 / OV5640) on MIPI-CSI. CAM_MAX_W/H and CAM_FPS apply to both.
+#define USE_USB_WEBCAM false
 
 // ─── Speaker settings ─────────────────────────────────────────────────────────
 #define SPK_RATE     16000
