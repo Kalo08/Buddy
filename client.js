@@ -284,9 +284,10 @@ function playPCM16(arrayBuffer) {
 
   // Queue chunks back to back instead of playing each on arrival — network
   // jitter otherwise turns 30 ms chunks into gaps and overlaps (crackle).
-  // A small 60 ms cushion absorbs jitter; if we fall too far behind, resync.
+  // A 150 ms cushion absorbs network jitter (the P4 sends 100 ms chunks);
+  // if we fall too far behind, resync.
   const now = ctx.currentTime;
-  if (pcmPlayAt < now || pcmPlayAt - now > 0.5) pcmPlayAt = now + 0.06;
+  if (pcmPlayAt < now || pcmPlayAt - now > 0.6) pcmPlayAt = now + 0.15;
 
   const source = ctx.createBufferSource();
   source.buffer = buffer;

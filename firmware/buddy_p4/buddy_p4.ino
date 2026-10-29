@@ -110,7 +110,9 @@ struct __attribute__((packed)) BuddyConfig {
 // ─── Microphone settings ──────────────────────────────────────────────────────
 // Onboard mic → ES8311 → browser, as PCM16 mono 16 kHz (same as the Pi).
 #define MIC_ENABLED   true
-#define MIC_GAIN         5     // 0-7, each step = +6 dB (5 = 30 dB). Raise if quiet.
+#define MIC_GAIN         6     // 0-7, each step = +6 dB (6 = 36 dB). Analog, in the codec.
+#define MIC_BOOST      4.0f    // extra digital gain on top (clipped). Lower if it distorts.
+#define MIC_CHUNK_MS   100     // audio per packet: bigger = fewer packets = fewer drops
 // Half duplex: while the speaker is playing (and briefly after), the mic is
 // muted, so the browser doesn't hear its own voice echoed back.
 #define MIC_ECHO_GUARD_MS 300
@@ -129,7 +131,7 @@ struct Frame { uint8_t* buf; size_t len; };
 QueueHandle_t txQueue;
 #define TX_QUEUE_DEPTH 2   // keep small to minimise frame lag
 QueueHandle_t micQueue;    // mic chunks waiting for loop() to send
-#define MIC_QUEUE_DEPTH 8  // ~240 ms of audio
+#define MIC_QUEUE_DEPTH 10 // ~1 s of audio — rides out a slow video send
 
 // ═════════════════════════════════════════════════════════════════════════════
 // Wheels — ported from pi/buddy_pi.py
@@ -480,25 +482,34 @@ void initSpeaker() {
   }
 }
 
-// Mic → browser: 30 ms chunks of PCM16 mono 16 kHz as 0x02 frames, which
+// Mic → browser: MIC_CHUNK_MS chunks of PCM16 mono 16 kHz as 0x02 frames, which
 // client.js already plays (playPCM16). Handed to loop() via micQueue because
 // the WebSockets library isn't thread-safe.
 void micTask(void*) {
-  static int16_t buf[SPK_RATE * 30 / 1000];   // 480 samples
-  int peak = 0, sent = 0, muted = 0;
+  static int16_t buf[SPK_RATE * MIC_CHUNK_MS / 1000];   // 1600 samples at 100 ms
+  int peak = 0, sent = 0, muted = 0, dropped = 0;
   int64_t lastReport = esp_timer_get_time();
   for (;;) {
     size_t got = 0;
     if (i2s_channel_read(i2sRx, buf, sizeof(buf), &got, portMAX_DELAY) != ESP_OK || got == 0) continue;
 
+    // Digital boost (clipped), then track the level that actually gets sent.
+    for (size_t i = 0; i < got / 2; i++) {
+      int v = (int)(buf[i] * MIC_BOOST);
+      v = constrain(v, -32767, 32767);
+      buf[i] = (int16_t)v;
+      peak = max(peak, abs(v));
+    }
+
     // Once a second: how loud the mic is and what happened to the audio.
-    // Peak near 0 → no sound reaching the chip. Talk near the board: it should jump.
-    for (size_t i = 0; i < got / 2; i++) peak = max(peak, abs((int)buf[i]));
+    // Peak near 0 → no sound reaching the chip; near 32767 all the time → too
+    // much gain (distortion). Speech should land roughly 3000–20000.
     int64_t now = esp_timer_get_time();
     if (now - lastReport >= 1000000) {
-      Serial.printf("[mic] peak %5d / 32767   sent %2d   muted %2d   (%s)\n", peak, sent, muted,
+      Serial.printf("[mic] peak %5d / 32767   sent %2d   muted %2d   dropped %2d   (%s)\n",
+                    peak, sent, muted, dropped,
                     !wsLive ? "no server" : !peerOnline ? "no browser" : "streaming");
-      peak = sent = muted = 0;
+      peak = sent = muted = dropped = 0;
       lastReport = now;
     }
 
@@ -511,7 +522,7 @@ void micTask(void*) {
     out[0] = TYPE_AUDIO;
     memcpy(out + 1, buf, got);
     Frame f = { out, 1 + got };
-    if (xQueueSend(micQueue, &f, 0) != pdTRUE) free(out);  // network behind — drop
+    if (xQueueSend(micQueue, &f, 0) != pdTRUE) { free(out); dropped++; }  // network behind
   }
 }
 
@@ -573,7 +584,7 @@ static bool openCamera() {
   esp_video_init_config_t vcfg = {};
   vcfg.csi = &csi;
   if (esp_video_init(&vcfg) != ESP_OK) {
-    Serial.println("[cam] init FAILED — is the OV5640 ribbon seated (contacts the right way)?");
+    Serial.println("[cam] init FAILED — is the camera ribbon seated (contacts the right way)?");
     return false;
   }
 
