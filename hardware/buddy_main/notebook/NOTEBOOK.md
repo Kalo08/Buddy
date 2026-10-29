@@ -8,7 +8,7 @@ are in `img/`.
 
 ## Entry 1 · 2026-10-29 · Requirements and architecture
 
-### Requirements (from Gavin)
+### Requirements 
 
 | # | Requirement | Notes |
 |---|---|---|
