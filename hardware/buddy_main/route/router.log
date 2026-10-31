@@ -2,3 +2,59 @@ plane fan-out: 96 vias, skipped []
   rip-up for /Motor Drivers/M3_B: ['/Motor Drivers/AISEN2']
   rip-up for /Motor Drivers/M1_A: ['/Motor Drivers/AISEN1', '/Motor Drivers/M1_B']
   rip-up for /Motor Drivers/M2_A: ['/Motor Drivers/BISEN1']
+  20/143 routed, queue 123, 125s
+  40/143 routed, queue 103, 133s
+  power stage done: froze 14 nets
+  60/143 routed, queue 83, 149s
+  FAIL /Motor Drivers/VCP2 -> ('C28', '1')
+  rip-up for /Audio and Camera/SPK_N: ['/Audio and Camera/SPK_P']
+  rip-up for M1_IN1: ['/Motor Drivers/VCP1', '/Motor Drivers/VINT1', 'VSYS']
+  rip-up for M3_IN2: ['/Motor Drivers/VINT2']
+  60/143 routed, queue 82, 168s
+  rip-up for 2V8: []
+  80/143 routed, queue 62, 224s
+  rip-up for CAM_Y7: ['CAM_Y5', 'CAM_Y6']
+  rip-up for CAM_HREF: []
+  rip-up for CAM_VSYNC: ['1V2']
+  rip-up for /MCU and USB/USB_DN: ['/MCU and USB/CC1', '/MCU and USB/USB_DP']
+  rip-up for CAM_SIOD: ['CAM_VSYNC', 'CAM_Y3']
+  rip-up for CAM_SIOC: []
+  FAIL /Motor Drivers/AISEN2 -> ('R17', '1')
+  FAIL /Motor Drivers/M1_B -> ('U8', '4')
+  FAIL /Motor Drivers/AISEN1 -> ('R15', '1')
+  FAIL /Motor Drivers/BISEN1 -> ('U8', '6')
+  100/143 routed, queue 38, 556s
+  rip-up for /Motor Drivers/VINT1: ['I2S_DIN']
+  100/143 routed, queue 38, 557s
+  rip-up for /Motor Drivers/VCP1: ['M1_IN2', 'M2_IN1', 'M2_IN2']
+  rip-up for VSYS: ['CAM_HREF', 'CAM_XCLK']
+  rip-up for VSYS: ['CAM_PCLK']
+  100/143 routed, queue 38, 591s
+  rip-up for VSYS: ['I2S_BCLK']
+  rip-up for VSYS: ['/Power and Protection/GATE']
+  rip-up for VSYS: []
+  rip-up for /Motor Drivers/VINT2: ['M3_IN2']
+  rip-up for 1V2: []
+  rip-up for 1V2: ['CAM_Y8', 'CAM_Y9']
+  rip-up for /MCU and USB/USB_DP: ['/MCU and USB/USB_DN']
+  rip-up for CAM_Y3: []
+  rip-up for CAM_VSYNC: []
+  120/143 routed, queue 18, 809s
+  rip-up for CAM_PCLK: ['CAM_Y6']
+  rip-up for M3_IN2: ['/Motor Drivers/VINT2', 'MOT_nSLEEP']
+  rip-up for CAM_Y9: ['/MCU and USB/USB_DP']
+  rip-up for CAM_Y8: ['CAM_HREF', 'CAM_SIOC', 'CAM_Y5', 'CAM_Y7', 'CAM_Y9']
+  120/143 routed, queue 18, 873s
+  rip-up for /MCU and USB/USB_DN: ['/MCU and USB/CC1']
+  120/143 routed, queue 18, 900s
+  rip-up for /Motor Drivers/VINT2: ['M3_IN2']
+  rip-up for /MCU and USB/USB_DP: ['/MCU and USB/USB_DN']
+  rip-up for CAM_SIOC: ['CAM_Y9']
+  rip-up for CAM_Y7: ['CAM_HREF', 'CAM_Y8']
+  rip-up for M3_IN2: ['/Motor Drivers/VINT2', 'I2S_DIN', 'I2S_DOUT']
+  rip-up for /MCU and USB/USB_DN: ['/MCU and USB/CC1', '/MCU and USB/USB_DP']
+  rip-up for CAM_Y8: ['/MCU and USB/EN', '/MCU and USB/USB_DN', 'CAM_Y7', 'CAM_Y9']
+  rip-up for /MCU and USB/USB_DN: ['/MCU and USB/CC1', '/MCU and USB/USB_DP']
+  FAIL /MCU and USB/USB_DP -> ('J3', 'A6')
+  FAIL /MCU and USB/USB_DP -> ('U6', '14')
+done: 136/143 connections, 920 tracks, 273 vias, 7 failed, 1182s

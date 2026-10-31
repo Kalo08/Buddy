@@ -1,0 +1,10 @@
+plane fan-out: 96 vias, skipped []
+round 1: 74 violations, 26 connections to redo, 6 unrouted
+round 2: 3 violations, 3 connections to redo, 13 unrouted
+round 3: 3 violations, 3 connections to redo, 15 unrouted
+round 4: 2 violations, 2 connections to redo, 17 unrouted
+round 5: 1 violations, 1 connections to redo, 18 unrouted
+round 6: 1 violations, 1 connections to redo, 18 unrouted
+round 7: 0 violations, 0 connections to redo, 18 unrouted
+round 8: 0 violations, 0 connections to redo, 18 unrouted
+final: 0 violations, 18 unrouted: [('/Motor Drivers/BISEN1', ('U8', '6')), ('/Motor Drivers/AISEN1', ('R15', '1')), ('/Motor Drivers/AISEN2', ('R17', '1')), ('/Motor Drivers/M1_B', ('U8', '4')), ('/Motor Drivers/M3_A', ('J7', '1')), ('VBUS', ('U7', '5')), ('5V', ('C13', '1')), ('5V', ('C12', '1')), ('5V', ('L2', '2')), ('5V', ('U3', '1')), ('/Motor Drivers/VCP1', ('C24', '1')), ('M3_IN2', ('U6', '25')), ('2V8', ('C34', '1')), ('CAM_PCLK', ('J10', '17')), ('CAM_SIOD', ('J10', '3')), ('CAM_SIOD', ('U6', '4')), ('I2S_WS', ('J9', '4')), ('I2S_WS', ('U6', '35'))]

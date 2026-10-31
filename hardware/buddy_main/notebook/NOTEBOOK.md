@@ -362,3 +362,65 @@ Backups before this step are in `backup/` (2-layer, and 4-layer unrouted).
    file for JLCPCB).
 3. New ESP32-S3 firmware for this board (OV2640 camera, I2S speaker and mic,
    DC motors). `buddy_p4.ino` is for the P4 and won't run on it.
+
+---
+
+## Entry 5 · 2026-10-29 · More room, 45°/90° routing, board installed
+
+### Layout change: 64 × 56 → 72 × 62 mm
+The 64 × 56 mm board left 20 or more connections that no automatic route
+could fit (motor drivers, ESP32 lower pins, camera connector, supply
+branches). The parts there were too tight to leave any corridor. The board
+grew by 8 × 6 mm (3584 → 4464 mm², +25 %) and the crowded clusters were spread:
+- 4 mm more space between the power block and the ESP32.
+- Motor group (both DRV8833s, their caps and connectors) moved right and
+  spread vertically; audio group moved down and right.
+- Camera supplies, USB-C, camera FPC and mic socket moved down, which opens
+  the corridor for the 8 camera data lines.
+- Same rounded 4 mm corners; ESP32 antenna still overhangs the top edge.
+
+### Router fixes (what actually made it work)
+Each of these was a real bug, found by checking KiCad's own DRC:
+
+| Problem | Cause | Fix |
+|---|---|---|
+| VSYS (supply) never routed | Other nets kept ripping it up, and it can't be re-routed once its neighbours are placed. Alone on an empty board it routes in 14 s | Route all supply nets first, then **freeze** them |
+| Traces off 45°/90° (222 of 857) | Trace ends were nudged onto pad centres, tilting long traces by 1–4° | No nudging: every point sits on the 0.1 mm grid, so only 0/45/90° exist. A script checks every segment: **0 off-angle** |
+| ~20 phantom "open" connections | Branches started mid-wire; KiCad only joins wires at endpoints | Branches start only on exact grid points; wires are split there; traces end well inside pads |
+| Ground/3V3 open at the new board edge | Pours still covered the old outline | Pour outline updated to 72 × 62 |
+| Repair loop lost routes | It ripped the supply net or half a net | Signals yield to supplies; a flagged net is ripped and re-routed whole |
+
+### Result (installed as `buddy_main.kicad_pcb`)
+| Check | Result |
+|---|---|
+| Board | 72 × 62 mm, 4 layers (signal / GND / 3V3 / signal) |
+| Tracks / vias | 881 / 255 |
+| Trace angles | all exactly 45° or 90° |
+| DRC errors | **0** (one harmless thermal-relief note) |
+| Open connections | **23 items** (listed below) |
+
+![Routed board, top](img/09_pcb_routed_top_3d.png)
+
+![Routed board, isometric](img/10_pcb_routed_iso_3d.png)
+
+![Routed board, bottom](img/11_pcb_routed_bottom_3d.png)
+
+**Still open (23 items):** 5V (4, the L2/C12/C13 buck output cluster), I2S_WS (2),
+CAM_SIOD (2), and one each of 2V8, AISEN1, AISEN2, M1_B, BISEN1, VCP1, EN,
+BOOT, I2S_DIN, CAM_PCLK, M3_IN2, UART_TX, VBUS, M3_A, SPK_N. They are the
+last few spots where the router couldn't find a path without breaking a
+rule, and are finished by hand.
+
+### Notes
+- Backups before this step: `backup/buddy_main_64x56_routed.kicad_pcb`,
+  `backup/buddy_main_4layer_unrouted.kicad_pcb`,
+  `backup/buddy_main_2layer_before_routing.kicad_pcb`.
+- The routing tools (`route/router.py`, `repair.py`, `finish*.py`, `apply.py`)
+  and the old 64 × 56 results (`route/old_64x56/`) are kept for reference.
+- `kicad-python` is installed in `C:\Users\Gavin\Downloads\kipy-site` so the
+  open PCB Editor can be edited live (`route/push_live.py`).
+
+### Next
+1. Hand-route the 23 remaining items, refill zones.
+2. Final DRC, silkscreen cleanup, fab outputs (Gerbers, drill, BOM, pick-and-place).
+3. ESP32-S3 firmware for this board (OV2640, I2S speaker and mic, DC motors).
