@@ -19,7 +19,8 @@ import time
 
 import numpy as np
 
-RES = 0.1
+import os
+RES = float(os.environ.get("ROUTER_RES", "0.1"))
 X0, Y0 = 99.9, 99.9
 CLR = 0.15            # board clearance rule
 MARGIN = 0.10         # raster safety margin (half a cell diagonal)

@@ -29,8 +29,38 @@ def track_key(layer, xa, ya, xb, yb, w):
     return (layer,) + (a + b if a <= b else b + a) + (q(w),)
 
 
+def split_t_junctions(tracks):
+    """KiCad joins wires only at endpoints: split a wire wherever another wire of the same net ends on it."""
+    out = [list(t) for t in tracks]
+    changed = True
+    while changed:
+        changed = False
+        ends = {}
+        for t in out:
+            ends.setdefault((t[6], t[0]), set()).update([(round(t[1], 3), round(t[2], 3)), (round(t[3], 3), round(t[4], 3))])
+        for idx, t in enumerate(out):
+            l, xa, ya, xb, yb, w, net = t
+            for (px, py) in ends[(net, l)]:
+                if (abs(px - xa) < 5e-4 and abs(py - ya) < 5e-4) or (abs(px - xb) < 5e-4 and abs(py - yb) < 5e-4):
+                    continue
+                dx, dy = xb - xa, yb - ya
+                L2 = dx * dx + dy * dy
+                if L2 < 1e-9:
+                    continue
+                u = ((px - xa) * dx + (py - ya) * dy) / L2
+                if 0 < u < 1 and abs(xa + u * dx - px) < 2e-3 and abs(ya + u * dy - py) < 2e-3:
+                    out[idx] = [l, xa, ya, px, py, w, net]
+                    out.append([l, px, py, xb, yb, w, net])
+                    changed = True
+                    break
+            if changed:
+                break
+    return out
+
+
+
 want_t = {}
-for l, xa, ya, xb, yb, w, net in routes["tracks"]:
+for l, xa, ya, xb, yb, w, net in split_t_junctions(routes["tracks"]):
     want_t[track_key(l, xa, ya, xb, yb, w)] = (l, xa, ya, xb, yb, w, net)
 want_v = {}
 for x, y, d, dr, net in routes["vias"]:
