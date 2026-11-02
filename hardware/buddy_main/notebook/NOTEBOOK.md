@@ -6,6 +6,30 @@ are in `img/`.
 
 ---
 
+## Status at a glance (2026-11-02)
+
+| | |
+|---|---|
+| **Board** | 72 × 62 mm, 4 layers (signal / GND plane / 3V3 plane / signal), 4 mm rounded corners, ESP32 antenna overhanging the top edge |
+| **Schematic** | 4 hierarchical sheets, 92 parts, ERC: 0 errors (2 intentional warnings) |
+| **Placement** | Done. 0 courtyard overlaps |
+| **Routing** | 881 tracks and 255 vias, every trace exactly 45° or 90°. KiCad DRC: 0 errors (1 harmless thermal-relief note) |
+| **Not finished** | **23 connections are still open** (listed in Entry 5), so the board **must not be ordered yet** |
+| **3D models** | All 92 parts have one; two (XT30 plug, 2920 fuse) are simplified generated models |
+| **Firmware** | None for this board yet. `firmware/buddy_p4` is for the ESP32-P4 and won't run on it |
+
+**Where things are** (`hardware/buddy_main/`): `buddy_main.kicad_pro` and the
+`.kicad_sch` / `.kicad_pcb` files; `3d/` (generated models); `route/` (routing
+tools and logs); `backup/` (earlier board versions); `notebook/` (this file,
+`bom.csv`, and `img/`).
+
+**Contents:** Entry 1 requirements and architecture · Entry 2 schematic ·
+Entry 3 compact layout · Entry 4 four layers (first routing attempts) ·
+Entry 5 more room and 45°/90° routing · Entry 6 current state, bring-up plan,
+open decisions · Appendix: parts list.
+
+---
+
 ## Entry 1 · 2026-10-29 · Requirements and architecture
 
 ### Requirements 
@@ -348,6 +372,8 @@ must not be edited behind its back.
 ![Routed board, bottom](img/11_pcb_routed_bottom_3d.png)
 
 ### Status
+*(Superseded by Entry 5: the board grew to 72 × 62 mm and routing improved.)*
+
 Everything routed is **DRC-clean**. A final DRC lists **35 open ratsnest
 items** that still need finishing: they sit at the tightest spots (the two
 DRV8833 motor drivers, the ESP32's lower-left pins, the camera connector and
@@ -424,3 +450,149 @@ rule, and are finished by hand.
 1. Hand-route the 23 remaining items, refill zones.
 2. Final DRC, silkscreen cleanup, fab outputs (Gerbers, drill, BOM, pick-and-place).
 3. ESP32-S3 firmware for this board (OV2640, I2S speaker and mic, DC motors).
+
+---
+
+## Entry 6 · 2026-11-02 · State check, bring-up plan, open decisions
+
+### State of the board (checked, not assumed)
+| Check | Result |
+|---|---|
+| File | `buddy_main.kicad_pcb`, unchanged since the Entry 5 install |
+| Size / layers | 72.0 × 62.0 mm, 4 copper layers |
+| Copper | 881 tracks, 255 vias, four zones (GND on both outer layers and In1, 3V3 on In2) |
+| KiCad DRC | 0 errors; one `starved_thermal` note on a ground pad |
+| Open connections | **23 items**, as listed in Entry 5 |
+| Live editing | `kicad-python` connects to the open PCB Editor (KiCad 10.0.3) and reads the board correctly. Hand-routing of the 23 items has **not started** |
+
+The board is therefore good for review but **not ready to fabricate**: 23
+connections are unrouted, including part of the 5V buck output (L2/C12/C13),
+the camera I2C and pixel clock, and three motor-driver sense/charge-pump nets.
+
+### What is still to do, in order
+1. Route the 23 open connections (hand-route in the PCB Editor, or move a part
+   where a path physically doesn't exist), then refill zones and re-run DRC.
+2. Silkscreen cleanup (the DRC run lists about 210 silkscreen and library
+   warnings, none electrical).
+3. Fab outputs: Gerbers, drill files, BOM, pick-and-place. Pick JLCPCB part
+   numbers for the BOM (not assigned yet).
+4. Firmware for the ESP32-S3.
+
+### Bring-up plan (written before the first board exists)
+1. **No power:** with a multimeter, check VSYS, 3V3 and 5V are not shorted to
+   GND, and that the battery pins and the USB VBUS pin are not shorted to each
+   other.
+2. **USB only:** the green power LED (D4) should light; measure 3V3 (about
+   3.3 V) and 5V. On USB alone 5V runs close to dropout, about 4.3 V, which
+   the speaker amp accepts (decision D4).
+3. **Battery, current-limited:** use a bench supply at 7.4 V with a low current
+   limit first, then a real 2S LiPo. Protection trips at 9.72 V (over) and
+   6.12 V (under), and the input survives reversed polarity down to -40 V
+   (decision D2). Don't test reverse polarity on purpose with a real LiPo;
+   if you want to confirm it, do it with a current-limited bench supply.
+4. **Flash over USB-C** (hold BOOT, tap RESET if needed); UART header J4 is the
+   backup path.
+5. Peripherals one at a time: status LED, mic, speaker, camera, then each motor
+   with the wheels off the ground.
+
+### Open decisions and risks
+- **Microphone:** J9 is a plug-in socket for an INMP441 module (pins: 1 3V3,
+  2 GND, 3 data, 4 word-select, 5 bit-clock, 6 GND; the module's L/R pin
+  goes to GND). A mic soldered on the board is possible but needs a sound hole
+  through the PCB. Undecided.
+- **Camera pinout:** the 24-pin connector uses the common OV2640 "ESP32-CAM"
+  pinout. This has **not** been checked against the actual camera's datasheet.
+  Check it before ordering.
+- **No on-board charger:** charge the LiPo with a balance charger off the robot.
+- **Antenna:** the ESP32 antenna sticks past the top edge. The enclosure must
+  leave it clear of metal and the battery.
+- **Generated 3D models:** J1 (XT30) and F1 (2920 fuse) use simple box models
+  from `3d/make_models.py`. Good for fit checks, not for pictures.
+- **Motor current:** each DRV8833 bridge is limited to 2 A by the 0.1 Ω sense
+  resistors. Stalled motors are limited, not protected from heating, so use
+  motors that can take 2 A.
+
+### Related work outside this board: robot firmware lag
+The Buddy robot running on the Waveshare ESP32-P4 board was slow, with a laggy
+camera and a mic and speaker that seemed dead. Video, mic, speaker and drive
+commands share one websocket through a phone hotspot to a cloud server, and
+the 448 × 448 video I had set earlier (quality 70, 15 fps) most likely
+flooded the link. Changes to `firmware/buddy_p4/buddy_p4.ino`:
+- Video now defaults to 320 × 320, quality 55, up to 12 fps.
+- Only one video frame is in flight; frames are skipped (not even encoded)
+  while the last one is still sending.
+- The frame rate slows itself down when sends take long, so audio and drive
+  commands get through.
+- A status line every 3 s: `[net] video fps, KB/s, send ms/frame, gap, wifi dBm`.
+- `AEC_LOW_COST` option for a lighter echo canceller.
+
+This was written but **not yet tested on the robot**. The cause is a best
+guess from reading the code; the `[net]` lines will confirm or rule it out.
+
+### Lessons from the routing work
+- Grid-router bugs looked like board problems. The supply net routed in 14 s
+  when alone and failed only because other nets kept tearing it up; the fix was
+  to route supplies first and freeze them.
+- KiCad joins wires only at endpoints, so a branch that starts mid-wire counts
+  as open. Everything is now split at junctions.
+- Using KiCad's own DRC as the judge, and keeping a result only if DRC stayed
+  clean, was what finally made the routing trustworthy.
+
+---
+
+## Appendix · Parts list (from `bom.csv`)
+
+50 line items, 92 parts. Generated from the schematic with `kicad-cli sch export bom`.
+
+| Qty | Reference | Value | Footprint |
+|---|---|---|---|
+| 1 | C1 | 100uF 16V | CP_Elec_6.3x7.7 |
+| 5 | C2,C4,C9,C22,C26 | 10uF 25V | C_1206_3216Metric |
+| 12 | C3,C5,C6,C10,C11,C19,C20,C23,C27,C32,C33,C36 | 100nF | C_0603_1608Metric |
+| 5 | C7,C8,C12,C13,C18 | 22uF 10V | C_0805_2012Metric |
+| 8 | C14-C17,C21,C34,C35,C37 | 1uF | C_0603_1608Metric |
+| 2 | C24,C28 | 10nF 16V | C_0603_1608Metric |
+| 2 | C25,C29 | 2.2uF | C_0603_1608Metric |
+| 1 | C30 | 47uF 16V | CP_Elec_6.3x7.7 |
+| 1 | C31 | 10uF 10V | C_0805_2012Metric |
+| 1 | D1 | SMBJ24CA | D_SMB |
+| 1 | D2 | SMAJ5.0A | D_SMA |
+| 1 | D3 | SS34 | D_SMA |
+| 1 | D4 | PWR green | LED_0603_1608Metric |
+| 1 | D5 | STATUS blue | LED_0603_1608Metric |
+| 1 | F1 | PTC 3A hold | Fuse_2920_7451Metric |
+| 1 | F2 | PTC 1.1A hold | Fuse_1206_3216Metric |
+| 1 | J1 | XT30 BATTERY | AMASS_XT30U-M_1x02_P5.0mm_Vertical |
+| 1 | J2 | JST-PH BATTERY | JST_PH_B2B-PH-K_1x02_P2.00mm_Vertical |
+| 1 | J3 | USB-C | USB_C_Receptacle_GCT_USB4105-xx-A_16P_TopMnt_Horizontal |
+| 1 | J4 | UART DEBUG | PinHeader_1x04_P2.54mm_Vertical |
+| 1 | J5 | MOTOR 1 | JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical |
+| 1 | J6 | MOTOR 2 | JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical |
+| 1 | J7 | MOTOR 3 | JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical |
+| 1 | J8 | SPEAKER 4-8R | JST_PH_B2B-PH-K_1x02_P2.00mm_Vertical |
+| 1 | J9 | I2S MIC (INMP441) | PinSocket_1x06_P2.54mm_Vertical |
+| 1 | J10 | CAMERA OV2640 24P | Hirose_FH12-24S-0.5SH_1x24-1MP_P0.50mm_Horizontal |
+| 1 | L1 | 4.7uH | L_Bourns_SRN6045TA |
+| 1 | L2 | 6.8uH | L_Bourns_SRN6045TA |
+| 1 | Q1 | Si4214DDY | SOIC-8_3.9x4.9mm_P1.27mm |
+| 2 | R1,R18 | 1M | R_0603_1608Metric |
+| 2 | R2,R6 | 33k | R_0603_1608Metric |
+| 1 | R3 | 56k | R_0603_1608Metric |
+| 3 | R4,R5,R13 | 100k | R_0603_1608Metric |
+| 2 | R7,R12 | 1k | R_0603_1608Metric |
+| 5 | R8,R9,R14,R19,R20 | 10k | R_0603_1608Metric |
+| 2 | R10,R11 | 5.1k | R_0603_1608Metric |
+| 3 | R15-R17 | 0.1R 1206 | R_1206_3216Metric |
+| 2 | R21,R22 | 4.7k | R_0603_1608Metric |
+| 1 | SW1 | POWER | SW_SPDT_PCM12 |
+| 1 | SW2 | RESET | SW_SPST_PTS810 |
+| 1 | SW3 | BOOT | SW_SPST_PTS810 |
+| 1 | U1 | LTC4365TS8 | TSOT-23-8 |
+| 1 | U2 | AP63203WU | TSOT-23-6 |
+| 1 | U3 | AP63205WU | TSOT-23-6 |
+| 1 | U4 | XC6206P282MR | SOT-23-3 |
+| 1 | U5 | XC6206P122MR | SOT-23-3 |
+| 1 | U6 | ESP32-S3-WROOM-1-N16R8 | ESP32-S3-WROOM-1 |
+| 1 | U7 | USBLC6-2SC6 | SOT-23-6 |
+| 2 | U8,U9 | DRV8833PWP | HTSSOP-16-1EP_4.4x5mm_P0.65mm_EP3.4x5mm_Mask2.46x2.31mm_ThermalVias |
+| 1 | U10 | MAX98357A | TQFN-16-1EP_3x3mm_P0.5mm_EP1.23x1.23mm |
