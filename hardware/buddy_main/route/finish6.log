@@ -1,0 +1,13 @@
+ripped plane vias in region: 16
+fan-out kept: 80 vias, 80 stubs
+to route: [('/Motor Drivers/BISEN1', ('U8', '6')), ('/Motor Drivers/AISEN1', ('R15', '1')), ('/Motor Drivers/AISEN2', ('R17', '1')), ('/Motor Drivers/M1_B', ('U8', '4')), ('/Motor Drivers/M3_A', ('J7', '1')), ('CAM_PCLK', ('J10', '17')), ('CAM_SIOD', ('J10', '3')), ('CAM_SIOD', ('U6', '4'))]
+  no path: /Motor Drivers/BISEN1 -> ('U8', '6')
+  no path: /Motor Drivers/AISEN1 -> ('R15', '1')
+  routed /Motor Drivers/AISEN2 -> ('R17', '1'): 13 segments, 4 vias
+  no path: /Motor Drivers/M1_B -> ('U8', '4')
+  routed /Motor Drivers/M3_A -> ('J7', '1'): 9 segments, 2 vias
+  no path: CAM_PCLK -> ('J10', '17')
+  no path: CAM_SIOD -> ('J10', '3')
+  no path: CAM_SIOD -> ('U6', '4')
+plane fan-out: 95 vias, skipped [['GND', ['U9', '13']]]
+result: 7 violations, 12 open items, still unrouted: [('/Motor Drivers/BISEN1', ('U8', '6')), ('/Motor Drivers/AISEN1', ('R15', '1')), ('/Motor Drivers/M1_B', ('U8', '4')), ('CAM_PCLK', ('J10', '17')), ('CAM_SIOD', ('J10', '3')), ('CAM_SIOD', ('U6', '4'))]

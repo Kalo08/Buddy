@@ -1,0 +1,128 @@
+"""Try each unrouted connection one at a time; keep it only if DRC stays clean.
+
+Starts from routes.json (the clean state), writes routes.json when done.
+"""
+import copy
+import json
+import math
+import subprocess
+import sys
+
+sys.argv = [sys.argv[0], "geom.json"]
+import router as R
+R.NARROW = 0.15
+R.VIA[0.15] = (0.6, 0.3)
+R.MARGIN = 0.04
+R.VIA_COST = 25.0
+R.BEND_COST = 1.5
+
+KPY = "C:/Users/Gavin/Downloads/bin/python.exe"
+KCLI = "C:/Users/Gavin/Downloads/bin/kicad-cli.exe"
+data = json.load(open("routes.json"))
+key_of = {i: (c[0], c[1]) for i, c in enumerate(R.conns)}
+idx_of = {v: k for k, v in key_of.items()}
+for c in data["conns"]:
+    R.routes[(c["net"], tuple(c["key"]))] = {"net": c["net"], "tracks": [tuple(t) for t in c["tracks"]],
+                                               "vias": [tuple(v) for v in c["vias"]]}
+# Stage: rip the plane vias around the motor drivers, route the stuck nets first, then re-place the vias
+REGION = (148.0, 100.0, 166.0, 135.0)          # x1, y1, x2, y2 (mm)
+pad_at = {}
+for key, pin in R.pins.items():
+    if pin["net"] in R.PLANES:
+        for p in pin["pads"]:
+            pad_at[(round(p["x"], 2), round(p["y"], 2), pin["net"])] = key
+via_by_stub = {}
+keep_t, keep_v, ripped = [], [], set()
+for t in data["tracks"]:
+    if t[6] not in R.PLANES:
+        continue
+    near = [v for v in data["vias"] if v[4] == t[6] and abs(v[0] - t[3]) < 1e-3 and abs(v[1] - t[4]) < 1e-3]
+    inreg = near and REGION[0] <= near[0][0] <= REGION[2] and REGION[1] <= near[0][1] <= REGION[3]
+    if inreg:
+        k = pad_at.get((round(t[1], 2), round(t[2], 2), t[6]))
+        if k:
+            ripped.add(k)
+            continue
+    keep_t.append(t)
+    keep_v += near
+R.fanout["tracks"] = keep_t
+R.fanout["vias"] = keep_v
+for l, xa, ya, xb, yb, w, net in R.fanout["tracks"]:
+    (j0, j1, i0, i1), m = R.raster_segment(xa, ya, xb, yb, w / 2)
+    R.pad_owner[l, j0:j1, i0:i1][m] = R.net_id[net]
+    R.fan_owner[l, j0:j1, i0:i1][m] = R.net_id[net]
+for x, y, d, dr, net in R.fanout["vias"]:
+    (j0, j1, i0, i1), m = R.raster_segment(x, y, x, y, d / 2)
+    for li in (0, 1):
+        R.pad_owner[li, j0:j1, i0:i1][m] = R.net_id[net]
+        R.fan_owner[li, j0:j1, i0:i1][m] = R.net_id[net]
+        R.pad_any[li, j0:j1, i0:i1] |= m
+print("ripped plane vias in region:", len(ripped), flush=True)
+print("fan-out kept:", len(R.fanout["vias"]), "vias,", len(R.fanout["tracks"]), "stubs", flush=True)
+R.FROZEN.update(R.net_id[n] for n in R.POWER if n in R.net_id and any(k[0] == n for k in R.routes))
+
+
+def reset_state():
+    for net, k in R.seeds.items():
+        R.connected[net] = {k}
+    for (net, key) in R.routes:
+        R.connected[net].add(key)
+    R.rebuild()
+
+
+def save():
+    out = {"tracks": list(R.fanout["tracks"]), "vias": list(R.fanout["vias"]), "failed": [],
+           "fanout_skipped": R.fanout["skipped"], "conns": []}
+    for (net, key), r in R.routes.items():
+        out["tracks"] += [[l, a, b, c, d, w, net] for l, a, b, c, d, w in r["tracks"]]
+        out["vias"] += [[x, y, d, dr, net] for x, y, d, dr in r["vias"]]
+        out["conns"].append({"net": net, "key": list(key), "tracks": [list(t) for t in r["tracks"]],
+                             "vias": [list(v) for v in r["vias"]]})
+    out["failed"] = [[n, list(k)] for (n, k) in (key_of[c] for c in range(len(R.conns))) if (n, k) not in R.routes]
+    json.dump(out, open("routes.json", "w"))
+
+
+def drc_count():
+    save()
+    subprocess.run([KPY, "apply.py", "work.kicad_pcb", "routed.kicad_pcb", "buddy_main.ses"], check=True, capture_output=True)
+    subprocess.run([KCLI, "pcb", "drc", "--severity-error", "--format", "json", "--all-track-errors",
+                    "-o", "drc_try.json", "routed.kicad_pcb"], check=True, capture_output=True)
+    d = json.load(open("drc_try.json"))
+    unconn = [u for u in d["unconnected_items"]
+              if not all("GND_" in i["description"] for i in u["items"])]
+    return len(d["violations"]), len(unconn)
+
+
+def route_one(ci):
+    net, key = key_of[ci]
+    res = R.route_conn(net, key, allow_soft=False, full_board=True)
+    if res is None:
+        res = R.route_conn(net, key, allow_soft=True, full_board=True)
+    if res is None:
+        return None
+    tracks, vias, cells = res
+    victims = {key_of[v][0] for v in R.victims_of(cells, net)} - {net}
+    return tracks, vias, cells, victims
+
+
+R.MARGIN = 0.04
+R.MARGIN = 0.04
+todo = [ci for ci in range(len(R.conns)) if key_of[ci] not in R.routes]
+print("to route:", [key_of[c] for c in todo], flush=True)
+reset_state()
+miss = []
+for ci in sorted(todo, key=lambda c: (0 if key_of[c][0] in R.POWER else 1, c)):
+    net, key = key_of[ci]
+    res = R.route_conn(net, key, allow_soft=False, full_board=True)
+    if res is None:
+        miss.append((net, key))
+        print(f"  no path: {net} -> {key}", flush=True)
+        continue
+    tracks, vias, _c = res
+    R.routes[(net, key)] = {"net": net, "tracks": tracks, "vias": vias}
+    R.paint((net, key), R.net_id[net], ci)
+    R.connected[net].add(key)
+    print(f"  routed {net} -> {key}: {len(tracks)} segments, {len(vias)} vias", flush=True)
+R.plane_fanout(only=ripped, preplaced=[(v[0], v[1]) for v in R.fanout["vias"]])
+v, u = drc_count()
+print(f"result: {v} violations, {u} open items, still unrouted: {miss}")

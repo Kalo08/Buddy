@@ -1,0 +1,22 @@
+fan-out kept: 96 vias, 96 stubs
+baseline: 1 violations, 23 open items, 18 unrouted
+  skip /Motor Drivers/BISEN1 -> ('U8', '6'): no path
+  skip /Motor Drivers/AISEN1 -> ('R15', '1'): no path
+  undo /Motor Drivers/AISEN2 -> ('R17', '1')
+  skip /Motor Drivers/M1_B -> ('U8', '4'): no path
+  undo /Motor Drivers/M3_A -> ('J7', '1')
+  KEPT VBUS -> ('U7', '5') (moved [])
+  KEPT 5V -> ('C13', '1') (moved [])
+  KEPT 5V -> ('C12', '1') (moved [])
+  KEPT 5V -> ('L2', '2') (moved [])
+  KEPT 5V -> ('U3', '1') (moved [])
+  KEPT /Motor Drivers/VCP1 -> ('C24', '1') (moved [])
+  KEPT M3_IN2 -> ('U6', '25') (moved [])
+  KEPT 2V8 -> ('C34', '1') (moved [])
+  undo CAM_PCLK -> ('J10', '17')
+  undo CAM_SIOD -> ('J10', '3')
+  undo CAM_SIOD -> ('U6', '4')
+  KEPT I2S_WS -> ('J9', '4') (moved [])
+  KEPT I2S_WS -> ('U6', '35') (moved [])
+final: 1 violations, 14 open items; kept 10, left open 8
+open: [('/Motor Drivers/BISEN1', ('U8', '6')), ('/Motor Drivers/AISEN1', ('R15', '1')), ('/Motor Drivers/AISEN2', ('R17', '1')), ('/Motor Drivers/M1_B', ('U8', '4')), ('/Motor Drivers/M3_A', ('J7', '1')), ('CAM_PCLK', ('J10', '17')), ('CAM_SIOD', ('J10', '3')), ('CAM_SIOD', ('U6', '4'))]

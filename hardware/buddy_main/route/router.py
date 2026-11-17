@@ -505,15 +505,15 @@ def victims_of(cells, net):
 fanout = {"tracks": [], "vias": [], "skipped": []}
 
 
-def plane_fanout():
+def plane_fanout(only=None, preplaced=()):
     """Stub + via from every SMD pad of a plane net down to its inner plane.
 
     The stubs and vias become static copper (pad_owner) so signal routing
     treats them like pads and never rips them up.
     """
     VD, VDR = 0.6, 0.3
-    placed = []
-    keys = [k for k, v in pins.items() if v["net"] in PLANES]
+    placed = list(preplaced)
+    keys = [k for k, v in pins.items() if v["net"] in PLANES and (only is None or k in only)]
     # tightest pads first: smallest pad gets first pick of via sites
     keys.sort(key=lambda k: min(p["bbox"][2] - p["bbox"][0] for p in pins[k]["pads"]) *
               min(p["bbox"][3] - p["bbox"][1] for p in pins[k]["pads"]))

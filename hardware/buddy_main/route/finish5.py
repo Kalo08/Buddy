@@ -24,7 +24,20 @@ idx_of = {v: k for k, v in key_of.items()}
 for c in data["conns"]:
     R.routes[(c["net"], tuple(c["key"]))] = {"net": c["net"], "tracks": [tuple(t) for t in c["tracks"]],
                                                "vias": [tuple(v) for v in c["vias"]]}
-R.plane_fanout()
+# keep the ground / 3V3 stubs and vias exactly where they are (never recompute them on a new grid)
+R.fanout["tracks"] = [t for t in data["tracks"] if t[6] in R.PLANES]
+R.fanout["vias"] = [v for v in data["vias"] if v[4] in R.PLANES]
+for l, xa, ya, xb, yb, w, net in R.fanout["tracks"]:
+    (j0, j1, i0, i1), m = R.raster_segment(xa, ya, xb, yb, w / 2)
+    R.pad_owner[l, j0:j1, i0:i1][m] = R.net_id[net]
+    R.fan_owner[l, j0:j1, i0:i1][m] = R.net_id[net]
+for x, y, d, dr, net in R.fanout["vias"]:
+    (j0, j1, i0, i1), m = R.raster_segment(x, y, x, y, d / 2)
+    for li in (0, 1):
+        R.pad_owner[li, j0:j1, i0:i1][m] = R.net_id[net]
+        R.fan_owner[li, j0:j1, i0:i1][m] = R.net_id[net]
+        R.pad_any[li, j0:j1, i0:i1] |= m
+print("fan-out kept:", len(R.fanout["vias"]), "vias,", len(R.fanout["tracks"]), "stubs", flush=True)
 R.FROZEN.update(R.net_id[n] for n in R.POWER if n in R.net_id and any(k[0] == n for k in R.routes))
 
 
